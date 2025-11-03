@@ -1,3 +1,7 @@
+project:
+  output-dir: "_output"
+output-file: "template.pdf"
+keep-typ: false
 execute:
   echo: false
   warning: false
