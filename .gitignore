@@ -1,0 +1,15 @@
+/.quarto/
+**/*.quarto_ipynb
+.Rproj.user
+#.Rprofile
+#renv*
+_extensions/academiccvtemplate/typst/metadata.typ
+_extensions/academiccvtemplate/typst/trash.typ
+_extensions/academiccvtemplate/lua/dump_ast_to_file.lua
+_extensions/academiccvtemplate/lua/metadata_filter_debug.lua
+_extensions/academiccvtemplate/lua/metadata_to_ast_filter.lua
+_src/
+.Rbuildignore
+.Rhistory
+template.typ
+_output/
