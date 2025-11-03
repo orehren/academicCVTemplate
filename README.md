@@ -1,4 +1,4 @@
-# AcademicCVtoolsTemplate Typst
+# AcademicCVTemplate Typst
 
 ## Installing
 
