@@ -17,7 +17,8 @@ contributes:
       # include-in-header:
       #   - file: typst/metadata.typ
       filters:
-        - at: post-ast
+        - path: lua/extract-cover-letter.lua
+        - at: ast
           path: lua/inject_metadata.lua
       keep-typ: true
       template-partials:
