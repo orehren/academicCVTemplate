@@ -18,8 +18,7 @@ contributes:
       #   - file: typst/metadata.typ
       filters:
         - path: lua/extract-cover-letter.lua
-        - at: ast
-          path: lua/inject_metadata.lua
+        - path: lua/inject_metadata.lua
       keep-typ: true
       template-partials:
         - typst/typst-template.typ

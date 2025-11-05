@@ -31,15 +31,7 @@ stringify_pandoc_object = function(obj)
   end
 end
 
-to_typst_value = function(val, key)
-  if key == "cover_letter_content" then
-    if val and val.text then
-      return val.text
-    else
-      return "none"
-    end
-  end
-
+to_typst_value = function(val)
   if val == nil then
     return "none"
   end
@@ -84,14 +76,10 @@ function M.Pandoc(doc)
   local quarto_meta = doc.meta or {}
   local typst_definitions = {}
 
-  if not quarto_meta.cover_letter_content then
-    quarto_meta.cover_letter_content = pandoc.MetaString("none")
-  end
-
   for key, value in pairs(quarto_meta) do
     local typst_var_name = key
 
-    local typst_val_str = to_typst_value(value, key)
+    local typst_val_str = to_typst_value(value)
 
     if type(typst_var_name) == 'string' and typst_var_name ~= "" and
        typst_val_str and typst_val_str ~= "" and typst_val_str ~= "none" and
