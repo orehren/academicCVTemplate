@@ -13,6 +13,9 @@ contributes:
         color-accent: "#dc3522"
         font-header: ["Roboto", "Arial", "Dejavu Sans"]
         font-text: ["Source Sans Pro", "Arial", "Dejavu Sans"]
+      surpress-bibliography: true
+      bibliographystyle: "assets/bib/apa-cv.csl"
+      bibliography: "assets/bib/bibliography.bib"
     typst:
       # include-in-header:
       #   - file: typst/metadata.typ

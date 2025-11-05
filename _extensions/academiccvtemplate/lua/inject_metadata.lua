@@ -1,16 +1,14 @@
---- incject_metadata.lua – filter to auto inject metadata into typst template.
+--- inject_metadata.lua - a Lua filter to automatically inject document metadata
+--- into a Typst template.
 ---
---- DESCRIPTION: Reads all metadata from the YAML-Header of a qmd file and
---- transforms the key-value pairs into code strings with typst syntax for
---- variables definitions, e.g.  `#let var1 = "val1"`. The rendered content
---- is then saved to the file `typst/typst-metadata.typ` as a partial
---- in the folder of the extension. The resulting file is then imported
---- via `#import "_extensions/academiccvtoolstemplate/typst/metadata.typ": *`)
---- as a modul at the start of the Template file.
+--- This filter reads all metadata from the YAML header of a .qmd file,
+--- converts the key-value pairs into Typst variable definitions
+--- (e.g., `#let my_variable = "my_value"`), and writes them to the
+--- `typst/metadata.typ` partial file. This makes all YAML metadata
+--- available as variables within the Typst templates.
 ---
---- Providing metadata is fully automated. This allows you to extend the YAML
---- header with new key-value pairs as desired, without having to make any
---- code adjustments (e.g., in `typst-show.typ`).
+--- This process is fully automated, allowing users to add new keys to the
+--- YAML header without needing to modify any other code.
 ---
 --- Copyright: © 2025 Oliver Rehren
 --- License:   MIT – see LICENSE file for details
@@ -20,6 +18,7 @@ local M = {}
 local to_typst_value
 local stringify_pandoc_object
 
+-- Converts any Pandoc object to a string.
 stringify_pandoc_object = function(obj)
   if obj == nil then return nil end
   if pandoc and pandoc.utils and pandoc.utils.stringify then
@@ -31,6 +30,7 @@ stringify_pandoc_object = function(obj)
   end
 end
 
+-- Recursively converts a Lua object (from Pandoc metadata) into a Typst value string.
 to_typst_value = function(val)
   if val == nil then
     return "none"
@@ -78,14 +78,12 @@ function M.Pandoc(doc)
 
   for key, value in pairs(quarto_meta) do
     local typst_var_name = key
-
     local typst_val_str = to_typst_value(value)
 
     if type(typst_var_name) == 'string' and typst_var_name ~= "" and
        typst_val_str and typst_val_str ~= "" and typst_val_str ~= "none" and
        not typst_val_str:match("^%(%s*%/%*%s*Unhandled") then
-
-        table.insert(typst_definitions, "#let " .. typst_var_name .. " = (" .. typst_val_str .. ")")
+        table.insert(typst_definitions, "#let " .. typst_var_name .. " = " .. typst_val_str)
     end
   end
 

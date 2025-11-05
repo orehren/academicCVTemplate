@@ -10,6 +10,20 @@
   color-accent,
   text-style-header
 ) = {
+  // --- Helper function to find contact info by icon ---
+  let find_contact(icon_name) = {
+    let item = author.contact.find(item => item.icon == icon_name)
+    if item != none {
+      if "url" in item {
+        link(item.url, item.text)
+      } else {
+        item.text
+      }
+    } else {
+      ""
+    }
+  }
+
   // --- Header ---
   // Using a grid to align sender and recipient information.
   grid(
@@ -17,9 +31,9 @@
     gutter: 2em,
     [
       #text(fill: color-accent, weight: "bold", author.firstname + " " + author.lastname) \
-      #author.contact.at(0).text \
-      #author.contact.at(1).text \
-      #link("mailto:" + author.contact.at(2).text, author.contact.at(2).text)
+      #find_contact("fa address-card") \
+      #find_contact("fa mobile-screen") \
+      #find_contact("fa envelope")
     ],
     [
       #recipient.name \
