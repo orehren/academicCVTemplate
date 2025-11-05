@@ -42,7 +42,7 @@
 
   // --- Closing ---
   v(2em)
-  "Sincerely," \
+  "Sincerely,"
   v(1em)
   author.firstname + " " + author.lastname
 }

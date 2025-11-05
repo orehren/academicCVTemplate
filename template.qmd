@@ -31,7 +31,7 @@ author:
       text: "Your GitHub Page"
       url: "Link To Your GitHub Page"
     - icon: fa linkedin
-      text: LinkedIn
+      text: "LinkedIn"
       url: "Link To Your LinkedIn Account"
 
 # -- Cover Letter Information --------------------------------------
