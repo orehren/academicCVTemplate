@@ -42,7 +42,7 @@
         ],
 
         grid.cell(x: 2, y: 1, align: right + bottom)[
-            #if profile-photo != none {
+            #if profile-photo != none and profile-photo != "" {
                 image(profile-photo, width: 100pt)
             }
         ],

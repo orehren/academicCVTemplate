@@ -47,7 +47,7 @@ subject: "The subject of the cover letter"
 # -- Core CV Content -----------------------------------------------
 # These fields provide main content blocks to the template.
 position: "Your Position" # Either your current position or the position you are applying for
-profile-photo: "Path To Your Profile Picture" # Optional path to a photo
+profile-photo: "assets/picture.jpg" # Optional path to a photo
 aboutme: |
   Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
   eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam 
