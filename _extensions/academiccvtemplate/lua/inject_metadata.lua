@@ -83,7 +83,8 @@ function M.Pandoc(doc)
     if type(typst_var_name) == 'string' and typst_var_name ~= "" and
        typst_val_str and typst_val_str ~= "" and typst_val_str ~= "none" and
        not typst_val_str:match("^%(%s*%/%*%s*Unhandled") then
-        table.insert(typst_definitions, "#let " .. typst_var_name .. " = " .. typst_val_str)
+        -- table.insert(typst_definitions, "#let " .. typst_var_name .. " = " .. typst_val_str)
+        table.insert(typst_definitions, "#let " .. typst_var_name .. " = (" .. typst_val_str .. ")")
     end
   end
 

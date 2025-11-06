@@ -1,5 +1,9 @@
 project:
   output-dir: "_output"
+  render:
+    - "*.qmd"
+    - "!USAGE.md"
+    - "!README.md"
 output-file: "template.pdf"
 keep-typ: false
 execute:

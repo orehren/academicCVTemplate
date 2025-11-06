@@ -14,8 +14,8 @@ contributes:
         font-header: ["Roboto", "Arial", "Dejavu Sans"]
         font-text: ["Source Sans Pro", "Arial", "Dejavu Sans"]
       surpress-bibliography: true
-      bibliographystyle: "assets/bib/apa-cv.csl"
-      bibliography: "assets/bib/bibliography.bib"
+      #bibliography: "assets/bib/bibliography.bib"
+      #bibliographystyle: "assets/bib/apa-cv.csl"
     typst:
       # include-in-header:
       #   - file: typst/metadata.typ
