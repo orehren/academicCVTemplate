@@ -16,9 +16,8 @@ contributes:
       surpress-bibliography: true
       #bibliography: "assets/bib/bibliography.bib"
       #bibliographystyle: "assets/bib/apa-cv.csl"
+      profile-photo: "assets/images/picture.jpg"
     typst:
-      # include-in-header:
-      #   - file: typst/metadata.typ
       filters:
         - path: lua/correct-path.lua
         - path: lua/inject_metadata.lua

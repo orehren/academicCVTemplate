@@ -1,10 +1,7 @@
 project:
-  output-dir: "_output"
-  render:
-    - "*.qmd"
-    - "!USAGE.md"
-    - "!README.md"
-output-file: "template.pdf"
+  type: default
+  output-dir: _output
+output-file: "Curriculum_Vitae"
 keep-typ: false
 execute:
   echo: false
