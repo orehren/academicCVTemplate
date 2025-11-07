@@ -23,6 +23,27 @@ local function escape_typst_string(s)
 end
 
 ---
+-- Checks if a Lua table should be treated as a Typst array
+-- (i.e., has sequential integer keys starting from 1).
+---
+local function is_typst_array(tbl)
+  -- An empty table is considered an array.
+  if next(tbl) == nil then
+    return true
+  end
+
+  local i = 1
+  for k, _ in pairs(tbl) do
+    if k ~= i then
+      return false -- Found a non-sequential or non-integer key.
+    end
+    i = i + 1
+  end
+
+  return true -- All keys were sequential integers.
+end
+
+---
 -- Recursively converts a Pandoc Meta value or raw Lua table
 -- into a Typst value string.
 ---
@@ -44,29 +65,14 @@ local function to_typ_value(val)
     return escape_typst_string(pandoc.utils.stringify(val))
 
   elseif type(val) == 'table' then
-
-    -- Manually detect if the table should be treated as a Typst array or a dictionary.
     local parts = {}
-    local is_array = true
-    local i = 1
-    for k, _ in pairs(val) do
-      if k ~= i then
-        is_array = false
-        break
-      end
-      i = i + 1
-    end
-    if #val == 0 and next(val) ~= nil then
-      is_array = false
-    end
 
-    if is_array then
+    if is_typst_array(val) then
       -- Convert to Typst Array
       for _, item in ipairs(val) do
         table.insert(parts, to_typ_value(item))
       end
       return '(' .. table.concat(parts, ", ") .. (#parts > 0 and "," or "") .. ')'
-
     else
       -- Convert to Typst Dictionary
       for key, item in pairs(val) do
