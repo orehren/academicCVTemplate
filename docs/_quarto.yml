@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: ../docs/_site # Render the website to a nested directory
+
+website:
+  title: "academicCVTemplate"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: installation.qmd
+        text: Installation
+      - href: tutorial.qmd
+        text: Tutorial
+      - href: yaml_reference.qmd
+        text: YAML Reference
+      - href: styling.qmd
+        text: Styling
+      - href: data_integration.qmd
+        text: Data Integration
+      - href: acknowledgements.qmd
+        text: Acknowledgements
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    keep-md: true # Keep the markdown files
+
+execute:
+  eval: false # Don't execute code chunks for the website
