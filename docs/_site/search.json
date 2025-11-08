@@ -1,0 +1,282 @@
+[
+  {
+    "objectID": "yaml_reference.html",
+    "href": "yaml_reference.html",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "This page provides a comprehensive reference for all the configuration options available in the YAML frontmatter of your .qmd file.\n\n\nThe main title for the generated PDF document.\nType: String Example:\ntitle: \"Application Documents of John Doe\"\n\n\n\nA nested object containing information about you.\nType: Object Fields: * firstname: Your first name. (String) * lastname: Your last name. (String) * contact: A list of your contact details. (See below) * socialmedia: A list of your social media profiles. (See below)\n\n\nA list of contact items. Each item is an object with the following fields:\n\nicon: A Font Awesome icon class (e.g., fa envelope).\ntext: The text to display.\nurl: (Optional) A URL to link to (e.g., mailto:, tel:).\n\nExample:\nauthor:\n  contact:\n    - icon: fa envelope\n      text: \"your.email@example.com\"\n      url: \"mailto:your.email@example.com\"\n    - icon: fa mobile-screen\n      text: \"+1 (555) 123-4567\"\n\n\n\nIdentical in structure to contact.\nExample:\nauthor:\n  socialmedia:\n    - icon: fa github\n      text: \"GitHub Profile\"\n      url: \"https://github.com/your-username\"\n\n\n\n\nAn object containing information about the cover letter recipient.\nType: Object Fields: * name: Full name of the recipient. * salutation: Formal salutation (e.g., “Dr. Smith”). * address: Street address. * city: City. * zip: Postal code.\n\n\n\nThe date for the cover letter.\nType: String Example: date: \"November 8, 2025\"\n\n\n\nThe subject line for the cover letter.\nType: String Example: subject: \"Application for Postdoctoral Position\"\n\n\n\nThe position you are applying for or your current title. Displayed on the CV title page.\nType: String\n\n\n\nThe path to your profile photo, relative to the project root. To disable the photo, provide an empty string.\nType: String Examples:\n# Use a photo\nprofile-photo: \"assets/images/my_photo.jpg\"\n\n# Disable the photo\nprofile-photo: \"\"\n\n\n\nA short paragraph about yourself, displayed on the CV.\nType: String (can be multi-line)\n\n\n\nAn optional quote to display on the CV.\nType: Object Fields: * text: The text of the quote. * attribution: The author of the quote.\n\n\n\nControls which documents are generated.\nType: String Options: * \"cv-only\": Renders only the CV. * \"letter-only\": Renders only the cover letter. * \"combined\": Renders the cover letter followed by the CV in a single PDF.\n\n\n\nA list of documents to append to the end of the PDF, such as certificates or transcripts. Each item is an object with:\n\nname: The title to display for the attachment.\nfile: The path to the image file of the attachment.\n\nExample:\nattachments:\n  - name: \"Master's Degree Certificate\"\n    file: \"attachments/master_cert.png\"\n  - name: \"Bachelor's Degree Certificate\"\n    file: \"attachments/bachelor_cert.png\"\n\n\n\nAn object for customizing visual styles.\nType: Object Fields: * color-accent: The main accent color for the document (hex code). * font-header: A list of fonts for headings. * font-text: A list of fonts for body text.\nExample:\nstyle:\n  color-accent: \"#005f73\"\n  font-header: [\"Lato\", \"Helvetica\", \"sans-serif\"]\n\n\n\nStandard Quarto options for controlling the bibliography.\nType: String (file path)"
+  },
+  {
+    "objectID": "yaml_reference.html#title",
+    "href": "yaml_reference.html#title",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "The main title for the generated PDF document.\nType: String Example:\ntitle: \"Application Documents of John Doe\""
+  },
+  {
+    "objectID": "yaml_reference.html#author",
+    "href": "yaml_reference.html#author",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "A nested object containing information about you.\nType: Object Fields: * firstname: Your first name. (String) * lastname: Your last name. (String) * contact: A list of your contact details. (See below) * socialmedia: A list of your social media profiles. (See below)\n\n\nA list of contact items. Each item is an object with the following fields:\n\nicon: A Font Awesome icon class (e.g., fa envelope).\ntext: The text to display.\nurl: (Optional) A URL to link to (e.g., mailto:, tel:).\n\nExample:\nauthor:\n  contact:\n    - icon: fa envelope\n      text: \"your.email@example.com\"\n      url: \"mailto:your.email@example.com\"\n    - icon: fa mobile-screen\n      text: \"+1 (555) 123-4567\"\n\n\n\nIdentical in structure to contact.\nExample:\nauthor:\n  socialmedia:\n    - icon: fa github\n      text: \"GitHub Profile\"\n      url: \"https://github.com/your-username\""
+  },
+  {
+    "objectID": "yaml_reference.html#recipient",
+    "href": "yaml_reference.html#recipient",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "An object containing information about the cover letter recipient.\nType: Object Fields: * name: Full name of the recipient. * salutation: Formal salutation (e.g., “Dr. Smith”). * address: Street address. * city: City. * zip: Postal code."
+  },
+  {
+    "objectID": "yaml_reference.html#date",
+    "href": "yaml_reference.html#date",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "The date for the cover letter.\nType: String Example: date: \"November 8, 2025\""
+  },
+  {
+    "objectID": "yaml_reference.html#subject",
+    "href": "yaml_reference.html#subject",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "The subject line for the cover letter.\nType: String Example: subject: \"Application for Postdoctoral Position\""
+  },
+  {
+    "objectID": "yaml_reference.html#position",
+    "href": "yaml_reference.html#position",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "The position you are applying for or your current title. Displayed on the CV title page.\nType: String"
+  },
+  {
+    "objectID": "yaml_reference.html#profile-photo",
+    "href": "yaml_reference.html#profile-photo",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "The path to your profile photo, relative to the project root. To disable the photo, provide an empty string.\nType: String Examples:\n# Use a photo\nprofile-photo: \"assets/images/my_photo.jpg\"\n\n# Disable the photo\nprofile-photo: \"\""
+  },
+  {
+    "objectID": "yaml_reference.html#aboutme",
+    "href": "yaml_reference.html#aboutme",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "A short paragraph about yourself, displayed on the CV.\nType: String (can be multi-line)"
+  },
+  {
+    "objectID": "yaml_reference.html#famous-quote",
+    "href": "yaml_reference.html#famous-quote",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "An optional quote to display on the CV.\nType: Object Fields: * text: The text of the quote. * attribution: The author of the quote."
+  },
+  {
+    "objectID": "yaml_reference.html#render-output",
+    "href": "yaml_reference.html#render-output",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "Controls which documents are generated.\nType: String Options: * \"cv-only\": Renders only the CV. * \"letter-only\": Renders only the cover letter. * \"combined\": Renders the cover letter followed by the CV in a single PDF."
+  },
+  {
+    "objectID": "yaml_reference.html#attachments",
+    "href": "yaml_reference.html#attachments",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "A list of documents to append to the end of the PDF, such as certificates or transcripts. Each item is an object with:\n\nname: The title to display for the attachment.\nfile: The path to the image file of the attachment.\n\nExample:\nattachments:\n  - name: \"Master's Degree Certificate\"\n    file: \"attachments/master_cert.png\"\n  - name: \"Bachelor's Degree Certificate\"\n    file: \"attachments/bachelor_cert.png\""
+  },
+  {
+    "objectID": "yaml_reference.html#style",
+    "href": "yaml_reference.html#style",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "An object for customizing visual styles.\nType: Object Fields: * color-accent: The main accent color for the document (hex code). * font-header: A list of fonts for headings. * font-text: A list of fonts for body text.\nExample:\nstyle:\n  color-accent: \"#005f73\"\n  font-header: [\"Lato\", \"Helvetica\", \"sans-serif\"]"
+  },
+  {
+    "objectID": "yaml_reference.html#bibliography-and-csl",
+    "href": "yaml_reference.html#bibliography-and-csl",
+    "title": "YAML Reference",
+    "section": "",
+    "text": "Standard Quarto options for controlling the bibliography.\nType: String (file path)"
+  },
+  {
+    "objectID": "data_integration.html",
+    "href": "data_integration.html",
+    "title": "Data Integration",
+    "section": "",
+    "text": "A key feature of this template is its ability to populate your CV by pulling data directly from a Google Sheet. This allows you to maintain your CV content in a structured way, separate from the document itself.\nThis guide provides a brief overview. For a full list of options, please refer to the documentation for the academicCVtools R package.\n\n\nAll data integration is handled by the academicCVtools R package. Ensure you have it installed as described in the Installation Guide.\nThe two key functions you will use are load_cv_sheets() and format_typst_section().\n\n\n\nThe functions expect your Google Sheet to be organized with one sheet (tab) per CV section. For example:\n\nA sheet named “Education”\nA sheet named “Working Experiences”\nA sheet named “Skills”\n\nEach row in a sheet represents an entry in that section. The column headers in your sheet will become the field names for each entry (e.g., “Degree”, “Institution”, “Year”).\n\n\n\nThe first step in your .qmd file is to load the data from your Google Sheet. This is done in the R setup chunk.\n# In the [lst-setup] R chunk\ncv_sheets &lt;- load_cv_sheets(\n  # The exact name of your Google Sheet\n  doc_identifier = \"My Academic CV Data\", \n  \n  # A list of the sheets you want to load\n  sheets_to_load = list(\n    \"Working Experiences\",\n    \"Education\",\n    \"Skills\"\n  )\n)\nThe load_cv_sheets function will authenticate with Google, download the data, and store it in the cv_sheets R object.\n\n\n\nOnce the data is loaded, you can render any section in your CV with a small R code chunk.\nTo render the “Education” section, you would add the following to your .qmd file:\n## Education\n r #| output: asis cv_sheets$Education |&gt; format_typst_section( typst_func = “#resume-entry” ) |&gt; cat() ```\n\n\n\ncv_sheets$Education: This selects the “Education” data that we loaded.\nformat_typst_section(): This function takes the data and transforms it into the raw Typst code needed to render the section.\ntypst_func = \"#resume-entry\": This tells the function to format each row of data using the #resume-entry function defined in the Typst template, which is the standard layout for a CV item.\n|&gt; cat(): This takes the generated Typst code and outputs it directly into the document.\n\nYou can create your entire CV by repeating this pattern for each section."
+  },
+  {
+    "objectID": "data_integration.html#the-academiccvtools-r-package",
+    "href": "data_integration.html#the-academiccvtools-r-package",
+    "title": "Data Integration",
+    "section": "",
+    "text": "All data integration is handled by the academicCVtools R package. Ensure you have it installed as described in the Installation Guide.\nThe two key functions you will use are load_cv_sheets() and format_typst_section()."
+  },
+  {
+    "objectID": "data_integration.html#setting-up-your-google-sheet",
+    "href": "data_integration.html#setting-up-your-google-sheet",
+    "title": "Data Integration",
+    "section": "",
+    "text": "The functions expect your Google Sheet to be organized with one sheet (tab) per CV section. For example:\n\nA sheet named “Education”\nA sheet named “Working Experiences”\nA sheet named “Skills”\n\nEach row in a sheet represents an entry in that section. The column headers in your sheet will become the field names for each entry (e.g., “Degree”, “Institution”, “Year”)."
+  },
+  {
+    "objectID": "data_integration.html#loading-the-data",
+    "href": "data_integration.html#loading-the-data",
+    "title": "Data Integration",
+    "section": "",
+    "text": "The first step in your .qmd file is to load the data from your Google Sheet. This is done in the R setup chunk.\n# In the [lst-setup] R chunk\ncv_sheets &lt;- load_cv_sheets(\n  # The exact name of your Google Sheet\n  doc_identifier = \"My Academic CV Data\", \n  \n  # A list of the sheets you want to load\n  sheets_to_load = list(\n    \"Working Experiences\",\n    \"Education\",\n    \"Skills\"\n  )\n)\nThe load_cv_sheets function will authenticate with Google, download the data, and store it in the cv_sheets R object."
+  },
+  {
+    "objectID": "data_integration.html#rendering-a-section-in-your-cv",
+    "href": "data_integration.html#rendering-a-section-in-your-cv",
+    "title": "Data Integration",
+    "section": "",
+    "text": "Once the data is loaded, you can render any section in your CV with a small R code chunk.\nTo render the “Education” section, you would add the following to your .qmd file:\n## Education\n r #| output: asis cv_sheets$Education |&gt; format_typst_section( typst_func = “#resume-entry” ) |&gt; cat() ```\n\n\n\ncv_sheets$Education: This selects the “Education” data that we loaded.\nformat_typst_section(): This function takes the data and transforms it into the raw Typst code needed to render the section.\ntypst_func = \"#resume-entry\": This tells the function to format each row of data using the #resume-entry function defined in the Typst template, which is the standard layout for a CV item.\n|&gt; cat(): This takes the generated Typst code and outputs it directly into the document.\n\nYou can create your entire CV by repeating this pattern for each section."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Welcome to the official documentation for academicCVTemplate, a Quarto extension designed to help you create beautiful, modern, and professional academic CVs and cover letters with ease. This extension leverages the power of the Typst typesetting system to produce high-quality, print-ready PDF documents.\n\n\n\nHigh-Quality Typesetting: Built on Typst, a modern and powerful typesetting system, ensuring your documents look clean, professional, and are perfectly formatted.\nData-Driven Content: Seamlessly integrate your CV data from Google Sheets, allowing you to keep your information up-to-date in one central location.\nHighly Customizable: Easily change colors, fonts, and layout options through a simple YAML configuration.\nAll-in-One: Generate both your academic CV and a matching cover letter from a single Quarto document.\n\n\n\n\nIf you’re new to the template, we recommend starting with the following sections:\n\nInstallation: A step-by-step guide to get the extension and all its dependencies set up.\nTutorial: A hands-on tutorial that will walk you through creating your first CV and cover letter.\n\n\n\n\nThis website provides a complete reference for all the features and options available in the academicCVTemplate. Use the navigation bar to explore the different sections, from the basic YAML configuration to advanced styling and data integration techniques."
+  },
+  {
+    "objectID": "index.html#why-use-this-template",
+    "href": "index.html#why-use-this-template",
+    "title": "Home",
+    "section": "",
+    "text": "High-Quality Typesetting: Built on Typst, a modern and powerful typesetting system, ensuring your documents look clean, professional, and are perfectly formatted.\nData-Driven Content: Seamlessly integrate your CV data from Google Sheets, allowing you to keep your information up-to-date in one central location.\nHighly Customizable: Easily change colors, fonts, and layout options through a simple YAML configuration.\nAll-in-One: Generate both your academic CV and a matching cover letter from a single Quarto document."
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "Home",
+    "section": "",
+    "text": "If you’re new to the template, we recommend starting with the following sections:\n\nInstallation: A step-by-step guide to get the extension and all its dependencies set up.\nTutorial: A hands-on tutorial that will walk you through creating your first CV and cover letter."
+  },
+  {
+    "objectID": "index.html#about-this-documentation",
+    "href": "index.html#about-this-documentation",
+    "title": "Home",
+    "section": "",
+    "text": "This website provides a complete reference for all the features and options available in the academicCVTemplate. Use the navigation bar to explore the different sections, from the basic YAML configuration to advanced styling and data integration techniques."
+  },
+  {
+    "objectID": "styling.html",
+    "href": "styling.html",
+    "title": "Advanced Styling",
+    "section": "",
+    "text": "This template provides several ways to customize the visual appearance of your CV and cover letter, from simple YAML options to modifying the underlying Typst stylesheets.\n\n\nThe easiest way to change the look of your document is by using the style object in the YAML header.\n\n\nThis sets the primary color used for heading accents, links, and other highlighted elements.\nType: String (Hex color code) Example:\nstyle:\n  color-accent: \"#2a9d8f\" # A dark teal color\n\n\n\nThese options allow you to change the fonts used in the document. Provide a list of font names. Typst will try each font in order until it finds one installed on your system.\nType: List of Strings Example:\nstyle:\n  font-header: [\"Calibri\", \"Arial\", \"sans-serif\"]\n  font-text: [\"Garamond\", \"Times New Roman\", \"serif\"]\n\n\n\n\nFor users who want more control, you can directly modify the Typst style files located in the _extensions/academiccvtemplate/typst/ directory.\nWarning: Modifying these files requires some knowledge of the Typst language. Always make a backup before making changes.\n\n\n\nstyling.typ: This is the main stylesheet. It defines all the core styles, such as colors and font sizes, as #let variables. This is the best place to start for most advanced changes. For example, you can change the default font sizes: typst     // in styling.typ     #let font-size-large = 18pt     #let font-size-middle = 12pt     #let font-size-small = 10pt\ntypst-show.typ: This file controls the appearance of specific document elements, like headings, using #show rules. For example, you could change the style of a level-2 heading: typst     // in typst-show.typ     #show heading.where(level: 2): it =&gt; {         set text(fill: blue, weight: \"bold\") // Change to bold and blue         it.body     }\npartial-functions.typ: This file contains the functions that render larger components, like the title-page. You can modify the layout of these components here. For example, you could change the alignment or spacing of elements on the title page.\n\n\n\n\n\nOpen the relevant .typ file in a text editor.\nMake your desired changes.\nSave the file.\nRe-render your .qmd document with quarto render.\n\nYour changes will be immediately reflected in the new PDF output."
+  },
+  {
+    "objectID": "styling.html#basic-styling-with-yaml",
+    "href": "styling.html#basic-styling-with-yaml",
+    "title": "Advanced Styling",
+    "section": "",
+    "text": "The easiest way to change the look of your document is by using the style object in the YAML header.\n\n\nThis sets the primary color used for heading accents, links, and other highlighted elements.\nType: String (Hex color code) Example:\nstyle:\n  color-accent: \"#2a9d8f\" # A dark teal color\n\n\n\nThese options allow you to change the fonts used in the document. Provide a list of font names. Typst will try each font in order until it finds one installed on your system.\nType: List of Strings Example:\nstyle:\n  font-header: [\"Calibri\", \"Arial\", \"sans-serif\"]\n  font-text: [\"Garamond\", \"Times New Roman\", \"serif\"]"
+  },
+  {
+    "objectID": "styling.html#advanced-styling-modifying-typst",
+    "href": "styling.html#advanced-styling-modifying-typst",
+    "title": "Advanced Styling",
+    "section": "",
+    "text": "For users who want more control, you can directly modify the Typst style files located in the _extensions/academiccvtemplate/typst/ directory.\nWarning: Modifying these files requires some knowledge of the Typst language. Always make a backup before making changes.\n\n\n\nstyling.typ: This is the main stylesheet. It defines all the core styles, such as colors and font sizes, as #let variables. This is the best place to start for most advanced changes. For example, you can change the default font sizes: typst     // in styling.typ     #let font-size-large = 18pt     #let font-size-middle = 12pt     #let font-size-small = 10pt\ntypst-show.typ: This file controls the appearance of specific document elements, like headings, using #show rules. For example, you could change the style of a level-2 heading: typst     // in typst-show.typ     #show heading.where(level: 2): it =&gt; {         set text(fill: blue, weight: \"bold\") // Change to bold and blue         it.body     }\npartial-functions.typ: This file contains the functions that render larger components, like the title-page. You can modify the layout of these components here. For example, you could change the alignment or spacing of elements on the title page.\n\n\n\n\n\nOpen the relevant .typ file in a text editor.\nMake your desired changes.\nSave the file.\nRe-render your .qmd document with quarto render.\n\nYour changes will be immediately reflected in the new PDF output."
+  },
+  {
+    "objectID": "installation.html",
+    "href": "installation.html",
+    "title": "Installation",
+    "section": "",
+    "text": "To use the academicCVTemplate, you need to install the Quarto extension itself and the academicCVtools R package, which provides the functions for data integration.\n\n\nThe first step is to add the extension to your Quarto project. Open your terminal or command prompt, navigate to your project’s root directory, and run the following command:\nquarto use template YourGitHubUsername/academicCVTemplate\n(Note: Replace YourGitHubUsername/academicCVTemplate with the actual repository path once it is public.)\nThis will download the extension files into a _extensions directory within your project.\n\n\n\nThis template uses R to fetch and process data from Google Sheets. The project relies on the renv package for dependency management and the academicCVtools package for its core functions.\n\n\nThe academicCVtools package is not yet on CRAN, so you will need to install it directly from GitHub. Open your R console and run the following commands:\n# First, ensure you have the 'remotes' package installed\nif (!requireNamespace(\"remotes\", quietly = TRUE)) {\n  install.packages(\"remotes\")\n}\n\n# Now, install the tools package from GitHub\nremotes::install_github(\"YourGitHubUsername/academicCVtools\")\n(Note: Replace YourGitHubUsername/academicCVtools with the actual repository path.)\n\n\n\nThe project template comes with a renv.lock file that lists all the specific R package versions needed to ensure the template renders correctly.\nTo install these packages, open your R console in the project directory and run:\n# Restore the R environment using renv\nrenv::restore()\nThis command will install all the necessary packages, ensuring that your environment perfectly matches the one the template was designed for.\n\n\n\n\nWith the extension and the R environment set up, you are now ready to start creating your CV. Head over to the Tutorial for a step-by-step guide."
+  },
+  {
+    "objectID": "installation.html#install-the-quarto-extension",
+    "href": "installation.html#install-the-quarto-extension",
+    "title": "Installation",
+    "section": "",
+    "text": "The first step is to add the extension to your Quarto project. Open your terminal or command prompt, navigate to your project’s root directory, and run the following command:\nquarto use template YourGitHubUsername/academicCVTemplate\n(Note: Replace YourGitHubUsername/academicCVTemplate with the actual repository path once it is public.)\nThis will download the extension files into a _extensions directory within your project."
+  },
+  {
+    "objectID": "installation.html#set-up-the-r-environment",
+    "href": "installation.html#set-up-the-r-environment",
+    "title": "Installation",
+    "section": "",
+    "text": "This template uses R to fetch and process data from Google Sheets. The project relies on the renv package for dependency management and the academicCVtools package for its core functions.\n\n\nThe academicCVtools package is not yet on CRAN, so you will need to install it directly from GitHub. Open your R console and run the following commands:\n# First, ensure you have the 'remotes' package installed\nif (!requireNamespace(\"remotes\", quietly = TRUE)) {\n  install.packages(\"remotes\")\n}\n\n# Now, install the tools package from GitHub\nremotes::install_github(\"YourGitHubUsername/academicCVtools\")\n(Note: Replace YourGitHubUsername/academicCVtools with the actual repository path.)\n\n\n\nThe project template comes with a renv.lock file that lists all the specific R package versions needed to ensure the template renders correctly.\nTo install these packages, open your R console in the project directory and run:\n# Restore the R environment using renv\nrenv::restore()\nThis command will install all the necessary packages, ensuring that your environment perfectly matches the one the template was designed for."
+  },
+  {
+    "objectID": "installation.html#next-steps",
+    "href": "installation.html#next-steps",
+    "title": "Installation",
+    "section": "",
+    "text": "With the extension and the R environment set up, you are now ready to start creating your CV. Head over to the Tutorial for a step-by-step guide."
+  },
+  {
+    "objectID": "tutorial.html",
+    "href": "tutorial.html",
+    "title": "Tutorial: Your First CV",
+    "section": "",
+    "text": "This tutorial will guide you through the process of creating a complete CV and cover letter using the template.qmd file provided with the extension.\n\n\nThe easiest way to get started is by using the template.qmd file that comes with this extension. It contains a pre-configured YAML header and the necessary R code chunks to get you started.\nMake a copy of this file and rename it to something like my-cv.qmd.\n\n\n\nOpen your new .qmd file. The top section, enclosed in ---, is the YAML header. This is where you will configure all your personal information.\n\n\nStart by filling in your name and the document title.\ntitle: \"Documents of Application\"\nauthor:\n  firstname: \"Your Firstname\"\n  lastname: \"Your Lastname\"\n\n\n\nFill in your contact details. You can add or remove items from this list as you see fit. The icon field uses Font Awesome icons.\nauthor:\n  # ...\n  contact:\n    - icon: fa address-card\n      text: \"Your Address\"\n    - icon: fa mobile-screen\n      text: \"Your Phone Number\"\n    - icon: fa envelope\n      text: \"your.email@example.com\"\n      url: \"mailto:your.email@example.com\"\n  socialmedia:\n    - icon: fa github\n      text: \"Your GitHub\"\n      url: \"https://github.com/your-username\"\n\n\n\nBy default, the template includes a placeholder image. To use your own photo, replace the placeholder file at assets/images/picture.jpg with your own image.\nIf you prefer not to have a profile photo, you can disable it in the YAML header:\nprofile-photo: \"\"\n\n\n\n\nThe body of your cover letter is written directly in the .qmd file under a ## Coverletter heading. You can use standard Markdown for formatting.\n## Coverletter\n\nDear Dr. Recipient,\n\nThis is the body of my cover letter. I can use **bold**, *italics*, and other Markdown features.\n\nSincerely,\nYour Name\n\n\n\nThe template is designed to pull data from a Google Sheet.\n\n\nThe R code in the template.qmd expects a Google Sheet with specific tabs (e.g., “Working Experiences”, “Education”). Make a copy of the example sheet and fill it with your own data.\n\n\n\nIn the first R code chunk, update the doc_identifier to the name of your Google Sheet.\n# In the [lst-setup] R chunk\ncv_sheets &lt;- load_cv_sheets(\n  doc_identifier = \"Your_Google_Sheet_Name\",\n  # ...\n)\n\n\n\nFor each section of your CV, there is a small R chunk that takes the data and formats it. For example, to render your work experience:\n## Working Experiences\n\n\n```{.r .cell-code}\ncv_sheets$`Working Experiences` |&gt;\n  format_typst_section(\n    typst_func = \"#resume-entry\"\n  ) |&gt; cat()\nYou can add, remove, or reorder these sections to build your CV.\n\n\n\n\nOnce you have configured your YAML and set up your data, you can render the final PDF. Open your terminal in the project directory and run:\nquarto render my-cv.qmd\nThis will generate a my-cv.pdf file containing your professional, typeset CV and cover letter. Congratulations!"
+  },
+  {
+    "objectID": "tutorial.html#the-template.qmd-file",
+    "href": "tutorial.html#the-template.qmd-file",
+    "title": "Tutorial: Your First CV",
+    "section": "",
+    "text": "The easiest way to get started is by using the template.qmd file that comes with this extension. It contains a pre-configured YAML header and the necessary R code chunks to get you started.\nMake a copy of this file and rename it to something like my-cv.qmd."
+  },
+  {
+    "objectID": "tutorial.html#configure-the-yaml-header",
+    "href": "tutorial.html#configure-the-yaml-header",
+    "title": "Tutorial: Your First CV",
+    "section": "",
+    "text": "Open your new .qmd file. The top section, enclosed in ---, is the YAML header. This is where you will configure all your personal information.\n\n\nStart by filling in your name and the document title.\ntitle: \"Documents of Application\"\nauthor:\n  firstname: \"Your Firstname\"\n  lastname: \"Your Lastname\"\n\n\n\nFill in your contact details. You can add or remove items from this list as you see fit. The icon field uses Font Awesome icons.\nauthor:\n  # ...\n  contact:\n    - icon: fa address-card\n      text: \"Your Address\"\n    - icon: fa mobile-screen\n      text: \"Your Phone Number\"\n    - icon: fa envelope\n      text: \"your.email@example.com\"\n      url: \"mailto:your.email@example.com\"\n  socialmedia:\n    - icon: fa github\n      text: \"Your GitHub\"\n      url: \"https://github.com/your-username\"\n\n\n\nBy default, the template includes a placeholder image. To use your own photo, replace the placeholder file at assets/images/picture.jpg with your own image.\nIf you prefer not to have a profile photo, you can disable it in the YAML header:\nprofile-photo: \"\""
+  },
+  {
+    "objectID": "tutorial.html#the-cover-letter",
+    "href": "tutorial.html#the-cover-letter",
+    "title": "Tutorial: Your First CV",
+    "section": "",
+    "text": "The body of your cover letter is written directly in the .qmd file under a ## Coverletter heading. You can use standard Markdown for formatting.\n## Coverletter\n\nDear Dr. Recipient,\n\nThis is the body of my cover letter. I can use **bold**, *italics*, and other Markdown features.\n\nSincerely,\nYour Name"
+  },
+  {
+    "objectID": "tutorial.html#adding-cv-content-with-r",
+    "href": "tutorial.html#adding-cv-content-with-r",
+    "title": "Tutorial: Your First CV",
+    "section": "",
+    "text": "The template is designed to pull data from a Google Sheet.\n\n\nThe R code in the template.qmd expects a Google Sheet with specific tabs (e.g., “Working Experiences”, “Education”). Make a copy of the example sheet and fill it with your own data.\n\n\n\nIn the first R code chunk, update the doc_identifier to the name of your Google Sheet.\n# In the [lst-setup] R chunk\ncv_sheets &lt;- load_cv_sheets(\n  doc_identifier = \"Your_Google_Sheet_Name\",\n  # ...\n)\n\n\n\nFor each section of your CV, there is a small R chunk that takes the data and formats it. For example, to render your work experience:\n## Working Experiences\n\n\n```{.r .cell-code}\ncv_sheets$`Working Experiences` |&gt;\n  format_typst_section(\n    typst_func = \"#resume-entry\"\n  ) |&gt; cat()\nYou can add, remove, or reorder these sections to build your CV."
+  },
+  {
+    "objectID": "tutorial.html#render-the-document",
+    "href": "tutorial.html#render-the-document",
+    "title": "Tutorial: Your First CV",
+    "section": "",
+    "text": "Once you have configured your YAML and set up your data, you can render the final PDF. Open your terminal in the project directory and run:\nquarto render my-cv.qmd\nThis will generate a my-cv.pdf file containing your professional, typeset CV and cover letter. Congratulations!"
+  },
+  {
+    "objectID": "acknowledgements.html",
+    "href": "acknowledgements.html",
+    "title": "Acknowledgements",
+    "section": "",
+    "text": "This project was made possible by the excellent work of the open-source community. We were inspired by and, in some cases, directly borrowed code and ideas from the following projects. We are deeply grateful for their contributions.\n\n\n\nProject Link: https://github.com/posquit0/Awesome-CV\nDevelopers: The Awesome-CV team and its many contributors.\n\nThe visual design and overall structure of this CV template are heavily inspired by the classic and widely-used Awesome-CV LaTeX template. Its clean, modern aesthetic is the foundation upon which this project is built.\n\n\n\n\nProject Link: https://github.com/kazuyanagimoto/quarto-awesomecv-typst\nDeveloper: Kazuharu Yanagimoto (@kazuyanagimoto)\n\nThis project served as a crucial starting point and proof-of-concept for creating an Awesome-CV-style template in the Quarto and Typst ecosystem. Several of the initial Typst styling rules and functions were adapted from this work.\n\n\n\n\nProject Link: https://github.com/pandoc-ext/abstract-section\nDevelopers: Albert Krewinkel (@tarleb), John MacFarlane (@jgm), Mickaël Canouil (@mcanouil)\n\nThe extract-cover-letter.lua filter in this project is a modified version of the abstract-section.lua filter. Their elegant and robust code for extracting a specific section from a document was adapted to handle the cover letter content."
+  },
+  {
+    "objectID": "acknowledgements.html#awesome-cv",
+    "href": "acknowledgements.html#awesome-cv",
+    "title": "Acknowledgements",
+    "section": "",
+    "text": "Project Link: https://github.com/posquit0/Awesome-CV\nDevelopers: The Awesome-CV team and its many contributors.\n\nThe visual design and overall structure of this CV template are heavily inspired by the classic and widely-used Awesome-CV LaTeX template. Its clean, modern aesthetic is the foundation upon which this project is built."
+  },
+  {
+    "objectID": "acknowledgements.html#quarto-awesomecv-typst",
+    "href": "acknowledgements.html#quarto-awesomecv-typst",
+    "title": "Acknowledgements",
+    "section": "",
+    "text": "Project Link: https://github.com/kazuyanagimoto/quarto-awesomecv-typst\nDeveloper: Kazuharu Yanagimoto (@kazuyanagimoto)\n\nThis project served as a crucial starting point and proof-of-concept for creating an Awesome-CV-style template in the Quarto and Typst ecosystem. Several of the initial Typst styling rules and functions were adapted from this work."
+  },
+  {
+    "objectID": "acknowledgements.html#abstract-section-pandoc-filter",
+    "href": "acknowledgements.html#abstract-section-pandoc-filter",
+    "title": "Acknowledgements",
+    "section": "",
+    "text": "Project Link: https://github.com/pandoc-ext/abstract-section\nDevelopers: Albert Krewinkel (@tarleb), John MacFarlane (@jgm), Mickaël Canouil (@mcanouil)\n\nThe extract-cover-letter.lua filter in this project is a modified version of the abstract-section.lua filter. Their elegant and robust code for extracting a specific section from a document was adapted to handle the cover letter content."
+  }
+]
