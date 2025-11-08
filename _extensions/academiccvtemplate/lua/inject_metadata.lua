@@ -119,7 +119,8 @@ function M.Pandoc(doc)
 
     if not typst_val_str or
        typst_val_str == "none" or
-       (typst_val_str == '""' and pandoc.utils.type(value) == 'string') or
+       typst_val_str == '""' or
+       typst_val_str == '()' or
        typst_val_str:match("^%(%s*%/%*") then
       goto continue
     end
