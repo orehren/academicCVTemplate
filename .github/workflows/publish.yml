@@ -1,70 +1,59 @@
 # Filename: .github/workflows/publish.yml
-# COMBINED WORKFLOW:
-# 1. Renders the website
-# 2. Moves .md files to the /_extensions folder
-# 3. Commits .md files back to the 'master' branch
-# 4. Publishes the HTML website to 'gh-pages'
+# UPDATED FOR 'master' BRANCH
 
-name: Render and Deploy Documentation Website
+name: Render, Commit MDs, and Deploy Website
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master ] # <-- Changed from main to master
   workflow_dispatch:
 
 jobs:
   publish-and-commit:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Important: Needed for BOTH (gh-pages AND master)
+      contents: write
 
     steps:
       # 1. Check out repository
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 2. Set up Quarto
-      - name: Set up Quarto
+      # 2. Set up Quarto and R (if R code is present)
+      - name: Set up Quarto and R
         uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          use-r: false # Set to 'false' or remove if no R code
 
       # 3. Render Quarto Website
-      # (Creates docs/_site/ with .html AND .md files)
       - name: Render Quarto Website
         uses: quarto-dev/quarto-actions/render@v2
         with:
           path: docs
 
-      # 4. (NEW) Move MD files to offline directory
+      # 4. Move MD files to offline directory
       - name: Move intermediate Markdown files
         run: |
-          # Create the target directory (with -p, in case it doesn't exist)
           mkdir -p _extensions/academiccvtemplate/docs
-
-          # Find all .md files in the _site folder and move them
           find docs/_site -type f -name "*.md" -exec mv {} _extensions/academiccvtemplate/docs/ \;
         shell: bash
 
-      # 5. (NEW) Commit changed MD files back to 'master'
+      # 5. Commit changed MD files back to 'master'
       - name: Commit offline MD docs back to master
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          # IMPORTANT: [skip ci] prevents this commit
-          # from triggering the workflow again (endless loop)
           commit_message: "Docs: Update offline markdown documentation [skip ci]"
-          branch: master
-          # Limit the commit to only the offline docs folder
+          branch: master # <-- Changed from main to master
           file_pattern: _extensions/academiccvtemplate/docs/*.md
           repository: .
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
 
-      # 6. (Old) Publish rendered website to GitHub Pages
-      # (This step ignores the moved .md files and
-      # only publishes the HTML/CSS/JS files, which is perfect)
-      - name: Publish to GitHub Pages
-        uses: quarto-dev/quarto-actions/publish@v2
+      # 6. Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          target: gh-pages
-          path: docs/_site
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_site
+          publish_branch: gh-pages
+          force_orphan: true
