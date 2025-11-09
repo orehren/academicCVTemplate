@@ -4,12 +4,12 @@
 
 #let render-cover-letter(
   author,
-  recipient,
-  date,
-  subject,
-  cover_letter_content,
   color-accent,
-  text-style-header
+  text-style-header,
+  recipient: none,
+  date: datetime.today,
+  subject: none,
+  cover_letter_content: [],
 ) = {
 
   // --- Header ---
@@ -24,9 +24,11 @@
       #find_contact(author, "fa envelope")
     ],
     [
+    #if recipient != none or recipient == "" [
       #recipient.name \
       #recipient.address \
       #recipient.zip #recipient.city
+      ]
     ]
   )
 
@@ -34,20 +36,24 @@
   v(2em)
   align(right)[#date]
   v(2em)
-  block(
-    width: 100%,
-    [
-      #set text(..text-style-header)
-      #align(left)[
-          #strong[#text(fill: color-accent)[#subject.slice(0, 3)]#subject.slice(3)]
-          #box(width: 1fr, line(length: 99%))
+  if subject != none or subject == "" {
+    block(
+      width: 100%,
+      [
+        #set text(..text-style-header)
+        #align(left)[
+            #strong[#text(fill: color-accent)[#subject.slice(0, 3)]#subject.slice(3)]
+            #box(width: 1fr, line(length: 99%))
+        ]
       ]
-    ]
-  )
-  v(2em)
+    )
+    v(2em)
+  }
 
   // --- Salutation ---
-  "Dear " + recipient.salutation + ","
+  if recipient != none or recipient == "" {
+    "Dear " + recipient.salutation + ","
+  }
 
   // --- Body ---
   v(1em)

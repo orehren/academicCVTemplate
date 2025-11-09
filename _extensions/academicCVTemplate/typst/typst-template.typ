@@ -58,7 +58,12 @@
 
     // 1. Render Cover Letter (if requested)
     if render-output == "letter-only" or render-output == "combined" {
-      render-cover-letter(author, recipient, date, subject, cover_letter_content, color-accent, text-style-aboutme)
+      render-cover-letter(author, color-accent, text-style-aboutme,
+                          recipient: doc.at("recipient", default: none),
+                          date: doc.at("date", default: datetime.today),
+                          subject: doc.at("subject", default: none),
+                          cover_letter_content: doc.at("cover_letter_content", default: none)
+                          )
     }
 
     // 2. Render CV (if requested)
