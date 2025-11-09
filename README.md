@@ -2,7 +2,7 @@
 
 This is a [Quarto](https://quarto.org/) extension for creating beautiful, modern, and professional academic CVs and cover letters using the [Typst](https://typst.app/) typesetting system.
 
-![Template Screenshot](https://github.com/orehren/academicCVTemplate/blob/main/screenshot.png)
+![Template Screenshot](https://github.com/orehren/academicCVTemplate/blob/main/screenshot.png | width=300)
 *(Note: A screenshot of the final PDF output should be added here.)*
 
 ## Features
@@ -23,7 +23,7 @@ quarto install extension orehren/academicCVTemplate
 Alternatively, you can create a new Quarto project bundled with a `.qmd` template file to get started:
 
 ``` bash
-quarto use template orehren/academiccvtemplate
+quarto use template orehren/academicCVTemplate
 ```
 
 This will install the format extension and create an example qmd file that you can use as a starting place for your document.
