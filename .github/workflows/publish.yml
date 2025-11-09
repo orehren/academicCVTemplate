@@ -31,6 +31,13 @@ jobs:
         with:
           path: docs
 
+      # DEBUGGING
+      - name: "DEBUG: List files in _site directory"
+        run: |
+          echo "--- Listing contents of docs/_site ---"
+          ls -R docs/_site
+        shell: bash
+
       # 4. Move MD files to offline directory
       - name: Move intermediate Markdown files
         run: |
