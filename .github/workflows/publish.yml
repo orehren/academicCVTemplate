@@ -1,11 +1,11 @@
 # Filename: .github/workflows/publish.yml
-# UPDATED FOR 'master' BRANCH
+# UPDATED FOR 'main' BRANCH
 
 name: Render, Commit MDs, and Deploy Website
 
 on:
   push:
-    branches: [ master ] # <-- Changed from main to master
+    branches: [ main ] # <-- Changed from main to main
   workflow_dispatch:
 
 jobs:
@@ -38,13 +38,13 @@ jobs:
           find docs/_site -type f -name "*.md" -exec mv {} _extensions/academicCVTemplate/docs/ \;
         shell: bash
 
-      # 5. Commit changed MD files back to 'master'
-      - name: Commit offline MD docs back to master
+      # 5. Commit changed MD files back to 'main'
+      - name: Commit offline MD docs back to main
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Docs: Update offline markdown documentation [skip ci]"
-          branch: master # <-- Changed from main to master
-          file_pattern: _extensions/academiccvtemplate/docs/*.md
+          branch: main # <-- Changed from main to main
+          file_pattern: _extensions/academicCVTemplate/docs/*.md
           repository: .
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
