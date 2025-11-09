@@ -42,7 +42,7 @@ jobs:
       - name: Move intermediate Markdown files
         run: |
           mkdir -p _extensions/academicCVTemplate/docs
-          find docs/_site -type f -name "*.md" -exec mv {} _extensions/academicCVTemplate/docs/ \;
+          find docs/ -type f -name "*.md" -exec mv {} _extensions/academicCVTemplate/docs/ \;
         shell: bash
 
       # 5. Commit changed MD files back to 'main'
