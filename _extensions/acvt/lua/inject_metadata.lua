@@ -7,7 +7,7 @@ local M = {}
 -- 1. CONFIGURATION & HELPER
 -- ---
 
-local TYPST_METADATA_FILE = quarto.utils.resolve_path("../typst/metadata.typ")
+local TYPST_METADATA_FILE = quarto.utils.resolve_path("../typst/02-definitions-metadata.typ")
 
 -- Escapes a Lua string for use as a Typst string literal.
 ---

@@ -1,10 +1,6 @@
-// typst/styling.typ
+// typst/03-definitions-styling.typ
 // defines color palett, typography and styles
 
-// -- 1. Imports --
-// ----------------
-#import "helper-functions.typ": *
-#import "metadata.typ": style
 
 
 // -- 2. Color Palett Definition --

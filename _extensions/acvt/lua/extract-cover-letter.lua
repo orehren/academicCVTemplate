@@ -9,7 +9,7 @@ local section_identifiers = {
 local collected = {}
 local toplevel = 6
 
-local TYPST_METADATA_FILE = quarto.utils.resolve_path("../typst/metadata.typ")
+local TYPST_METADATA_FILE = quarto.utils.resolve_path("../typst/02-definitions-metadata.typ")
 
 
 ---

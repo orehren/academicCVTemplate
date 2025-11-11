@@ -9,49 +9,9 @@
 // =============================================
 
 
-// -- 1. Imports --
-// ----------------
-#import "_extensions/academicCVTemplate/typst/helper-functions.typ": *
-#import "_extensions/academicCVTemplate/typst/metadata.typ": *
-#import "_extensions/academicCVTemplate/typst/styling.typ": *
-#import "_extensions/academicCVTemplate/typst/partial-functions.typ": *
-#import "_extensions/academicCVTemplate/typst/cover-letter.typ": *
-
-#set text(..text-style-default)
-#set grid(..grid-style-default)
-#set table(..table-style-default)
-#set par(justify: true, leading: 0.5em)
-
-#set page(
-    paper: "a4",
-    margin: (x: 2cm, y: 1.5cm),
-    header: align(right)[
-        #box(width: 1fr, line(length: 100%))
-        #set text(..text-style-header)
-        #text(fill: color-accent)[#title.slice(0, 3)]#title.slice(3)
-    ],
-)
-
 // -- 7. Main Document Function --
 // -------------------------------
 #let resume(doc) = {
-
-    // --- Local Show Rules ---
-    show quote.where(block: true): it => {
-        set align(center)
-        set text(..text-style-quote)
-        let attribution = if it.attribution != none {
-          align(end, [\~ #it.attribution \~])
-          } else { none }
-
-        block(
-            width: 100%, inset: 1em,
-            {
-                if it.quotes == true { quote(it.body) } else { it.body }
-                attribution
-            }
-        )
-    }
 
     // --- Document Assembly ---
     // -------------------------

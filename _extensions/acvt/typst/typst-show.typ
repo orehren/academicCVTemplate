@@ -1,6 +1,23 @@
 // typst/typst-show.typ
 // forwards yaml metadata to typst template
 
+
+#show quote.where(block: true): it => {
+    set align(center)
+    set text(..text-style-quote)
+    let attribution = if famous-quote.at("attribution") != none {
+      align(end, [\~ #famous-quote.at("attribution") \~])
+      } else { none }
+
+    block(
+        width: 100%, inset: 1em,
+        {
+            if it.quotes == true { quote(it.body) } else { it.body }
+            attribution
+        }
+    )
+}
+
 #show heading: set text(..text-style-header)
 #show heading.where(level: 1): it => [
     #set block(above: 1.5em, below: 1em)
