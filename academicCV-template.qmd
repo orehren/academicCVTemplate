@@ -75,9 +75,9 @@ google-document:
 
 attachments:
   - name: "First Document"
-    file: "_extensions/orehren/acvt/assets/images/first_document.png"
+    file: "_extensions/acvt/assets/images/first_document.png"
   - name: "Second Document"
-    file: "_extensions/orehren/acvt/assets/images/second_document.png"
+    file: "_extensions/acvt/assets/images/second_document.png"
 
 # -- Publication List ----------------------------------------------
 # Configuration for the publication list. See `?render_publication_list`.
@@ -98,68 +98,75 @@ format: acvt-typst
 
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
-	```{r}
-	#| label: lst-setup
-	#| include: false
+```{r}
+#| label: lst-setup
+#| include: false
 
-	# Load required libraries
-	library(tidyverse)       # For data manipulation (pipes, dplyr)
-	library(academicCVtools) # The extension's R helper package
+# Load required libraries
+library(tidyverse)       # For data manipulation (pipes, dplyr)
+library(academicCVtools) # The extension's R helper package
 
-	setup_cv_environment()
-	```
+setup_cv_environment()
+```
 
 ## Research Interests
 
-	```{r}
-	#| output: asis
-	#| label: lst-research_interests
+```{r}
+#| output: asis
+#| label: lst-research_interests
 
-	cv_data$interests |>
-	  format_typst_section(
-	    # The name of the Typst function to call in your template
-	    typst_func = "#research-interests"
-	  ) |>
-	  cat()
-	```
+cv_data$interests |>
+  format_typst_section(
+    # The name of the Typst function to call in your template
+    typst_func = "#research-interests"
+  ) |>
+  cat()
+```
 
 ## Working Experiences
 
-	```{r}
-	#| output: asis
-	#| label: lst-work
+```{r}
+#| output: asis
+#| label: lst-work
 
-	cv_data$working |>
-	  format_typst_section(
-	    typst_func = "#resume-entry",
-    
-	    # --- Data Combination ---
-	    # This is a powerful feature:
-	    # It finds all columns starting with "detail" (e.g., detail1, detail2)
-	    # and combines them into a single list column...
-	    combine_cols = c(dplyr::starts_with("detail")),
-	    # ...named "details".
-	    combine_as = "details",
-	    # This separator is added *between* combined items
-	    combine_sep = "\\ \\ ", # A Typst line break
-	    # This prefix is added *before* each item
-	    combine_prefix = "· ",
-    
-	    # --- Column Exclusion ---
-	    # Exclude columns from the Google Sheet that the Typst function
-	    # doesn't need (e.g., sorting columns).
-	    exclude_cols = c(start, end)
-	  ) |> cat()
-	```
+cv_data$working |>
+  format_typst_section(
+    typst_func = "#resume-entry",
+  
+    # --- Data Combination ---
+    # This is a powerful feature:
+    # It finds all columns starting with "detail" (e.g., detail1, detail2)
+    # and combines them into a single list column...
+    combine_cols = c(dplyr::starts_with("detail")),
+    # ...named "details".
+    combine_as = "details",
+    # This separator is added *between* combined items
+    combine_sep = "\\ \\ ", # A Typst line break
+    # This prefix is added *before* each item
+    combine_prefix = "· ",
+  
+    # --- Column Exclusion ---
+    # Exclude columns from the Google Sheet that the Typst function
+    # doesn't need (e.g., sorting columns).
+    exclude_cols = c(start, end)
+  ) |> cat()
+```
 
 ## Publications
 
-	```{r}
-	#| output: asis
-	#| label: lst-publications
-	#| test: 23
+```{r}
+#| output: asis
+#| label: lst-publications
+#| test: 23
 
-	# This function reads all its configuration from the `publication-list`
-	# key in the YAML header.
-	render_publication_list()
-	```
+# This function reads all its configuration from the `publication-list`
+# key in the YAML header.
+#render_publication_list()
+library(jsonlite)
+
+info_file <- Sys.getenv("QUARTO_EXECUTE_INFO")
+info <- fromJSON(info_file)
+
+# Access format information
+info$format$metadata
+```

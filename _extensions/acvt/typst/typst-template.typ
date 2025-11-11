@@ -19,10 +19,10 @@
     // 1. Render Cover Letter (if requested)
     if render-output == "letter-only" or render-output == "combined" {
       render-cover-letter(author, color-accent, text-style-aboutme,
-                          recipient: doc.at("recipient", default: none),
-                          date: doc.at("date", default: datetime.today),
-                          subject: doc.at("subject", default: none),
-                          cover_letter_content: doc.at("cover_letter_content", default: none)
+                          recipient: get-optional(recipient, none),
+                          date: get-optional(date, datetime.today()),
+                          subject: get-optional(subject, none),
+                          cover_letter_content: get-optional(cover_letter_content, none)
                           )
     }
 
@@ -31,7 +31,7 @@
       // Render the Title Page
       title-page(
         author,
-        profile-photo: doc.at("profile-photo", default: none)
+        profile-photo: get-optional(profile-photo, none)
       )
 
       // Set up page settings for the rest of document (page numbering + footer)

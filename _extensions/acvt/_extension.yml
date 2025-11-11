@@ -18,9 +18,9 @@ contributes:
         font-text: ["Source Sans Pro", "Arial", "Dejavu Sans"]
       surpress-bibliography: true
       publication-list:
-        bibfile: "../assets/bib/bibliography.bib"
-        bibstyle: "../assets/bib/apa-cv.csl"
-      profile-photo: "../assets/images/picture.jpg"
+        bibfile: "assets/bib/bibliography.bib"
+        bibstyle: "assets/bib/apa-cv.csl"
+      profile-photo: "assets/images/picture.jpg"
     typst:
       keep-typ: false
       filters:
