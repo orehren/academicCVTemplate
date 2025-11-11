@@ -10,8 +10,8 @@
 # -- Basic Document Information ------------------------------------
 title: "Documents of Application"
 author:
-  firstname: "Your Firstname"
-  lastname: "Your Lastname"
+  firstname: "Arthur"
+  lastname: "Author"
   contact:
     - icon: fa address-card
       text: "Your Address"
@@ -62,13 +62,28 @@ style:
   font-header: "Lato"
   font-text: "Roboto"
 
-profile-photo: ""
+# profile-photo: null
+
+google-document:
+  auth-email: TRUE
+  document-identifier: "Application_CV_Data"
+  sheets-to-load:
+    - name: "Working Experiences"
+      shortname: "working"
+    - name: "Research Interests"
+      shortname: "interests"
 
 attachments:
   - name: "First Document"
-    file: "_extensions/academicCVTemplate/assets/images/first_document.png"
+    file: "_extensions/orehren/acvt/assets/images/first_document.png"
   - name: "Second Document"
-    file: "_extensions/academicCVTemplate/assets/images/second_document.png"
+    file: "_extensions/orehren/acvt/assets/images/second_document.png"
+
+# -- Publication List ----------------------------------------------
+# Configuration for the publication list. See `?render_publication_list`.
+# publication-list:
+  # author_name: "Your Name" # Optional: Will be inferred if not set
+#  highlight_author: "bold" # "bold", "italic", "color", or a custom Typst string
   
 # -- Output Options ------------------------------------------------
 render-output: "combined" # "cv-only", "letter-only", or "combined"
@@ -76,103 +91,75 @@ render-output: "combined" # "cv-only", "letter-only", or "combined"
 # -- Format Activation ---------------------------------------------
 # This is the most important line:
 # It tells Quarto to use your custom Typst format.
-format: academicCVTemplate-typst
+format: acvt-typst
 ---
 
 ## Coverletter
 
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
-```{r}
-#| label: lst-setup
-#| include: false
+	```{r}
+	#| label: lst-setup
+	#| include: false
 
-# Load required libraries
-library(tidyverse)       # For data manipulation (pipes, dplyr)
-library(googledrive)     # To find the Google Sheet by name
-library(googlesheets4)   # To read the Google Sheet data
-library(academicCVtools) # The extension's R helper package
+	# Load required libraries
+	library(tidyverse)       # For data manipulation (pipes, dplyr)
+	library(academicCVtools) # The extension's R helper package
 
-# --- Authentication -----------------------------------------------
-# You must authenticate with Google to allow R to access your private sheets.
-# This will open a browser window for you to log in the first time.
-drive_auth()
-gs4_auth(token = drive_token())
-
-# --- Sheet Selection ----------------------------------------------
-# Define which tabs (sheets) you want to load from your Google Sheet.
-# The names here MUST match the tab names in your Google Sheet exactly.
-cv_sheets_list <- list(
-  "Working Experiences",
-  "Education",
-  "IT Skills", 
-  "Language Skills",
-  # You can rename a sheet if needed, e.g.:
-  # "Raised Fundings" = "funds", 
-  "Reviewer",
-  "Institutional Services",
-  "Research Interests",
-  "Additional Academic Activity",
-  "Teaching Experiences",
-  "Training and Professional Development",
-  "Other Employments",
-  "Social Engagement",
-  "Internships"
-)
-
-# --- Data Loading -------------------------------------------------
-# The `load_cv_sheets` function finds your sheet and loads all the tabs
-# defined in `cv_sheets_list` into a single R list named `cv_sheets`.
-cv_sheets <- load_cv_sheets(
-  # The name of your Google Sheet (must be unique in your Drive)
-  doc_identifier = "Application_CV_Data", 
-  
-  # Use the list defined above.
-  # Alternatively, use "*" to load ALL tabs from the sheet.
-  sheets_to_load = cv_sheets_list 
-)
-```
+	setup_cv_environment()
+	```
 
 ## Research Interests
 
-```{r}
-#| output: asis
-#| label: lst-research_interests
+	```{r}
+	#| output: asis
+	#| label: lst-research_interests
 
-cv_sheets$research_interests |> 
-  format_typst_section(
-    # The name of the Typst function to call in your template
-    typst_func = "#research-interests"
-  ) |> 
-  cat()
-```
+	cv_data$interests |>
+	  format_typst_section(
+	    # The name of the Typst function to call in your template
+	    typst_func = "#research-interests"
+	  ) |>
+	  cat()
+	```
 
 ## Working Experiences
 
-```{r}
-#| output: asis
-#| label: lst-work
+	```{r}
+	#| output: asis
+	#| label: lst-work
 
-cv_sheets$working_experiences |>
-  format_typst_section(
-    typst_func = "#resume-entry",
+	cv_data$working |>
+	  format_typst_section(
+	    typst_func = "#resume-entry",
     
-    # --- Data Combination ---
-    # This is a powerful feature:
-    # It finds all columns starting with "detail" (e.g., detail1, detail2)
-    # and combines them into a single list column...
-    combine_cols = c(dplyr::starts_with("detail")),
-    # ...named "details".
-    combine_as = "details",
-    # This separator is added *between* combined items
-    combine_sep = "\\ \\ ", # A Typst line break
-    # This prefix is added *before* each item
-    combine_prefix = "· ",
+	    # --- Data Combination ---
+	    # This is a powerful feature:
+	    # It finds all columns starting with "detail" (e.g., detail1, detail2)
+	    # and combines them into a single list column...
+	    combine_cols = c(dplyr::starts_with("detail")),
+	    # ...named "details".
+	    combine_as = "details",
+	    # This separator is added *between* combined items
+	    combine_sep = "\\ \\ ", # A Typst line break
+	    # This prefix is added *before* each item
+	    combine_prefix = "· ",
     
-    # --- Column Exclusion ---
-    # Exclude columns from the Google Sheet that the Typst function
-    # doesn't need (e.g., sorting columns).
-    exclude_cols = c(start, end)
-  ) |> cat()
-```
+	    # --- Column Exclusion ---
+	    # Exclude columns from the Google Sheet that the Typst function
+	    # doesn't need (e.g., sorting columns).
+	    exclude_cols = c(start, end)
+	  ) |> cat()
+	```
 
+## Publications
+
+	```{r}
+	#| output: asis
+	#| label: lst-publications
+	#| test: 23
+
+	# This function reads all its configuration from the `publication-list`
+	# key in the YAML header.
+	render_publication_list()
+	```
