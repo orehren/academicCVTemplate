@@ -43,7 +43,7 @@ jobs:
           commit_message: "Docs: Update offline markdown documentation [skip ci]"
           branch: main
           file_pattern: |
-            _extensions/academicCVTemplate/docs/*.md
+            _extensions/acvt/docs/*.md
           repository: .
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
