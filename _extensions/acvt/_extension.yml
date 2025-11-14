@@ -8,7 +8,6 @@ contributes:
   formats:
     common:
       output-file: "Application_Documents"
-      pre-render: scripts/pre-render.R
       execute:
         echo: false
         warning: false

@@ -2,3 +2,4 @@
 # This project context can influence how extensions and scripts are run.
 project:
   type: default
+  pre-render: _extensions/acvt/scripts/pre-render.R
