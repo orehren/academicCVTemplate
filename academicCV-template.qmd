@@ -106,7 +106,10 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 library(tidyverse)       # For data manipulation (pipes, dplyr)
 library(academicCVtools) # The extension's R helper package
 
-setup_cv_environment()
+# The pre-render script `pre-render.R` has already fetched the Google Sheet
+# data and injected it into the document's metadata. We now simply
+# assign it to a variable for use in subsequent R chunks.
+cv_data <- rmarkdown::metadata$cv_data
 ```
 
 ## Research Interests

@@ -5,7 +5,7 @@ description: "A Quarto extension for creating academic CVs and cover letters usi
 quarto-required: ">=1.8.0"
 license: MIT
 contributes:
-  format:
+  formats:
     common:
       output-file: "Application_Documents"
       execute:
