@@ -1,0 +1,4 @@
+# This file defines the directory as a Quarto project.
+# This project context can influence how extensions and scripts are run.
+project:
+  type: default
