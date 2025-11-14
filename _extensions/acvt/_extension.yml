@@ -5,9 +5,10 @@ description: "A Quarto extension for creating academic CVs and cover letters usi
 quarto-required: ">=1.8.0"
 license: MIT
 contributes:
-  format:
+  formats:
     common:
       output-file: "Application_Documents"
+      pre-render: scripts/pre-render.R
       execute:
         echo: false
         warning: false
@@ -22,7 +23,6 @@ contributes:
         bibstyle: "assets/bib/apa-cv.csl"
       profile-photo: "assets/images/picture.jpg"
     typst:
-      pre-render: scripts/pre-render.R
       keep-typ: false
       filters:
         - path: lua/inject_metadata.lua
