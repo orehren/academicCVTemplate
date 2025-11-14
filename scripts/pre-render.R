@@ -15,10 +15,9 @@
 # ------------------------------------------------------------------------------
 
 # --- 1. Load Required Libraries -----------------------------------------------
-# It's best practice to keep the script self-contained.
+# This script is self-contained and only relies on widely used packages.
 library(jsonlite)
 library(googlesheets4)
-library(academicCVtools)
 library(yaml)
 
 # --- 2. Read and Parse Quarto Metadata ----------------------------------------
@@ -57,8 +56,9 @@ gs4_auth(email = auth_email %||% TRUE, cache = TRUE, use_oob = TRUE)
 message("INFO: Authentication successful.")
 
 # --- 5. Process Sheet Configuration -------------------------------------------
-# This logic is identical to the original `setup_cv_environment` function.
-# It prepares the list of sheets for the `load_cv_sheets` function.
+# This logic prepares the list of sheets to load. The `names` of the list
+# will be the full sheet names to read, and the `values` will be the
+# target shortnames for the final output list.
 sheets_to_load <- list()
 for (item in sheets_config) {
   if (is.list(item)) {
@@ -74,17 +74,31 @@ for (item in sheets_config) {
 
 # --- 6. Load Data from Google Sheet -------------------------------------------
 message("INFO: Loading data from Google Sheet: ", doc_id)
-loaded_data <- load_cv_sheets(
-  doc_identifier = doc_id,
-  sheets_to_load = sheets_to_load
-)
+
+# Initialize an empty list to store the loaded data frames.
+loaded_data <- list()
+
+# Iterate over the prepared list of sheets.
+for (sheet_name in names(sheets_to_load)) {
+  target_name <- sheets_to_load[[sheet_name]]
+  message("INFO: Reading sheet '", sheet_name, "' into '", target_name, "'...")
+
+  # Use a tryCatch block to gracefully handle potential errors, such as a
+  # sheet not being found in the Google Sheet document.
+  tryCatch({
+    sheet_data <- read_sheet(ss = doc_id, sheet = sheet_name, col_types = "c")
+    loaded_data[[target_name]] <- sheet_data
+  }, error = function(e) {
+    warning("WARN: Failed to read sheet '", sheet_name, "'. Error: ", e$message, call. = FALSE)
+  })
+}
 message("INFO: Data loading complete.")
 
 # --- 7. Generate and Output YAML ----------------------------------------------
-# The final step is to create a list with the desired top-level key
-# and then convert it to a YAML string for Quarto.
+# The final step is to create a list with the desired top-level key (`cv_data`)
+# and then convert it to a YAML string for Quarto to ingest.
 output_list <- list(cv_data = loaded_data)
 output_yaml <- as.yaml(output_list, indent.mapping.sequence = TRUE)
 
-# Print the YAML to standard output. Quarto will capture this.
+# Print the final YAML to standard output. Quarto will capture this.
 cat(output_yaml)
