@@ -14,7 +14,13 @@
 # directly in the document.
 # ------------------------------------------------------------------------------
 
-# --- 1. Load Required Libraries -----------------------------------------------
+# --- 1. Load renv Environment -------------------------------------------------
+# This is the most critical step. It ensures that the script, when called by
+# Quarto's external Rscript process, uses the project's specific renv library
+# and has access to all the necessary packages.
+source("renv/activate.R")
+
+# --- 2. Load Required Libraries -----------------------------------------------
 # This script is self-contained and only relies on widely used packages.
 library(jsonlite)
 library(googlesheets4)
