@@ -65,7 +65,7 @@ style:
 # profile-photo: null
 
 google-document:
-  auth-email: TRUE
+  auth-email: o.rehren@gmail.com # TRUE
   document-identifier: "Application_CV_Data"
   sheets-to-load:
     - name: "Working Experiences"
@@ -118,42 +118,15 @@ cv_data <- rmarkdown::metadata$cv_data
 #| output: asis
 #| label: lst-research_interests
 
-cv_data$interests |>
-  format_typst_section(
-    # The name of the Typst function to call in your template
-    typst_func = "#research-interests"
-  ) |>
-  cat()
+# cv_data$interests |>
+#   format_typst_section(
+#     # The name of the Typst function to call in your template
+#     typst_func = "#research-interests"
+#   ) |>
+#   cat()
+cv_data
 ```
 
-## Working Experiences
-
-```{r}
-#| output: asis
-#| label: lst-work
-
-cv_data$working |>
-  format_typst_section(
-    typst_func = "#resume-entry",
-  
-    # --- Data Combination ---
-    # This is a powerful feature:
-    # It finds all columns starting with "detail" (e.g., detail1, detail2)
-    # and combines them into a single list column...
-    combine_cols = c(dplyr::starts_with("detail")),
-    # ...named "details".
-    combine_as = "details",
-    # This separator is added *between* combined items
-    combine_sep = "\\ \\ ", # A Typst line break
-    # This prefix is added *before* each item
-    combine_prefix = "· ",
-  
-    # --- Column Exclusion ---
-    # Exclude columns from the Google Sheet that the Typst function
-    # doesn't need (e.g., sorting columns).
-    exclude_cols = c(start, end)
-  ) |> cat()
-```
 
 ## Publications
 
@@ -171,5 +144,5 @@ info_file <- Sys.getenv("QUARTO_EXECUTE_INFO")
 info <- fromJSON(info_file)
 
 # Access format information
-info$format$metadata
+# info$format$metadata
 ```

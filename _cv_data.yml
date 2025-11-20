@@ -1,0 +1,177 @@
+cv_data:
+  working:
+    start:
+    - 1.5856992e+09
+    - 1.538352e+09
+    - 1.538352e+09
+    - 1.4779584e+09
+    - 1.4779584e+09
+    end:
+    - 1.7092512e+09
+    - 1.5830208e+09
+    - 1.6803072e+09
+    - 1.53576e+09
+    - 1.53576e+09
+    date:
+    - 04/2020 - 03/2024
+    - 10/2018 - 03/2020
+    - 10/2018 - 04/2023
+    - 11/2016 - 09/2018
+    - 11/2016 - 09/2018
+    title:
+    - 'Research Associate and PhD Candidate #text(fill: rgb("5e81ac"), weight: "bold")[|]
+      #text(size: 10pt, weight: "regular", style: "italic")[CRC Hybrid Societies -
+      Human Minds in Digital Technologies]'
+    - 'Research Associate and PhD Candidate #text(fill: rgb("5e81ac"), weight: "bold")[|]
+      #text(size: 10pt, weight: "regular", style: "italic")[Research Project Media
+      Literacy]'
+    - 'Research Associate & PhD Candidate #text(fill: rgb("5e81ac"), weight: "bold")[|]
+      #text(size: 10pt, weight: "regular", style: "italic")[Professorship of Media
+      Psychology]'
+    - 'Graduate Assistant #text(fill: rgb("5e81ac"), weight: "bold")[|] #text(size:
+      10pt, weight: "regular", style: "italic")[Professorship of Media Psychology]'
+    - 'Graduate Assistant #text(fill: rgb("5e81ac"), weight: "bold")[|]  #text(size:
+      10pt, weight: "regular", style: "italic")[Faculty of Humanities]'
+    location:
+    - Chemnitz \ University of Technology
+    - Chemnitz \ University of Technology
+    - Chemnitz \ University of Technology
+    - Chemnitz \ University of Technology
+    - Chemnitz \ University of Technology
+    description:
+    - Research Associate & PhD Candidate at the Institute for Media Research, worked
+      within Subproject B01 – 'Human Minds in Digital Technologies – Processes and
+      Effects of (De)Anthropomorphism' of the Collaborative Research Centre (CRC)
+      'Hybrid Societies'. Responsible for the design, implementation, and analysis
+      of laboratory studies for this DFG-funded CRC focused on shaping future hybrid
+      societies.
+    - Research Associate in the DFG funded research project Media Literacy (Mediale
+      Zeichenkompetenz), responsible for the design, implementation, and analysis
+      of field studies within a collaborative research project between the Professorship
+      of Media Psychology (TU Chemnitz) and the Professorship of Developmental Psychology
+      (JM University of Würzburg), operating at the forefront of research in developmental
+      media psychology.
+    - 'Served as Research Associate and Lecturer at the Institute of Media Research,
+      supporting the Bachelor''s and Master''s programs: ''Media Communication'',
+      ''Computational and Communication Science'', ''Media Psychology and Instructional
+      Psychology'', and ''Digital Media and Cultural Communication''.'
+    - Supported Professor Dr. Peter Ohler with teaching activities and preliminary
+      work for research projects within the Professorship.
+    - Performed various support tasks for the Institutes of German Studies and Media
+      Research.
+    note_label:
+    - Doctoral Dissertation
+    - .na.character
+    - .na.character
+    - .na.character
+    - .na.character
+    note:
+    - Anthropomorphism as an Enhancement of Empathy during humans interaction with
+      embodied digital technologies. (Submissoin scheduled for Oktober 2025)
+    - .na.character
+    - .na.character
+    - .na.character
+    - .na.character
+    label_2:
+    - Key Responsibilities \ and Achievements
+    - Key Responsibilities \ and Achievements
+    - Key Responsibilities \ and Achievements
+    - Key Responsibilities \ and Achievements
+    - Key Responsibilities \ and Achievements
+    detail_2:
+    - 'Developed novel methods and experimental designs for research on (de-)anthropomorphism
+      and embodied digital technologies. #text(size: 8pt, weight: "medium", style:
+      "oblique", fill: rgb("5e81ac"))[Developed a multidimensional anthropomorphism
+      questionnaire.]'
+    - 'Analyzed longitudinal data from kindergarten field studies and developed learning
+      materials for various media literacy training programs based on the findings.
+      #text(size: 8pt, weight: "medium", style: "oblique", fill: rgb("5e81ac"))[Developed
+      the final concepts for the individual training programs.]'
+    - Instructed undergraduate and graduate students in fundamental concepts and their
+      application within relevant fields, teaching a total of 24 courses across these
+      programs.
+    - 'Assisted with teaching activities for the ''Research Specialization: Media
+      Psychology'' course (Bachelor''s program ''Media Communication''), contributing
+      to the successful delivery of the seminar, assuming full teaching responsibility
+      for the two-semester course the following semester.'
+    - Administered and redesigned websites for multiple professorships (Prof. Malinowski,
+      Prof. Thielmann, Prof. Fraas) within the Institutes of German & Communication
+      Studies and Media Research.
+    detail_3:
+    - 'Implemented and conducted various experimental studies. #text(size: 8pt, weight:
+      "medium", style: "oblique", fill: rgb("5e81ac"))[Developed a virtual experimenter
+      using Unity to overcome pandemic-related restrictions on in-person data collection.]'
+    - 'Programmed learning modules for a planned media literacy app. #text(size: 8pt,
+      weight: "medium", style: "oblique", fill: rgb("5e81ac"))[Completed the initial
+      modules of the app.]'
+    - Supervised student research groups and a total of 19 Bachelor's theses and 23
+      Master's theses.
+    - Programming and implementation of behavioral scripts for the robot Nao, as part
+      of research into toddler robotics and enabling the first successful use of robots
+      in courses and student research at the Institute for Media Research.
+    - Developed and Implemented the online information portal for the 'Intercultural
+      German Studies' Master's program.
+    detail_4:
+    - 'Collaborated with interdisciplinary project groups within the CRC to conduct
+      joint research. #text(size: 8pt, weight: "medium", style: "oblique", fill: rgb("5e81ac"))[Successfully
+      conducted multiple studies and published findings in peer-reviewed journals.]'
+    - 'Planned and conducted workshops for researchers and student assistants on implementing
+      field studies with kindergarten and preschool children. #text(size: 8pt, weight:
+      "medium", style: "oblique", fill: rgb("5e81ac"))[Successfully trained a qualified
+      research team, enabling effective data collection in kindergartens and preschools.]'
+    - Performed institutional service, including serving on faculty hiring committees,
+      curriculum committees, organizing academic conferences, and contributing to
+      grant writing/funding proposals.
+    - Conceptualized and developed the blended learning course 'Scripting for Communication
+      Scientists', which was subsequently implemented at the Institute for Media Research.
+    - Managed the migration of the faculty's transcription analysis system from ATLAS.ti
+      to MAXQDA.
+    detail_5:
+    - 'Communicated and presented research findings at scientific events and public
+      forums. #text(size: 8pt, weight: "medium", style: "oblique", fill: rgb("5e81ac"))[Delivered
+      presentations at multiple conferences and scientific events.]'
+    - 'Managed various administrative tasks, including project budget administration,
+      recruitment of schools and classes for study participation, and study planning/preparation
+      in coordination with school officials and authorities of the State of Saxony.
+      #text(size: 8pt, weight: "medium", style: "oblique", fill: rgb("5e81ac"))[Organized
+      and led informational events for kindergartens, schools, and state authorities,
+      resulting in an officially approved list for mandatory participation of recruited
+      institutions.]'
+    - .na.character
+    - .na.character
+    - .na.character
+    detail_6:
+    - 'Performed statistical analysis of collected research data. #text(size: 8pt,
+      weight: "medium", style: "oblique", fill: rgb("5e81ac"))[Achieved a detailed
+      understanding of the psychological processes underlying (de-)anthropomorphism
+      and phenomena such as the Uncanny Valley.]'
+    - .na.character
+    - .na.character
+    - .na.character
+    - .na.character
+    detail_7:
+    - 'Authored scientific articles and project reports. #text(size: 8pt, weight:
+      "medium", style: "oblique", fill: rgb("5e81ac"))[Authored/Co-authored multiple
+      peer-reviewed publications (see Publications section).]'
+    - .na.character
+    - .na.character
+    - .na.character
+    - .na.character
+  interests:
+    label_1: '#text(fill: rgb("5e81ac"))[Empathy]'
+    details_1: Dissecting the empathic process in its cognitive, affective and motoric
+      subprocesses.
+    label_2: '#text(fill: rgb("5e81ac"))[Embodied Digital Technologies]'
+    details_2: The interaction of (de-)anthropomorphism and empathy in the human robotic
+      interaction and its influence on certain phenomena such as the uncanny valley.
+    label_3: '#text(fill: rgb("5e81ac"))[Dark Triad]'
+    details_3: Using dark personality traits to dissect the empathic process.
+    label_4: '#text(fill: rgb("5e81ac"))[Neurodiversity]'
+    details_4: Digital Media as a tool to counter the effects of the impaired dopaminerge
+      System in ADHD.
+    label_5: '#text(fill: rgb("5e81ac"))[Neurodiversity]'
+    details_5: Facilitating Learning and Social Live of neurodiverse People.
+    label_6: '#text(fill: rgb("5e81ac"))[Statistics]'
+    details_6: The application of new methods to reduce statistical biases in science.
+    label_7: '#text(fill: rgb("5e81ac"))[Data Science]'
+    details_7: Artificial Intelligence, neural networks and advanced statistical modelling.
