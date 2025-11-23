@@ -22,7 +22,10 @@ jobs:
 
       - name: Prepare Source Files (Patch Config & Clear Metadata)
         run: |
-          sed -i 's|_extensions/acvt|_extensions/orehren/acvt|g' _extensions/acvt/_extension.yml
+          CONF_FILE="_extensions/acvt/_extension.yml"
+
+          sed -i 's|pre-render: .*_fetch_cv_data\.R.*|pre-render: _extensions/orehren/acvt/R/_fetch_cv_data.R|' "$CONF_FILE"
+          #sed -i 's|_extensions/acvt|_extensions/orehren/acvt|g' _extensions/acvt/_extension.yml
           if [ -f "_extensions/acvt/typst/02-definitions-metadata.typ" ]; then
             truncate -s 0 _extensions/acvt/typst/02-definitions-metadata.typ
             echo "File _extensions/acvt/typst/02-definitions-metadata.typ cleared."
