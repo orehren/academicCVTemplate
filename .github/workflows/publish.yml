@@ -14,47 +14,34 @@ jobs:
       contents: write
 
     steps:
-      # 1. Check out repository
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 2. Set up Quarto and R
       - name: Set up Quarto and R
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # --- NEUER SCHRITT: Konfiguration anpassen und Datei leeren ---
       - name: Prepare Source Files (Patch Config & Clear Metadata)
         run: |
-          # 1. Ändern des Pfades in _extension.yml
-          # Sucht nach dem alten Pfad und ersetzt ihn durch den neuen (Namespace orehren)
           sed -i 's|_extensions/acvt/R/_fetch_cv_data.R|_extensions/orehren/acvt/R/_fetch_cv_data.R|g' _extension.yml
-
-          # 2. Leeren von typst/02-definitions-metadata.typ
-          # truncate -s 0 setzt die Dateigröße auf 0 Bytes (Inhalt weg, Datei bleibt)
-          # Prüfe bitte kurz, ob der Pfad exakt stimmt (manchmal liegen die auch in _extensions/...)
           if [ -f "_extensions/acvt/typst/02-definitions-metadata.typ" ]; then
             truncate -s 0 _extensions/acvt/typst/02-definitions-metadata.typ
             echo "File _extensions/acvt/typst/02-definitions-metadata.typ cleared."
           else
-            echo "Warning: typst/02-definitions-metadata.typ not found, skipping clear."
+            echo "Warning: _extensions/acvt/typst/02-definitions-metadata.typ not found, skipping clear."
           fi
         shell: bash
 
-      # 3. Render Quarto Website (passiert jetzt mit der neuen Config)
       - name: Render Quarto Website
         uses: quarto-dev/quarto-actions/render@v2
         with:
           path: docs
 
-      # 4. Move MD files to offline directory
       - name: Move intermediate Markdown files
         run: |
-          # 1. Handle Offline Documentation
           mkdir -p _extensions/acvt/docs
           find docs/ -type f -name "*.md" -exec mv {} _extensions/acvt/docs/ \;
         shell: bash
 
-      # 5. Commit changed files back to 'main'
       - name: Commit changes back to main
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -62,13 +49,12 @@ jobs:
           branch: main
           file_pattern: |
             _extensions/acvt/docs/*.md
-            _extension.yml
+            _extensions/acvt/_extension.yml
             _extensions/acvt/typst/02-definitions-metadata.typ
           repository: .
           commit_user_name: 'github-actions[bot]'
           commit_user_email: 'github-actions[bot]@users.noreply.github.com'
 
-      # 6. Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
