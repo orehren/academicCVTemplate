@@ -10,7 +10,7 @@ contributes:
       type: default
       output-dir: _output
       pre-render: _extensions/acvt/R/_fetch_cv_data.R
-    format: acvt
+    format: acvt-typst
     metadata-files:
       - _cv_data.yml
   formats:

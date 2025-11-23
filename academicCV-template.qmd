@@ -93,11 +93,7 @@ publication-list:
 
 # -- Output Options ------------------------------------------------
 render-output: "combined" # "cv-only", "letter-only", or "combined"
-keep-typ: true
-# -- Format Activation ---------------------------------------------
-# This is the most important line:
-# It tells Quarto to use your custom Typst format.
-format: acvt-typst
+
 ---
 
 ## Coverletter
