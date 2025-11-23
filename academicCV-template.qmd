@@ -100,20 +100,6 @@ render-output: "combined" # "cv-only", "letter-only", or "combined"
 
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 
-```{r}
-#| label: lst-setup
-#| include: false
-
-# Load required libraries
-library(tidyverse)       # For data manipulation (pipes, dplyr)
-library(academicCVtools) # The extension's R helper package
-
-# The pre-render script `pre-render.R` has already fetched the Google Sheet
-# data and injected it into the document's metadata. We now simply
-# assign it to a variable for use in subsequent R chunks.
-# cv_data <- rmarkdown::metadata$cv_data
-```
-
 ## Research Interests
 
 {{< cv-section sheet="interests" func="research-interests" combine_cols="details_6, details_7" exclude_cols="label_7" column_order="label_2=5, details_2=1" >}}
