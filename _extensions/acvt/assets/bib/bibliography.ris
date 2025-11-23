@@ -1,0 +1,52 @@
+TY  - JOUR
+ID  - ris_article_2023
+TI  - Parsing Legacy Formats with Modern Tools
+AU  - Smith, John
+AU  - Doe, Jane
+T2  - Journal of Bibliographic Data
+PY  - 2023
+VL  - 12
+IS  - 4
+SP  - 100
+EP  - 115
+ER  -
+
+TY  - BOOK
+ID  - ris_book_2022
+TI  - The History of Citation Standards
+AU  - Miller, Hans
+PB  - Academic Press
+CY  - Berlin
+PY  - 2022
+ER  -
+
+TY  - CONF
+ID  - ris_conf_2024
+TI  - Automated CV Generation from RIS Data
+AU  - Wang, Li
+AU  - Author, A.
+T2  - Proceedings of the International Conference on Data Formats
+PY  - 2024
+SP  - 50
+EP  - 55
+ER  -
+
+TY  - JOUR
+ID  - example_article
+AU  - Author, A.
+TI  - Example Article Title
+JO  - Journal of Examples
+PY  - 2023
+VL  - 1
+IS  - 1
+SP  - 1
+EP  - 10
+ER  -
+
+TY  - BOOK
+ID  - example_book
+AU  - Buthor, B.
+TI  - Example Book Title
+PB  - Example Publisher
+PY  - 2022
+ER  -

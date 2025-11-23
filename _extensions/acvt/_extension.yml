@@ -5,21 +5,20 @@ description: "A Quarto extension for creating academic CVs and cover letters usi
 quarto-required: ">=1.8.0"
 license: MIT
 contributes:
-  output-file: "CV_Application"
-  # metadata-files:
-  #   - _cv_data.yml
   project:
-    metadata-files:
-      - _cv_data.yml
     project:
       type: default
       output-dir: _output
-      pre-render: _extensions/acvt/_fetch_cv_data.R
-    format: acvt-typst
+      pre-render: _extensions/acvt/R/_fetch_cv_data.R
+    format: acvt
+    metadata-files:
+      - _cv_data.yml
   formats:
     common:
+      output-file: "CV_Application"
       shortcodes:
-        - cv-section.lua
+        - shortcodes/cv-section.lua
+        - shortcodes/publication-list.lua
       execute:
         echo: false
         warning: false
@@ -30,15 +29,21 @@ contributes:
         font-text: ["Source Sans Pro", "Arial", "Dejavu Sans"]
       surpress-bibliography: true
       publication-list:
-        bibfile: "assets/bib/bibliography.bib"
-        bibstyle: "assets/bib/apa-cv.csl"
+        bib_file:
+          - assets/bib/bibliography.bib
+          - assets/bib/bibliography.ris
+          - assets/bib/bibliography.json
+          - assets/bib/bibliography.xml
+          - assets/bib/bibliography.yml
+        bib_style: "assets/bib/apa-cv.csl"
+        highlight_author: color
       profile-photo: "assets/images/picture.jpg"
     typst:
       keep-typ: false
       filters:
-        - path: lua/inject_metadata.lua
-        - path: lua/extract-cover-letter.lua
-        - path: lua/embed-attachments.lua
+        - path: filters/inject_metadata.lua
+        - path: filters/extract-cover-letter.lua
+        - path: filters/embed-attachments.lua
       template: typst/template.typ
       template-partials:
         - typst/01-definitions-helper-functions.typ

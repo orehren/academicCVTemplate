@@ -61,7 +61,7 @@ style:
   font-header: "Lato"
   font-text: "Roboto"
 
-# profile-photo: null
+# profile-photo: null # to disable the picture
 
 google-document:
   auth-email: o.rehren@gmail.com # TRUE
@@ -80,13 +80,20 @@ attachments:
 
 # -- Publication List ----------------------------------------------
 # Configuration for the publication list. See `?render_publication_list`.
-# publication-list:
-  # author_name: "Your Name" # Optional: Will be inferred if not set
-#  highlight_author: "bold" # "bold", "italic", "color", or a custom Typst string
-  
+publication-list:
+  author_name: "Author, A." # Optional: Will be inferred if not set
+  #highlight_author: '#text(fill: rgb("516db0"), weight: "bold")[%s]' # "bold", "italic", "color", or a custom Typst string
+  # bib_file:
+  #   - _extensions/acvt/assets/bib/bibliography.bib
+  #   - _extensions/acvt/assets/bib/bibliography.ris
+  #   - _extensions/acvt/assets/bib/bibliography.json
+  #   - _extensions/acvt/assets/bib/bibliography.xml
+  #   - _extensions/acvt/assets/bib/bibliography.yml
+  #bib_style: "apa-cv.csl"
+
 # -- Output Options ------------------------------------------------
 render-output: "combined" # "cv-only", "letter-only", or "combined"
-
+keep-typ: true
 # -- Format Activation ---------------------------------------------
 # This is the most important line:
 # It tells Quarto to use your custom Typst format.
@@ -113,37 +120,10 @@ library(academicCVtools) # The extension's R helper package
 
 ## Research Interests
 
-```{r}
-#| output: asis
-#| label: lst-research_interests
-
-# cv_data$interests |>
-#   format_typst_section(
-#     # The name of the Typst function to call in your template
-#     typst_func = "#research-interests"
-#   ) |>
-#   cat()
-# cv_data
-```
-
 {{< cv-section sheet="interests" func="research-interests" combine_cols="details_6, details_7" exclude_cols="label_7" column_order="label_2=5, details_2=1" >}}
-
 
 ## Publications
 
-```{r}
-#| output: asis
-#| label: lst-publications
-#| test: 23
+{{< publication-list >}}
 
-# This function reads all its configuration from the `publication-list`
-# key in the YAML header.
-#render_publication_list()
-# library(jsonlite)
 
-# info_file <- Sys.getenv("QUARTO_EXECUTE_INFO")
-# info <- jsonlite::fromJSON(info_file)$format$metadata$cv_data
-
-# Access format information
-# info
-```
