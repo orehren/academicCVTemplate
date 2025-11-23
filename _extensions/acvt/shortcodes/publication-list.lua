@@ -1,60 +1,12 @@
 -- publication-list.lua
 
--- =============================================================================
--- 1. UTILS
--- =============================================================================
-local utils = {}
-
-function utils.safe_string(obj)
-  if obj == nil then return "" end
-  local status, res = pcall(pandoc.utils.stringify, obj)
-  if status then return res end
-  return tostring(obj)
-end
-
-function utils.trim(s)
-  if not s then return nil end
-  return s:match("^%s*(.-)%s*$")
-end
-
-function utils.fix_quotes(s)
-  if not s then return nil end
-  s = tostring(s)
-  s = s:gsub("“", '"'):gsub("”", '"')
-  s = s:gsub("‘", "'"):gsub("’", "'")
-  return s
-end
-
-function utils.file_exists(path)
-  local f = io.open(path, "r")
-  if f then io.close(f); return true else return false end
-end
-
-function utils.parse_key_val(str)
-  local res = {}
-  local s = utils.safe_string(str)
-  for pair in string.gmatch(s, "([^,]+)") do
-    local k, v = pair:match("^%s*([^=]+)=([^=]+)%s*$")
-    if k and v then res[utils.trim(k)] = utils.trim(v) end
-  end
-  return res
-end
-
-function utils.parse_list_string(str)
-  local res = {}
-  local s = utils.safe_string(str)
-  for item in string.gmatch(s, "([^,]+)") do
-    table.insert(res, utils.trim(item))
-  end
-  return res
-end
+local utils = require 'utils'
 
 -- =============================================================================
 -- 2. CONFIG LOADING
 -- =============================================================================
 local config = {}
 
--- Helper: merges kwargs, YAML metadata, and defaults.
 function config.get(kwargs)
   local env_conf = {}
   local global_meta = {}
@@ -158,7 +110,7 @@ function config.get(kwargs)
     end
     highlight_markup = '#text(fill: rgb("' .. col .. '"))[%s]'
   elseif hl_style:match("%%s") then
-    highlight_markup = utils.fix_quotes(hl_style)
+    highlight_markup = utils.fix_smart_quotes(hl_style)
   end
 
   local standard_group_labels = {
@@ -368,7 +320,7 @@ function Shortcode(args, kwargs, meta)
 
   local typst_items = {}
   for _, e in ipairs(entries) do
-    local item_str = e.content:gsub("\\", "\\\\"):gsub('"', '\\"')
+    local item_str = utils.escape_typst(e.content)
     table.insert(typst_items, string.format('(label: "%s", item: "%s")', e.label, item_str))
   end
 
