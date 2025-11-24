@@ -1,0 +1,44 @@
+[
+  {
+    "id": "example_article",
+    "type": "article-journal",
+    "author": [
+      {
+        "family": "Author",
+        "given": "A."
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2023
+        ]
+      ]
+    },
+    "title": "Example Article Title",
+    "container-title": "Journal of Examples",
+    "volume": 1,
+    "issue": 1,
+    "page": "1-10"
+  },
+
+  {
+    "id": "example_book",
+    "type": "book",
+    "author": [
+      {
+        "family": "Buthor",
+        "given": "B."
+      }
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2022
+        ]
+      ]
+    },
+    "title": "Example Book Title",
+    "publisher": "Example Publisher"
+  }
+]

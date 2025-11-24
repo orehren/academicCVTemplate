@@ -1,0 +1,11 @@
+Title: Academic CV (Typst)
+Binding: create_acvt_project
+Subtitle: Create a professional Academic CV using Typst and Quarto
+Caption: Create Academic CV
+Icon: icon.png
+
+Parameter: author
+Widget: TextInput
+Label: Author Name
+Default: Your Name
+Position: left

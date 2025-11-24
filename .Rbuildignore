@@ -1,0 +1,14 @@
+^renv$
+^renv\.lock$
+^_extensions$
+^scripts$
+^docs$
+^_output$
+^academicCV-template\.pdf$
+^academicCV-template\.qmd$
+^screenshot\.png$
+^_quarto\.yml$
+^\.github$
+^\.quarto$
+^\.Rlibs$
+^_cv_data\.yml$

@@ -1,0 +1,11 @@
+.Rlibs/
+_output/
+.cv_cache.rds
+_cv_data.yml
+.quarto/
+renv/library/
+renv/python/
+renv/staging/
+
+/.quarto/
+**/*.quarto_ipynb

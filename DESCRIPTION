@@ -1,0 +1,25 @@
+Package: academicCVtools
+Type: Package
+Title: Academic CV Tools
+Version: 0.9.0
+Authors@R: person("Oliver", "Rehren", email = "o.rehren@gmail.com", role = c("aut", "cre"))
+Description: A Quarto extension and RStudio Project Template for creating academic CVs and cover letters using Typst.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports:
+    yaml,
+    rmarkdown,
+    cli,
+    googledrive,
+    googlesheets4,
+    purrr,
+    checkmate,
+    rlang,
+    janitor,
+    readr,
+    dplyr,
+    tibble
+Suggests:
+    renv

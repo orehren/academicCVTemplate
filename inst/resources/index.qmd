@@ -1,0 +1,113 @@
+---
+# ------------------------------------------------------------------
+# EXAMPLE DOCUMENT FOR THE 'academiccvtemplate-typst' EXTENSION
+#
+# This document demonstrates how to use the Quarto extension to
+# create a data-driven CV. All metadata and styling is set
+# here in the YAML header, and the content is loaded from R.
+# ------------------------------------------------------------------
+# -- Basic Document Information ------------------------------------
+title: "Documents of Application"
+author:
+  firstname: "Arthur"
+  lastname: "Author"
+  contact:
+    - icon: fa address-card
+      text: "Your Address"
+    - icon: fa mobile-screen
+      text: "Your Phone Number"
+    - icon: fa envelope
+      text: "Your E-Mail-Address"
+      url: "mailto:your.email@gmail.com"
+  socialmedia:
+    - icon: fa house
+      text: example.com
+      url: https://example.com
+    - icon: fa orcid
+      text: "Your Orcid Number"
+      url: "Link To Your Orcid Page"
+    - icon: fa github
+      text: "Your GitHub Page"
+      url: "Link To Your GitHub Page"
+    - icon: fa linkedin
+      text: "LinkedIn"
+      url: "Link To Your LinkedIn Account"
+
+# -- Cover Letter Information --------------------------------------
+recipient:
+  name: "A Name"
+  salutation: "Salutation"
+  address: "Oxmoron Street"
+  city: "The City"
+  zip: "66696"
+date: "1. March 2025"
+subject: "The subject of the cover letter"
+
+# -- Core CV Content -----------------------------------------------
+# These fields provide main content blocks to the template.
+position: "Your Position" # Either your current position or the position you are applying for
+aboutme: |
+  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+  eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+  voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+famous-quote: # Optional
+  text: "Nothing is as practical as a good theory."
+  attribution: "Kurt Lewin"
+
+# -- Template Styling ----------------------------------------------
+# These variables override the template defaults.
+style:
+  color-accent: "5e81ac" # A custom accent color (e.g., from Nord palette)
+  font-header: "Lato"
+  font-text: "Roboto"
+
+# profile-photo: null # to disable the picture
+
+google-document:
+  auth-email: o.rehren@gmail.com # TRUE
+  document-identifier: "Application_CV_Data"
+  sheets-to-load:
+    - name: "Working Experiences"
+      shortname: "working"
+    - name: "Research Interests"
+      shortname: "interests"
+
+attachments:
+  - name: "First Document"
+    file: "_extensions/acvt/assets/images/first_document.png"
+  - name: "Second Document"
+    file: "_extensions/acvt/assets/images/second_document.png"
+
+# -- Publication List ----------------------------------------------
+# Configuration for the publication list. See `?render_publication_list`.
+publication-list:
+  author_name: "Author, A." # Optional: Will be inferred if not set
+  #highlight_author: '#text(fill: rgb("516db0"), weight: "bold")[%s]' # "bold", "italic", "color", or a custom Typst string
+  # bib_file:
+  #   - _extensions/acvt/assets/bib/bibliography.bib
+  #   - _extensions/acvt/assets/bib/bibliography.ris
+  #   - _extensions/acvt/assets/bib/bibliography.json
+  #   - _extensions/acvt/assets/bib/bibliography.xml
+  #   - _extensions/acvt/assets/bib/bibliography.yml
+  #bib_style: "apa-cv.csl"
+
+# -- Output Options ------------------------------------------------
+render-output: "combined" # "cv-only", "letter-only", or "combined"
+
+---
+
+## Coverletter
+
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+## Research Interests
+
+{{< cv-section sheet="interests" func="research-interests" combine_cols="details_6, details_7" exclude_cols="label_7" column_order="label_2=5, details_2=1" >}}
+
+## Working Experiences
+
+{{< cv-section sheet="working" func="resume-entry" combine_cols='starts_with("detail")' combine_as="details" combine_prefix="· " exclude_cols = "start, end" combine_sep = "\\ \\ " >}}
+
+## Publications
+
+{{< publication-list >}}
