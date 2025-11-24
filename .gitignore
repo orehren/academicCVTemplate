@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.cv_cache.rds
+_cv_data.yml
+_output/
+renv/library/
+renv/python/
+renv/staging/
+r_lib/
+.quarto/
+
+/.quarto/
+**/*.quarto_ipynb

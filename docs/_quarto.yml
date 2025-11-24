@@ -10,6 +10,8 @@ website:
         text: Home
       - href: installation.qmd
         text: Installation
+       - href: structure.qmd
+         text: Structure
       - href: tutorial.qmd
         text: Tutorial
       - href: yaml_reference.qmd

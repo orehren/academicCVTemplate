@@ -56,8 +56,10 @@ To change the profile photo, replace the file at `_extensions/acvt/assets/images
 ```yaml
 profile-photo: "path/to/your/photo.jpg"
 # To disable the photo:
-# profile-photo: ""
+# profile-photo: null
 ```
+
+**Note:** For this tutorial, we assume you want to use all features. However, if you don't have a profile photo or don't want a cover letter, you can simply set these fields to `null` or remove them from the YAML.
 
 ## 3. The Cover Letter
 

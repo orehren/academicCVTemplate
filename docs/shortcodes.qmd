@@ -2,13 +2,13 @@
 title: "Shortcodes Reference"
 ---
 
-# Shortcodes
+# Shortcodes Reference
 
-The `academicCVTemplate` uses Quarto shortcodes to insert dynamic content into your CV. This allows you to place your data exactly where you want it in the document without writing any complex R code.
+This page provides a comprehensive guide to the Quarto shortcodes provided by the extension. These shortcodes are the primary method for inserting dynamic content from your Google Sheets and bibliographies into your CV.
 
 ## `{{< cv-section >}}`
 
-The `cv-section` shortcode is the workhorse of your CV. It fetches data from a specific sheet in your Google Spreadsheet (or cached data) and renders it using a Typst function.
+The `cv-section` shortcode iterates over the rows of a specific data sheet and renders each row using a specified Typst function.
 
 ### Basic Usage
 
@@ -16,83 +16,124 @@ The `cv-section` shortcode is the workhorse of your CV. It fetches data from a s
 {{< cv-section sheet="working" func="resume-entry" >}}
 ```
 
+This tells Quarto to:
+1.  Look up the data sheet with the shortname `working`.
+2.  For each row in that sheet, call the Typst function `#resume-entry(...)`.
+3.  Pass the row's data as arguments to that function.
+
 ### Arguments
 
-| Argument | Description | Default | Example |
-| :--- | :--- | :--- | :--- |
-| `sheet` | **Required.** The `shortname` of the sheet to load data from (as defined in `google-document` config). | - | `sheet="working"` |
-| `func` | **Required.** The name of the Typst function to use for rendering each entry. | - | `func="resume-entry"` |
-| `exclude_cols` | A comma-separated list of columns to exclude from the data passed to the Typst function. Supports "tidy select" features. | `""` | `exclude_cols="id, note*"` |
-| `combine_cols` | A comma-separated list of columns to combine into a single text block (e.g., bullet points). Supports "tidy select". | `""` | `combine_cols="starts_with('detail')"` |
-| `combine_as` | The name of the new column where the combined text will be stored. | `"details"` | `combine_as="description"` |
-| `combine_sep` | The separator used between combined items. | `" "` | `combine_sep="\ \ "` (Typst line break) |
-| `combine_prefix` | A prefix string added before each item in the combined list (e.g., a bullet point). | `""` | `combine_prefix="· "` |
-| `column_order` | Explicitly reorder columns or move specific columns to indices. | `""` | `column_order="title=1, date=2"` |
-| `na_action` | How to handle empty/NA values. Options: `"omit"` (remove key), `"keep"` (pass as `none`), `"string"` (pass as `"NA"`). | `"omit"` | `na_action="keep"` |
+| Argument | Description | Default |
+| :--- | :--- | :--- |
+| `sheet` | **Required.** The `shortname` of the sheet to load data from (defined in `google-document` YAML). | - |
+| `func` | **Required.** The name of the Typst function to call for each row (e.g., `resume-entry`). | - |
+| `exclude_cols` | A list of columns to exclude from the output. | `""` |
+| `combine_cols` | A list of columns to combine into a single argument (e.g., bullet points). | `""` |
+| `combine_as` | The key name for the combined column. | `"details"` |
+| `combine_sep` | The separator used between combined items. | `" "` |
+| `combine_prefix` | A prefix string added before each combined item. | `""` |
+| `column_order` | **Optional.** A way to explicitly reorder columns before they are passed to the function. | `""` |
+| `na_action` | Handling of empty values (`omit`, `keep`, `string`). | `"omit"` |
 
-### "Tidy Select" Features
+### Controlling the Layout
 
-For `exclude_cols` and `combine_cols`, you can use powerful selection helpers:
+The layout of your CV entries is determined by how the Typst function (e.g., `resume-entry`) processes its arguments.
 
-*   **Exact Name:** `title` selects the column named "title".
-*   **Range:** `start:end` selects all columns from "start" to "end" (inclusive).
-*   **`starts_with("...")`**: Selects columns starting with the prefix.
-*   **`ends_with("...")`**: Selects columns ending with the suffix.
-*   **`contains("...")`**: Selects columns containing the string.
-*   **`matches("...")`**: Selects columns matching a Lua pattern.
+**Key Concept:** Typst functions used here process their arguments **sequentially**. This means the first argument passed by the shortcode goes to the first "slot" of the layout (e.g., the date column), the second argument goes to the second slot (e.g., the title), and so on.
 
-**Example:**
+You have two ways to control this mapping:
+
+1.  **Sheet Order (Default):** By default, the shortcode passes columns in the exact order they appear in your Google Sheet (excluding any `exclude_cols`). This is the simplest method—just arrange your spreadsheet columns to match the desired layout.
+2.  **`column_order` (Override):** If you cannot or do not want to rearrange your spreadsheet, you can use the `column_order` argument to force a specific sequence.
+
+#### Example: Using `column_order`
+
+Suppose your sheet has columns in this order: `Title, Location, Description, Date`.
+But `#resume-entry` lays them out in this order: `Date, Title, Location, Description`.
+
+You can fix this mapping in the shortcode:
+
+```markdown
+{{< cv-section
+    sheet="working"
+    func="resume-entry"
+    column_order="Date=1, Title=2, Location=3, Description=4"
+>}}
+```
+
+This ensures `Date` is passed first, regardless of its position in the sheet.
+
+### Tidy Selection Helpers
+
+For `exclude_cols` and `combine_cols`, you can use "Tidy Select" style helpers to match multiple columns:
+
+*   `starts_with("prefix")`
+*   `ends_with("suffix")`
+*   `contains("string")`
+*   `matches("pattern")`
+*   `col_a:col_b` (Selects a range of columns from A to B)
+
+**Example:** Combine all columns starting with "detail" into a bulleted list.
+
 ```markdown
 {{< cv-section
     sheet="working"
     func="resume-entry"
     combine_cols="starts_with('detail')"
-    combine_prefix="-- "
+    combine_as="description"
+    combine_prefix="• "
     combine_sep="\n"
 >}}
 ```
 
 ## `{{< publication-list >}}`
 
-The `publication-list` shortcode automatically generates a formatted list of publications from a bibliography file (BibTeX, CSL-JSON, RIS, etc.).
+The `publication-list` shortcode generates a formatted bibliography from your data files.
 
-### Basic Usage
+### Usage
+
+**Standard (YAML Configured):**
+If you have configured `publication-list` in your YAML header, you can simply use:
 
 ```markdown
 {{< publication-list >}}
 ```
 
-### Configuration
+**Custom (Argument Configured):**
+You can also pass arguments directly to the shortcode. This is powerful for creating multiple, distinct publication lists (e.g., "Peer-Reviewed Papers" vs. "Conference Talks").
 
-The `publication-list` shortcode is primarily configured via the `publication-list` key in your YAML header, but some options can be passed directly as arguments.
+```markdown
+## Peer-Reviewed Papers
+{{< publication-list bib_file="papers.bib" >}}
 
-**YAML Configuration:**
-```yaml
-publication-list:
-  bib_file: "assets/bib/my_publications.bib"
-  bib_style: "assets/bib/apa-cv.csl"
-  author_name: "Smith, J." # Name to highlight
-  highlight_author: "bold" # "bold", "italic", "color", or custom Typst
-  group_order: ["article", "book", "conference"]
+## Talks
+{{< publication-list bib_file="talks.bib" >}}
 ```
 
-**Shortcode Arguments (Override YAML):**
+### Author Highlighting
 
-| Argument | Description |
-| :--- | :--- |
-| `bib_file` | Path to the bibliography file. |
-| `bib_style` | Path to the CSL style file. |
-| `author_name` | The author name to highlight in the bibliography. |
-| `debug` | Set to `"true"` to print debug info in the output. |
+You can highlight specific author names (e.g., make them bold) in the bibliography.
 
-### Grouping and Sorting
+**1. Automatic Inference:**
+If you do not specify `author_name`, the extension attempts to infer it from the `author` fields in your YAML header.
 
-The shortcode groups publications by type (Journal Article, Conference Paper, etc.) and sorts them by year (descending). You can customize the group labels and order in the YAML configuration.
+**2. Explicit Configuration:**
+You can manually set the name to highlight using the `author_name` argument.
 
-```yaml
-publication-list:
-  group_labels:
-    article: "Peer-Reviewed Journals"
-    conference: "Conference Proceedings"
-  group_order: ["article", "conference", "misc"]
+**Important:** The string must match the *output format* of the citation style.
+*   The template uses `apa-cv.csl` by default, which formats names as `Lastname, Initial.`.
+*   To highlight "Arthur Author", you must set `author_name="Author, A."`.
+
+```markdown
+{{< publication-list
+    bib_file="my_pubs.bib"
+    author_name="Author, A."
+    highlight_author="bold"
+>}}
 ```
+
+**Highlighting Styles (`highlight_author`):**
+*   `"bold"`: **Author, A.**
+*   `"italic"`: *Author, A.*
+*   `"color"`: Uses the document's accent color.
+*   `"#strong[%s]"`: Custom Typst function pattern.

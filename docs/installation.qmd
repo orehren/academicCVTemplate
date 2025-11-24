@@ -4,63 +4,45 @@ title: "Installation"
 
 # Installation Guide
 
-To use the `academicCVTemplate`, you need to have Quarto and R installed on your system. The template handles its own dependencies using the `renv` package.
+To use the `academicCVTemplate`, you need Quarto, R, and a specific set of R packages.
 
 ## 1. Prerequisites
 
-Before you start, ensure you have the following installed:
+Ensure you have the following installed:
+1.  **[Quarto](https://quarto.org/docs/get-started/)** (Version 1.4+).
+2.  **[R](https://cloud.r-project.org/)** (Version 4.0+).
 
-1.  **[Quarto](https://quarto.org/docs/get-started/)** (Version 1.4 or later).
-2.  **[R](https://cloud.r-project.org/)** (Version 4.0 or later).
-3.  **[RStudio](https://posit.co/download/rstudio-desktop/)** (Recommended for the best experience).
+## 2. Create a Project
 
-## 2. Get Started with the Template
-
-There are two ways to use the template: creating a new project or adding it to an existing one.
-
-### Option A: Create a New Project (Recommended)
-
-To start a fresh project with this template, run the following command in your terminal (or RStudio Terminal tab):
+To start a new project with this extension, run:
 
 ```bash
 quarto use template orehren/academicCVTemplate
 ```
 
-You will be prompted to:
-1.  **Trust the authors?** (Type `Y` if you trust the extension).
-2.  **Directory name:** Enter the name for your new project folder (e.g., `my-cv`).
+Follow the prompts to create your directory.
 
-Quarto will create the directory and download all necessary files, including the `renv.lock` file for dependency management.
+## 3. Install R Packages
 
-### Option B: Add to an Existing Project
+This extension relies on R to fetch and process data. You need to install the following packages in your R environment:
 
-If you already have a Quarto project, navigate to its root directory in the terminal and run:
+*   `googledrive`
+*   `googlesheets4`
+*   `yaml`
+*   `rmarkdown`
+*   `cli`
+*   `purrr`
+*   `checkmate`
+*   `rlang`
+*   `janitor`
 
-```bash
-quarto add orehren/academicCVTemplate
-```
-
-## 3. Set Up the R Environment
-
-This template uses R to fetch data from Google Sheets and process it. To ensure reliability, the project uses `renv` to manage R package versions.
-
-1.  Open the project in RStudio (open the `.Rproj` file) or navigate to the project directory in your terminal.
-2.  Open the **R Console**.
-3.  Run the following command to restore the project environment:
+You can install them by running this command in your R console:
 
 ```r
-if (!require("renv")) install.packages("renv")
-renv::restore()
+install.packages(c(
+  "googledrive", "googlesheets4", "yaml", "rmarkdown",
+  "cli", "purrr", "checkmate", "rlang", "janitor"
+))
 ```
 
-This will download and install all the exact package versions needed for the template to work correctly.
-
-## 4. Verify Installation
-
-To verify that everything is set up correctly, try rendering the example template. In the terminal, run:
-
-```bash
-quarto render academicCV-template.qmd
-```
-
-**Note:** The first render might fail or ask for authentication if you haven't configured the Google Sheets connection yet. This is normal! Proceed to the **[Data Integration](./data_integration.qmd)** section to set up your data source, or check the **[Tutorial](./tutorial.qmd)** to see how to start customizing.
+Once installed, you are ready to configure your data connection.

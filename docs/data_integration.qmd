@@ -4,73 +4,72 @@ title: "Data Integration"
 
 # Data Integration
 
-This template separates your content from the layout by fetching data from Google Sheets. This allows you to update your CV simply by editing a spreadsheet.
+This template separates content from layout by fetching data from Google Sheets.
 
-## 1. Setup
+## 1. Setup Data Integration
 
-In your `.qmd` file, you configure the connection in the `google-document` YAML block:
+Before you can render your CV, you must authenticate with Google Drive. The extension's pre-render script runs non-interactively, so you need to cache your credentials first.
+
+### Authentication
+
+Open your R console in the project directory and run:
+
+```r
+library(googledrive)
+drive_auth()
+```
+
+This will open a browser window. Log in with the Google account that has access to your CV spreadsheet.
+
+**Important:** This creates a local token.
+*   **Global vs. Project:** By default, `drive_auth()` might store the token globally. For this project extension, ensure the token is available to the Quarto render process. If you are using `renv` or a project-specific library, ensure the authentication persists.
+
+## 2. Configuration (`google-document`)
+
+In your `.qmd` file, configure the connection:
 
 ```yaml
 google-document:
-  auth-email: "your.email@gmail.com"
+  auth-email: "your.email@gmail.com" # The email you authenticated with
   document-identifier: "Name_of_Your_Sheet"
   sheets-to-load:
     - name: "Working Experiences" # Tab Name
       shortname: "working"        # ID for Shortcodes
+    - name: "Skills"
+      shortname: "skills"
 ```
 
-On the first render, R will open a browser window to ask for permission to access your Google Drive. This token is cached locally, so you only need to do this once.
+## 3. Spreadsheet Structure
 
-## 2. Spreadsheet Structure
+Your Google Sheet should have separate tabs for each section. The first row must contain **Column Headers**.
 
-Your Google Sheet should have separate tabs for each section of your CV (e.g., "Experience", "Education", "Skills"). The first row of each tab must contain the **Column Headers**.
+### Example: Skills (Visualized)
+
+For the visual skills bar (using the `visualize-skills-list` function), your data **must** include a `value` column between `0.0` and `1.0`:
+
+| area | skill | value | level |
+| :--- | :--- | :--- | :--- |
+| Languages | English | 1.0 | Native |
+| Languages | German | 0.8 | C1 |
+| Tech | R | 0.9 | Expert |
+
+*   `area`: Used to group skills.
+*   `skill`: The name of the skill.
+*   `value`: Numeric (0.0 - 1.0) determining the bar length.
+*   `level`: Text label (e.g., "Expert").
 
 ### Example: Working Experience
 
-For a standard timeline entry, your sheet might look like this:
-
-| start | end | title | location | description |
+| title | location | description | start | end |
 | :--- | :--- | :--- | :--- | :--- |
-| 01/2020 | Present | Senior Researcher | University of X | Leading project Y... |
-| 05/2018 | 12/2019 | Postdoc | Institute Z | Developed algorithm... |
+| Researcher | Uni X | Project Y | 2020 | 2024 |
 
-**Key Concept:** The column names (`start`, `end`, `title`, etc.) are passed directly to the Typst template. The default CV entry function (`#resume-entry`) expects specific keys, but you can map your columns to these keys using the `cv-section` shortcode.
+## 4. Connecting Data to Layout
 
-### Example: Skills
-
-For a list of skills, you might structure it like this:
-
-| category | skill | level |
-| :--- | :--- | :--- |
-| Languages | English | Native |
-| Languages | German | C1 |
-| Tech | R | Expert |
-
-## 3. Connecting Data to Layout
-
-Once your data is in the sheet, you use the `{{< cv-section >}}` shortcode to display it.
+Use the `{{< cv-section >}}` shortcode to map your data to the layout.
 
 ```markdown
 {{< cv-section sheet="working" func="resume-entry" >}}
 ```
 
-### The `resume-entry` Function
-The default layout function `#resume-entry` expects the following arguments (columns):
-*   `title`
-*   `location`
-*   `date` (or `start` + `end`)
-*   `description`
-
-If your sheet has different column names, or if you want to combine multiple columns (e.g., multiple bullet points) into the `description`, you can configure the shortcode:
-
-```markdown
-{{< cv-section
-    sheet="working"
-    func="resume-entry"
-    combine_cols="details_*"
-    combine_as="description"
-    combine_prefix="• "
->}}
-```
-
-This flexibility allows you to structure your Google Sheet however you like, as long as you tell the shortcode how to map it to the template.
+**Note:** The `func` argument (e.g., `resume-entry`) refers to a Typst function. It does not expect specific column names. Instead, it processes the arguments passed to it in sequence. You control this sequence using the `column_order` argument in the shortcode (see **[Shortcodes](./shortcodes.qmd)**).
