@@ -8,58 +8,42 @@ The `academicCVTemplate` allows for extensive customization through YAML configu
 
 ## 1. Basic Styling (YAML)
 
-You can change the main accent color and fonts in the `style` section of your YAML header:
+You can change the main accent color and fonts in the `style` section of your YAML header. See the **[YAML Reference](./yaml_reference.qmd#style)** for all options.
 
 ```yaml
 style:
-  color-accent: "5e81ac" # Hex code (without #)
+  color-accent: "5e81ac"
   font-header: "Lato"
-  font-text: "Roboto"
 ```
 
 ## 2. Advanced Styling (Typst Inline Code)
 
-A powerful feature of this template is the ability to use **Typst inline code** directly within your Google Sheet data. This allows you to style specific words or cells without changing the global template.
+A powerful feature is the ability to use **Typst inline code** directly within your Google Sheet data.
 
 ### How it Works
 
-The template processes data in `markup` mode. This means you can use the `#` symbol to call Typst functions within your text.
+The template processes data in `markup` mode. You can use the `#` symbol to call Typst functions or standard Typst syntax (like `\` for line breaks).
 
 **Example:**
-Suppose you want to highlight the project name in your job title and force a line break in the location.
+Highlight a project name and force a line break.
 
 **In Google Sheets:**
 
 | title | location |
 | :--- | :--- |
-| Research Associate in `#text(fill: rgb("5e81ac"), weight: "bold")[My Project]` | University `#linebreak()` of Science |
+| Research Associate in `#text(fill: rgb("5e81ac"), weight: "bold")[My Project]` | University \ of Science |
 
 **Rendered Result:**
-*   "My Project" will appear in the accent color and bold.
-*   "University" and "of Science" will be on separate lines.
+*   "My Project" appears in the accent color and bold.
+*   "University" and "of Science" appear on separate lines.
 
 **Context:**
 The content is handled as if it is in Typst markup mode.
 *   `#text(...)[]` works.
-*   `text(...)[]` (without hash) does **not** work (treated as plain text).
+*   `text(...)[]` (without hash) does **not** work.
 
-For a full reference of available functions, see the **[Official Typst Documentation](https://typst.app/docs/)**.
+For available functions, see the **[Official Typst Documentation](https://typst.app/docs/)**.
 
-## 3. Typst Template Structure
+## 3. Modifying Templates
 
-For users who want to modify the core layout, the extension is installed in `_extensions/orehren/acvt/`. The Typst files are located in the `typst/` subdirectory.
-
-### File Overview
-
-| File | Purpose |
-| :--- | :--- |
-| `template.typ` | The main entry point. Orchestrates the loading of partials. |
-| `typst-template.typ` | Contains the main document structure and logic. |
-| `01-definitions-helper-functions.typ` | Helper functions for data processing and icons. |
-| `02-definitions-metadata.typ` | **Auto-generated.** Contains the metadata injected from your YAML. |
-| `03-definitions-styling.typ` | Defines colors, fonts, and text styles. |
-| `04-definitions-parts-functions.typ` | Defines the layout components (`resume-entry`, `visualize-skills-list`, title page, footer). |
-| `page.typ` | Page setup (margins, size). |
-| `typst-show.typ` | Global show rules. |
-
-To customize these files, you can copy them to your project root and update the `template-partials` in your `_extension.yml` (or `_quarto.yml`) to point to your local versions.
+For deep customization, you can modify the Typst partials located in `_extensions/orehren/acvt/typst/`. See **[Structure](./structure.qmd#file-reference)** for a file list.

@@ -9,108 +9,68 @@ This page provides a comprehensive reference for all the configuration options a
 ## Document Metadata
 
 ### `title`
-The main title for the generated PDF document properties.
+The main title for the generated PDF.
 **Type:** String
 
 ### `author`
-A nested object containing information about you.
+A nested object for personal details.
 **Fields:**
 *   `firstname`: Your first name.
 *   `lastname`: Your last name.
-*   `contact`: List of contact details (see below).
-*   `socialmedia`: List of social media profiles (see below).
-
-#### `author.contact` / `author.socialmedia`
-Lists of objects with:
-*   `icon`: Font Awesome icon class (e.g., `fa envelope`, `fa brands github`).
-*   `text`: Display text.
-*   `url`: (Optional) Hyperlink URL.
+*   `contact`: List of contact objects (`icon`, `text`, `url`).
+*   `socialmedia`: List of social media objects.
 
 ### `position`
-Your current title or the position you are applying for. Displayed on the Title Page.
+Displayed on the Title Page.
 **Type:** String
 
 ### `profile-photo`
-Path to your profile photo relative to the project root. Set to `""` or `null` to disable.
+Path relative to project root. Set to `null` to disable.
 **Type:** String
 
 ### `aboutme`
-A short bio paragraph displayed on the CV title page.
-**Type:** String (multiline)
+Short bio.
+**Type:** String
 
-### `famous-quote`
-An optional quote displayed on the CV.
-**Fields:**
-*   `text`: The quote text.
-*   `attribution`: The author of the quote.
-
-## Cover Letter Configuration
+## Cover Letter
 
 ### `recipient`
-Information about the addressee.
-**Fields:**
-*   `name`: Full name.
-*   `salutation`: Formal salutation (e.g., "Dear Dr. Smith,").
-*   `address`: Street address.
-*   `city`: City.
-*   `zip`: Postal code.
+Recipient details (`name`, `salutation`, `address`, `city`, `zip`).
 
-### `date`
-The date string for the cover letter.
-**Type:** String
-
-### `subject`
-The subject line of the cover letter.
-**Type:** String
+### `date` / `subject`
+Strings for the letter.
 
 ## Data Integration (`google-document`)
 
-Configures the connection to Google Sheets.
+Configures the Google Sheet connection.
 
 **Fields:**
-*   `auth-email`: The Google email address to use for authentication.
-*   `document-identifier`: The name or ID of the Google Sheet.
-*   `sheets-to-load`: A list of sheets to import.
-    *   `name`: The exact name of the tab in the Google Sheet.
-    *   `shortname`: The unique ID used in `{{< cv-section >}}` shortcodes.
-
-**Example:**
-```yaml
-google-document:
-  auth-email: "me@gmail.com"
-  document-identifier: "My_CV_Data"
-  sheets-to-load:
-    - name: "Working Experiences"
-      shortname: "working"
-```
+*   `auth-email`: Email for authentication.
+*   `document-identifier`: Sheet Name or ID.
+*   `sheets-to-load`: List of sheets mapping `name` (Tab Name) to `shortname` (ID).
 
 ## Publication List (`publication-list`)
 
-Configures the automated publication list generation.
-
 **Fields:**
-*   `bib_file`: Path to the bibliography file (BibTeX, CSL-JSON, RIS, etc.). Can be a list of files.
-*   `bib_style`: Path to the CSL style file.
-*   `author_name`: The name to highlight in the author list (e.g., "Doe, J.").
-*   `highlight_author`: Styling for the highlighted name. Options: `"bold"`, `"italic"`, `"color"`, or a custom Typst string (e.g., `#strong[%s]`).
-*   `group_labels`: Custom titles for publication groups (e.g., `article: "Journal Papers"`).
-*   `group_order`: Ordered list of group keys (e.g., `["article", "conference"]`).
+*   `bib_file`: Path to bibliography file(s).
+*   `bib_style`: Path to CSL file.
+*   `author_name`: Name to highlight (e.g., "Doe, J.").
+*   `default_label`: Label for uncategorized items (default: "Other").
+*   `group_labels`: Map of types to labels.
+    *   Types must follow Pandoc convention (e.g., `article`, `book`, `conference`).
+    *   Example: `article: "Journal Papers"`.
+*   `group_order`: A list defining the display order of groups.
+    *   **Indexing:** You can use `Name=Index` syntax to fix positions.
+    *   Example: `["Journal Article=1", "Book=3", "Other"]`. This puts Journals 1st, Books 3rd, and fills "Other" in the remaining slots (2nd).
 
 ## Output Options
 
 ### `render-output`
-Controls which documents are generated.
-**Options:** `"cv-only"`, `"letter-only"`, `"combined"`.
+`"cv-only"`, `"letter-only"`, or `"combined"`.
 
 ### `attachments`
-A list of images to append as pages at the end of the PDF.
-**Fields:**
-*   `name`: Display name (internal use).
-*   `file`: Path to the image file.
+List of `{name, file}` objects to append as pages.
 
 ### `style`
-Customize the visual appearance.
-**Fields:**
-*   `color-accent`: Hex code for the accent color (no `#` prefix required, but supported).
-*   `font-header`: Font family for headings (e.g., `"Lato"`).
-*   `font-text`: Font family for body text (e.g., `"Roboto"`).
+*   `color-accent`: Hex code.
+*   `font-header` / `font-text`: Font names.

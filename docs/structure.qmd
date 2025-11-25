@@ -2,75 +2,65 @@
 title: "Structure & Layout"
 ---
 
-# Structure & Layout
+# Extension Structure
 
-This page explains the architecture of the extension and the available Typst functions for layout.
+This page explains the architecture of the `academicCVTemplate` extension.
 
-## 1. Extension Architecture
+## 1. Data Caching Mechanism
 
-The `academicCVTemplate` is a Project Extension that orchestrates several components:
+To avoid hitting Google API limits and to speed up rendering, the extension uses a caching system.
 
-1.  **Pre-render Script:** A hidden R script fetches your Google Sheet data and saves it as `_cv_data.yml`.
-2.  **Lua Filters:** The `inject_metadata.lua` filter reads this YAML and converts it into Typst variables (e.g., `cv_data`, `author`) in `02-definitions-metadata.typ`.
-3.  **Typst Template:** The `template.typ` file includes these definitions and renders the final PDF.
+*   **Cache File:** Fetched data is stored in a hidden file: `.cv_cache.rds`.
+*   **Validity:** The cache is valid for **24 hours**.
+*   **Forcing Update:** If you update your Google Sheet and want to see changes immediately, you must **delete** the `.cv_cache.rds` file (and optionally `_cv_data.yml`) from your project root. The next render will force a fresh fetch.
 
-## 2. Layout Logic (The Grid)
+## 2. Extension Components
 
-The CV uses a consistent two-column grid layout:
-*   **Left Column (Sidebar):** Narrower, right-aligned text. Used for dates, labels, and tags.
-*   **Right Column (Content):** Wider, left-aligned text. Used for titles, descriptions, and details.
+The extension operates as a Quarto Project Extension:
 
-### How Data Maps to the Grid
+1.  **Pre-render Script:** Fetches data and writes it to `_cv_data.yml` (and updates cache).
+2.  **Filters:** `inject_metadata.lua` converts this YAML into Typst variables.
+3.  **Template:** `template.typ` renders the PDF.
 
-When you use `{{< cv-section >}}`, it calls a Typst function (like `#resume-entry`) for each row of your data. These functions process the columns **sequentially**.
+**Output:** By default, the generated PDF is saved to the `_output/` directory.
 
-For example, `#resume-entry` maps its arguments to the grid indices:
+## 3. Layout Logic (The Grid)
+
+The template uses a consistent two-column grid:
+*   **Left Column (Sidebar):** Narrow, right-aligned.
+*   **Right Column (Content):** Wide, left-aligned.
+
+### Row-by-Row Mapping (`cv-section`)
+
+When using `{{< cv-section >}}`, the data is processed row by row. The Typst function (e.g., `#resume-entry`) receives the row's data as arguments in a specific sequence and maps them to the grid.
+
 *   **Arg 1:** Left Column (Date/Label).
 *   **Arg 2:** Right Column (Title - Bold).
-*   **Arg 3:** Left Column (Sub-label - Optional).
-*   **Arg 4:** Right Column (Description - Regular).
-*   **Arg 5+:** Right Column (Details - Small/Italic).
+*   **Arg 3:** Left Column (Sub-label).
+*   **Arg 4:** Right Column (Description).
+*   **Arg 5+:** Right Column (Details).
 
-This sequence is why the order of columns in your Google Sheet (or your `column_order` config) is important.
+## 4. Typst Function Reference
 
-## 3. Typst Function Reference
+These functions define the layout of your content.
 
-These are the primary Typst functions available for you to use, either via `{{< cv-section >}}` or directly in Typst code blocks.
+| Function | Use Case |
+| :--- | :--- |
+| `resume-entry` | Standard CV entries (Jobs, Degrees). |
+| `research-interests` | Simple lists, optimized for right-column content. |
+| `publication-list` | Bibliographies. |
+| `visualize-skills-list` | Graphical skill bars. |
 
-| Function | Usage | Description |
-| :--- | :--- | :--- |
-| `resume-entry` | `{{< cv-section >}}` | The standard function for CV entries (Experience, Education). Maps data to the 2-column grid as described above. |
-| `research-interests` | `{{< cv-section >}}` | A variation of `resume-entry` optimized for simple lists. It starts mapping at Index 4 (Details), effectively placing content in the right column with specific styling. |
-| `publication-list` | `{{< publication-list >}}` | Renders the bibliography. Can also be called directly in Typst as `#publication-list(entries)`. |
-| `visualize-skills-list` | **Direct Call** | Renders a graphical skill bar table. Requires the full dataset, so it is usually called directly (see below). |
-
-## 4. Using `visualize-skills-list`
-
-Unlike `resume-entry`, which processes one row at a time, `visualize-skills-list` takes the entire list of skills to group them by category.
-
-Because `{{< cv-section >}}` iterates row-by-row, you typically call this function directly using a Typst block and the injected `cv_data` variable.
-
-**Prerequisite:** Your "Skills" sheet must have a `value` column (0.0 - 1.0).
-
-**Example Usage:**
-```markdown
-## Skills
-
-```{=typst}
-#visualize-skills-list(cv_data.skills)
-```
-```
+See **[Shortcodes & Content](./shortcodes.qmd)** for usage examples.
 
 ## 5. File Reference
 
-The Typst source files are located in `_extensions/orehren/acvt/typst/`.
+Typst files are located in `_extensions/orehren/acvt/typst/`.
 
 | Filename | Purpose |
 | :--- | :--- |
-| `template.typ` | Entry point. Loads partials. |
-| `typst-template.typ` | Main document logic (Cover Letter vs CV). |
-| `01-definitions-helper-functions.typ` | Helpers (Icons, Text cleaning). |
-| `02-definitions-metadata.typ` | **Generated.** Contains your data. |
-| `03-definitions-styling.typ` | Colors, fonts, styles. |
-| `04-definitions-parts-functions.typ` | Layout functions (`resume-entry`, etc.). |
-| `page.typ` | Page setup. |
+| `template.typ` | Entry point. |
+| `typst-template.typ` | Main document structure. |
+| `02-definitions-metadata.typ` | **Generated.** Contains injected data. |
+| `03-definitions-styling.typ` | Styles and Colors. |
+| `04-definitions-parts-functions.typ` | Layout functions. |

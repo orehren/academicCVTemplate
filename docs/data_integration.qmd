@@ -8,36 +8,43 @@ This template separates content from layout by fetching data from Google Sheets.
 
 ## 1. Setup Data Integration
 
-Before you can render your CV, you must authenticate with Google Drive. The extension's pre-render script runs non-interactively, so you need to cache your credentials first.
+Before you can render your CV, you must authenticate with Google Drive. The extension's pre-render script runs non-interactively, so it relies on a **cached authentication token**.
 
-### Authentication
+### Step 1: Authenticate Interactively
 
-Open your R console in the project directory and run:
+Open your R console (in your project directory) and run:
 
 ```r
 library(googledrive)
 drive_auth()
 ```
 
-This will open a browser window. Log in with the Google account that has access to your CV spreadsheet.
+1.  This will open a browser window.
+2.  Log in with the Google account that has access to your CV spreadsheet.
+3.  Grant the requested permissions.
 
-**Important:** This creates a local token.
-*   **Global vs. Project:** By default, `drive_auth()` might store the token globally. For this project extension, ensure the token is available to the Quarto render process. If you are using `renv` or a project-specific library, ensure the authentication persists.
+### Step 2: Verify Token Cache
 
-## 2. Configuration (`google-document`)
+By default, `googledrive` stores credentials in a user-level cache (e.g., `~/.cache/gargle`).
+*   **Global Environment:** If you run Quarto from the same user account as R, it will find the token automatically.
+*   **Project Environment:** If you encounter issues, ensure your R environment (e.g., `renv`) allows access to the global cache, or authenticate specifically within the project.
 
-In your `.qmd` file, configure the connection:
+Once authenticated interactively *once*, the token persists, and the pre-render script can run without prompting you.
+
+## 2. Configuration
+
+In your `.qmd` file, configure the connection in the `google-document` YAML block.
 
 ```yaml
 google-document:
   auth-email: "your.email@gmail.com" # The email you authenticated with
   document-identifier: "Name_of_Your_Sheet"
   sheets-to-load:
-    - name: "Working Experiences" # Tab Name
-      shortname: "working"        # ID for Shortcodes
-    - name: "Skills"
-      shortname: "skills"
+    - name: "Working Experiences"
+      shortname: "working"
 ```
+
+For a full list of options, see the **[`google-document` YAML Reference](./yaml_reference.qmd#data-integration-google-document)**.
 
 ## 3. Spreadsheet Structure
 
@@ -45,18 +52,12 @@ Your Google Sheet should have separate tabs for each section. The first row must
 
 ### Example: Skills (Visualized)
 
-For the visual skills bar (using the `visualize-skills-list` function), your data **must** include a `value` column between `0.0` and `1.0`:
+For the visual skills bar (using `visualize-skills-list`), your data **must** include a `value` column (0.0 - 1.0):
 
 | area | skill | value | level |
 | :--- | :--- | :--- | :--- |
 | Languages | English | 1.0 | Native |
-| Languages | German | 0.8 | C1 |
 | Tech | R | 0.9 | Expert |
-
-*   `area`: Used to group skills.
-*   `skill`: The name of the skill.
-*   `value`: Numeric (0.0 - 1.0) determining the bar length.
-*   `level`: Text label (e.g., "Expert").
 
 ### Example: Working Experience
 
@@ -72,4 +73,4 @@ Use the `{{< cv-section >}}` shortcode to map your data to the layout.
 {{< cv-section sheet="working" func="resume-entry" >}}
 ```
 
-**Note:** The `func` argument (e.g., `resume-entry`) refers to a Typst function. It does not expect specific column names. Instead, it processes the arguments passed to it in sequence. You control this sequence using the `column_order` argument in the shortcode (see **[Shortcodes](./shortcodes.qmd)**).
+See **[Shortcodes Reference](./shortcodes.qmd)** for details on controlling the layout.
