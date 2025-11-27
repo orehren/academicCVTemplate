@@ -23,7 +23,7 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
   dir.create(dest_ext_parent_dir, recursive = TRUE)
   file.copy(from = source_dir, to = dest_ext_parent_dir, recursive = TRUE)
 
-  # 4. Copy the project files from the *newly copied* extension to the project root (explicitly)
+  # 4. Copy the project files from the *newly copied* extension to the project root
   newly_copied_ext_dir <- file.path(dest_ext_parent_dir, "acvt")
   file.copy(from = file.path(newly_copied_ext_dir, "_quarto.yml"), to = path)
   file.copy(from = file.path(newly_copied_ext_dir, "academicCV-template.qmd"), to = path)
