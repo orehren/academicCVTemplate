@@ -17,7 +17,7 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
 
   # 2. Copy the core project files to the new project path
   files_to_copy <- c("_quarto.yml", "academicCV-template.qmd")
-  file.copy(from = file.path(source_dir, files_to_copy), to = path, recursive = TRUE)
+  file.copy(from = file.path(source_dir, files_to_copy), to = path)
 
   # 3. Rename the template qmd file
   file.rename(from = file.path(path, "academicCV-template.qmd"), to = file.path(path, "cv.qmd"))
