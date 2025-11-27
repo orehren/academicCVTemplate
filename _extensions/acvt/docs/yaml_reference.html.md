@@ -2,169 +2,250 @@
 title: "YAML Reference"
 ---
 
+---
+title: "YAML Reference"
+---
+
 # Complete YAML Reference
 
 This page provides a comprehensive reference for all the configuration options available in the YAML frontmatter of your `.qmd` file.
 
-## `title`
+## Document Metadata
 
-The main title for the generated PDF document.
+These fields define the core identity of your document.
 
+### `title`
+The document title, often used in the PDF metadata.
 **Type:** String
-**Example:**
 ```yaml
-title: "Application Documents of John Doe"
+title: "Application for Tenure Track Position"
 ```
 
-## `author`
+### `position`
+Your current job title or the position you are applying for. This appears prominently on the Title Page.
+**Type:** String
+```yaml
+position: "Senior Data Scientist"
+```
 
-A nested object containing information about you.
+### `profile-photo`
+The path to your profile photo, relative to the project root.
+**Type:** String
+**Note:** Set to `null` or `""` to disable the photo.
+```yaml
+profile-photo: "assets/images/my_photo.jpg"
+```
 
-**Type:** Object
+### `aboutme`
+A short bio or summary paragraph displayed on the Title Page.
+**Type:** String (multiline)
+```yaml
+aboutme: |
+  Passionate researcher with 5+ years of experience in...
+  Dedicated to open science and reproducibility.
+```
+
+### `famous-quote`
+An optional quote displayed in the document.
+**Type:** Object (`text`, `attribution`)
 **Fields:**
-*   `firstname`: Your first name. (String)
-*   `lastname`: Your last name. (String)
-*   `contact`: A list of your contact details. (See below)
-*   `socialmedia`: A list of your social media profiles. (See below)
+*   `text`: The quote text. **Type:** String
+*   `attribution`: The author of the quote. **Type:** String
 
-### `author.contact`
+```yaml
+famous-quote:
+  text: "The most reliable way to predict the future is to create it."
+  attribution: "Abraham Lincoln"
+```
 
-A list of contact items. Each item is an object with the following fields:
+## Author Details
 
-*   `icon`: A Font Awesome icon class (e.g., `fa envelope`).
-*   `text`: The text to display.
-*   `url`: (Optional) A URL to link to (e.g., `mailto:`, `tel:`).
+The `author` object contains your personal information and contact details.
+
+### `author`
+**Type:** Object (`firstname`, `lastename`, `contact`, `socialmedia`)
+**Fields:**
+*   `firstname`: Your first name. **Type:** String
+*   `lastname`: Your last name. **Type:** String
+*   `contact`: A list of contact details. **Type:** List of Objects (`icon`, `text`, `url`)
+*   `socialmedia`: A list of social profiles. **Type:** List of Objects (`icon`, `text`, `url`)
+
+#### Contact & Social Media Items
+Each item in the list is an object with:
+*   `icon`: A Font Awesome icon class (e.g., `fa envelope`, `fa brands github`). **Type:** String
+*   `text`: The text to display. **Type:** String
+*   `url`: (Optional) The link destination. **Type:** String
 
 **Example:**
 ```yaml
 author:
+  firstname: "Jane"
+  lastname: "Doe"
   contact:
     - icon: fa envelope
-      text: "your.email@example.com"
-      url: "mailto:your.email@example.com"
+      text: "jane@example.com"
+      url: "mailto:jane@example.com"
     - icon: fa mobile-screen
-      text: "+1 (555) 123-4567"
-```
-
-### `author.socialmedia`
-
-Identical in structure to `contact`.
-
-**Example:**
-```yaml
-author:
+      text: "+1 234 567 890"
   socialmedia:
-    - icon: fa github
-      text: "GitHub Profile"
-      url: "https://github.com/your-username"
+    - icon: fa brands github
+      text: "github.com/janedoe"
+      url: "https://github.com/janedoe"
+    - icon: fa globe
+      text: "janedoe.com"
+      url: "https://janedoe.com"
 ```
 
-## `recipient`
+## Cover Letter
 
-An object containing information about the cover letter recipient.
+Configuration for the cover letter section.
 
-**Type:** Object
+### `recipient`
+Information about the addressee.
+**Type:** Object (`name`, `salutation`, `address`, `city`, `zip`)
 **Fields:**
-*   `name`: Full name of the recipient.
-*   `salutation`: Formal salutation (e.g., "Dr. Smith").
-*   `address`: Street address.
-*   `city`: City.
-*   `zip`: Postal code.
-
-## `date`
-
-The date for the cover letter.
-
-**Type:** String
-**Example:** `date: "November 8, 2025"`
-
-## `subject`
-
-The subject line for the cover letter.
-
-**Type:** String
-**Example:** `subject: "Application for Postdoctoral Position"`
-
-## `position`
-
-The position you are applying for or your current title. Displayed on the CV title page.
-
-**Type:** String
-
-## `profile-photo`
-
-The path to your profile photo, relative to the project root. To disable the photo, provide an empty string.
-
-**Type:** String
-**Examples:**
-```yaml
-# Use a photo
-profile-photo: "assets/images/my_photo.jpg"
-
-# Disable the photo
-profile-photo: ""
-```
-
-## `aboutme`
-
-A short paragraph about yourself, displayed on the CV.
-
-**Type:** String (can be multi-line)
-
-## `famous-quote`
-
-An optional quote to display on the CV.
-
-**Type:** Object
-**Fields:**
-*   `text`: The text of the quote.
-*   `attribution`: The author of the quote.
-
-## `render-output`
-
-Controls which documents are generated.
-
-**Type:** String
-**Options:**
-*   `"cv-only"`: Renders only the CV.
-*   `"letter-only"`: Renders only the cover letter.
-*   `"combined"`: Renders the cover letter followed by the CV in a single PDF.
-
-## `attachments`
-
-A list of documents to append to the end of the PDF, such as certificates or transcripts. Each item is an object with:
-
-*   `name`: The title to display for the attachment.
-*   `file`: The path to the image file of the attachment.
+*   `name`: Full name. **Type:** String
+*   `salutation`: Person to greet. **Type:** String
+*   `address`: Street address. **Type:** String
+*   `city`: City. **Type:** String
+*   `zip`: Postal code. **Type:** String
 
 **Example:**
 ```yaml
-attachments:
-  - name: "Master's Degree Certificate"
-    file: "attachments/master_cert.png"
-  - name: "Bachelor's Degree Certificate"
-    file: "attachments/bachelor_cert.png"
+recipient:
+  name: "Dr. Alan Turing"
+  salutation: "Dr. Turing,"
+  address: "Bletchley Park"
+  city: "Milton Keynes"
+  zip: "MK3 6EB"
 ```
 
-## `style`
+### `date` & `subject`
+**Type:** String
+```yaml
+date: "October 24, 2025"
+subject: "Application for Research Position"
+```
 
-An object for customizing visual styles.
+## Data Integration (`google-document`)
 
-**Type:** Object
+Configures the connection to your Google Sheet data source.
+
+### `google-document`
+**Type:** Object (`auth-email`, `document-identifier`, `sheets-to-load`)
 **Fields:**
-*   `color-accent`: The main accent color for the document (hex code).
-*   `font-header`: A list of fonts for headings.
-*   `font-text`: A list of fonts for body text.
+*   `auth-email`: The email address used for Google authentication. **Type:** String
+*   `document-identifier`: The name or ID of your Google Sheet. **Type:** String
+*   `sheets-to-load`: A list of sheets to import. **Type:** List of Objects (`name`, `shortname`)
+
+#### `sheets-to-load` Items
+You can define sheets using objects (recommended for control) or simple strings.
+
+**Object Format:**
+*   `name`: The exact name of the tab in your Google Sheet. **Type:** String
+*   `shortname`: The unique ID you will use in the `{{< cv-section >}}` shortcode. **Type:** String
+
+**String Format:**
+*   You can simply list the tab names. The `shortname` will be automatically generated (lowercased, spaces replaced by underscores, special chars removed).
+    *   Example: `"Working Experiences"` -> `working_experiences`
+
+**Example:**
+```yaml
+google-document:
+  auth-email: "me@gmail.com"
+  document-identifier: "My_CV_Data"
+  sheets-to-load:
+    # Object Format
+    - name: "Working Experiences"
+      shortname: "working"
+    # String Format
+    - "Education" # shortname becomes 'education'
+```
+
+## Publication List (`publication-list`)
+
+Configures the automated bibliography generation.
+
+### `publication-list`
+**Type:** Object (`bib_file`, `bib_style`, `author_name`, `typst_func_name`, `default_label`, `group_labels`, `group_order`)
+
+**Basic Configuration:**
+*   `bib_file`: Path to bibliography file(s). Use a list for multiple files. **Type:** String (or List of Strings)
+*   `bib_style`: Path to the CSL style file. **Type:** String
+*   `author_name`: The name to highlight (e.g., "Doe, J."). **Type:** String
+*   `highlight_author`: Styling. **Type:** String (`bold`, `italic`, `color`, or format string)
+*   `func_name`: The Typst function to render the list (Default: `"publication-list"`). Useful for advanced customization. **Type:** String
+
+**Grouping & Sorting:**
+*   `default_label`: The default label for items that don't match a group (Default: `"Other"`). **Type:** String
+*   `group_labels`: A dictionary mapping **Pandoc types** to **Custom Labelss**. **Type:** Map (Key: String, Value: String)
+    *   *Pandoc Types:* `article` (Journal), `book`, `conference` (Proceedings), `thesis`, `report`, `misc`.
+*   `group_order`: A list defining the order of groups. **Type:** List of Strings
+    *   **Indexing:** Use `Label=Index` strings to fix positions.
+    *   **Note:** Use the *Custom Label* names here.
+
+**Example:**
+```yaml
+publication-list:
+  bib_file: ["pubs.bib", "talks.json"]
+  bib_style: "assets/bib/apa-cv.csl"
+  
+  # Grouping
+  default_label: "Miscellaneous"
+  group_labels:
+    article: "Journal Articles"
+    conference: "Conference Proceedings"
+  
+  # Ordering: Put Journals 1st, Proceedings 3rd. 
+  # "Miscellaneous" (default_label) will fill the 2nd slot.
+  group_order: 
+    - "Journal Articles=1"
+    - "Conference Proceedings=3"
+    - "Other"
+
+  # Author Highlighting
+  author_name: "Doe, J."
+  highlight_author: "bold"
+```
+
+## Style & Output
+
+### `style`
+Customize the visual identity.
+**Type:** Object (`color-accent`, `font-header`, `font-text`)
+**Fields:**
+*   `color-accent`: Hex color code (without `#`). **Type:** String
+*   `font-header`: List of font families for headings. **Type:** List of Strings
+*   `font-text`: List of font families for body text. **Type:** List of Strings
 
 **Example:**
 ```yaml
 style:
-  color-accent: "#005f73"
+  color-accent: "5e81ac"
   font-header: ["Lato", "Helvetica", "sans-serif"]
+  font-text: ["Roboto", "Arial", "sans-serif"]
 ```
 
-## `bibliography` and `csl`
+### `render-output`
+Controls which documents are generated.
+**Options:** `"cv-only"`, `"letter-only"`, `"combined"`.
+*   `cv-only`: Outputs the curriculum vitae only.
+*   `letter-only`: Outputs the cover letter only.
+*   `combined` (Default): Outputs both, the cover letter and the curriculum vitae.
 
-Standard Quarto options for controlling the bibliography.
+```yaml
+render-output: "combined"
+```
 
-**Type:** String (file path)
+### `attachments`
+Appends documents to the end of the PDF.
+**Type:** List of Objects (`name`, `file`)
+**Fields:** (per item)
+*   `name`: Display name. **Type:** String
+*   `file`: Path to the image file. **Type:** String
+
+```yaml
+attachments:
+  - name: "Transcript"
+    file: "assets/docs/transcript.pdf"
+```
