@@ -64,7 +64,7 @@ style:
 # profile-photo: null # to disable the picture
 
 google-document:
-  auth-email: o.rehren@gmail.com # TRUE
+  auth-email: example@geeemail.com # TRUE
   document-identifier: "Application_CV_Data"
   sheets-to-load:
     - name: "Working Experiences"
@@ -81,15 +81,15 @@ attachments:
 # -- Publication List ----------------------------------------------
 # Configuration for the publication list. See `?render_publication_list`.
 publication-list:
-  author_name: "Author, A." # Optional: Will be inferred if not set
-  #highlight_author: '#text(fill: rgb("516db0"), weight: "bold")[%s]' # "bold", "italic", "color", or a custom Typst string
-  # bib_file:
-  #   - _extensions/acvt/assets/bib/bibliography.bib
-  #   - _extensions/acvt/assets/bib/bibliography.ris
-  #   - _extensions/acvt/assets/bib/bibliography.json
-  #   - _extensions/acvt/assets/bib/bibliography.xml
-  #   - _extensions/acvt/assets/bib/bibliography.yml
-  #bib_style: "apa-cv.csl"
+  author-name: "Author, A." # Optional: Will be inferred if not set
+  highlight-author: "bold" # '#text(fill: rgb("516db0"), weight: "bold")[%s]' # "bold", "italic", "color", or a custom Typst string
+  bib-file:
+    - _extensions/acvt/assets/bib/bibliography.bib
+    - _extensions/acvt/assets/bib/bibliography.ris
+    - _extensions/acvt/assets/bib/bibliography.json
+    - _extensions/acvt/assets/bib/bibliography.xml
+    - _extensions/acvt/assets/bib/bibliography.yml
+  bib-style: _extensions/acvt/assets/bib/apa-cv.csl
 
 # -- Output Options ------------------------------------------------
 render-output: "combined" # "cv-only", "letter-only", or "combined"
@@ -102,11 +102,11 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 ## Research Interests
 
-{{< cv-section sheet="interests" func="research-interests" combine_cols="details_6, details_7" exclude_cols="label_7" column_order="label_2=5, details_2=1" >}}
+{{< cv-section sheet="interests" func="research-interests" combine-cols="details_6, details_7" exclude-cols="label_7" column-order="label_2=5, details_2=1" >}}
 
 ## Working Experiences
 
-{{< cv-section sheet="working" func="resume-entry" combine_cols='starts_with("detail")' combine_as="details" combine_prefix="· " exclude_cols = "start, end" combine_sep = "\\ \\ " >}}
+{{< cv-section sheet="working" func="resume-entry" combine-cols='starts_with("detail")' combine-as="details" combine-prefix="· " exclude-cols = "start, end" combine-sep = "\\ \\ " >}}
 
 ## Publications
 

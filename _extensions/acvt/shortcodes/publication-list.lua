@@ -1,5 +1,5 @@
 -- =============================================================================
--- 1. UTILS
+-- 1. UTILITIES
 -- =============================================================================
 local utils = {}
 
@@ -28,6 +28,14 @@ function utils.file_exists(path)
   if f then io.close(f); return true else return false end
 end
 
+function utils.read_file(path)
+  local f = io.open(path, "r")
+  if not f then return nil end
+  local content = f:read("*a")
+  f:close()
+  return content
+end
+
 function utils.parse_key_val(str)
   local res = {}
   local s = utils.safe_string(str)
@@ -48,29 +56,29 @@ function utils.parse_list_string(str)
 end
 
 -- =============================================================================
--- 2. CONFIG LOADING
+-- 2. CONFIGURATION LOADING
 -- =============================================================================
 local config = {}
 
-function config.get(kwargs)
-  local env_conf = {}
-  local global_meta = {}
+-- Reads metadata from the JSON file pointed to by QUARTO_EXECUTE_INFO
+-- because 'meta' argument in Lua filters does not contain merged defaults.
+local function read_global_metadata()
+  local path = os.getenv("QUARTO_EXECUTE_INFO")
+  if not path or path == "" then return {} end
 
-  local q_info = os.getenv("QUARTO_EXECUTE_INFO")
-  if q_info and q_info ~= "" then
-    local f = io.open(q_info, "r")
-    if f then
-      local c = f:read("*a")
-      f:close()
-      if c then
-        local status, decoded = pcall(pandoc.json.decode, c)
-        if status and decoded.format and decoded.format.metadata then
-          global_meta = decoded.format.metadata
-          env_conf = global_meta['publication-list'] or global_meta['publication_list'] or {}
-        end
-      end
-    end
+  local content = utils.read_file(path)
+  if not content or content == "" then return {} end
+
+  local status, res = pcall(pandoc.json.decode, content)
+  if status and res and res.format and res.format.metadata then
+    return res.format.metadata
   end
+  return {}
+end
+
+function config.get(kwargs)
+  local global_meta = read_global_metadata()
+  local env_conf = global_meta['publication-list'] or {}
 
   local function fetch(key)
     if kwargs[key] then
@@ -109,7 +117,8 @@ function config.get(kwargs)
 
   local function get_bib_files_list()
     local files = {}
-    local keys_to_check = {"bib_file", "bib_files", "bibfile"}
+    local keys_to_check = {"bib-file"}
+
     for _, key in ipairs(keys_to_check) do
       local arg_val = kwargs[key]
       local arg_str = utils.safe_string(arg_val)
@@ -128,6 +137,8 @@ function config.get(kwargs)
         end
       end
     end
+
+    -- to avoid duplicate entries
     local unique_files = {}
     local hash = {}
     for _, v in ipairs(files) do
@@ -139,7 +150,7 @@ function config.get(kwargs)
     return unique_files
   end
 
-  local author_name = fetch("author_name")
+  local author_name = fetch("author-name")
   if not author_name and global_meta.author then
     local ma = global_meta.author
     if type(ma) == "table" and ma.lastname then
@@ -151,7 +162,7 @@ function config.get(kwargs)
     end
   end
 
-  local hl_style = fetch("highlight_author") or "bold"
+  local hl_style = fetch("highlight-author") or "bold"
   local highlight_markup = "#strong[%s]"
   if hl_style == "bold" then highlight_markup = "#strong[%s]"
   elseif hl_style == "italic" then highlight_markup = "#emph[%s]"
@@ -175,34 +186,36 @@ function config.get(kwargs)
     misc = "Miscellaneous"
   }
 
-  local user_labels = fetch_complex("group_labels", utils.parse_key_val, {})
+  local user_labels = fetch_complex("group-labels", utils.parse_key_val, {})
   local final_group_labels = {}
   for k, v in pairs(standard_group_labels) do final_group_labels[k] = v end
   for k, v in pairs(user_labels) do final_group_labels[k] = v end
 
   return {
     bib_files = get_bib_files_list(),
-    bib_style = fetch("bib_style") or fetch("csl_file"),
+    bib_style = fetch("bib-style") or fetch("csl-file"),
     author_name = author_name,
     highlight = highlight_markup,
     group_labels = final_group_labels,
-    default_label = fetch("default_label") or "Other",
-    group_order = fetch_complex("group_order", utils.parse_list_string, nil),
-    func_name = fetch("typst_func_name") or "publication-list"
+    default_label = fetch("default-label") or "Other",
+    group_order = fetch_complex("group-order", utils.parse_list_string, nil),
+    func_name = fetch("func-name") or "publication-list"
   }
 end
 
 -- =============================================================================
--- 3. CORE LOGIC (PIPELINE)
+-- 3. PIPELINE LOGIC
 -- =============================================================================
 local core = {}
 
+-- Handling Format detection to allow mixing of .bib, .json, .xml etc.
 function core.read_bib_file(path)
   if not utils.file_exists(path) then return {} end
 
   local ext = path:match("^.+(%..+)$")
   if ext then ext = ext:lower() end
 
+  -- Special case for YAML: Must be wrapped in dummy markdown to trigger citeproc conversion
   if ext == ".yaml" or ext == ".yml" then
     local f = io.open(path, "r")
     if not f then return {} end
@@ -213,6 +226,7 @@ function core.read_bib_file(path)
 
     local args = {"-f", "markdown", "-t", "csljson"}
     local input_data = content
+    -- To ensure valid YAML header structure if missing
     if not content:match("^%-%-%-") and not content:match("^references:") then
        input_data = "---\nreferences:\n" .. content .. "\n---\n"
     end
@@ -245,6 +259,7 @@ function core.run_pandoc_pipeline(bib_files, csl)
   local all_refs = {}
   local seen_ids = {}
 
+  -- to deduplicate entries from all files
   for _, file in ipairs(bib_files) do
     local refs = core.read_bib_file(file)
     for _, ref in ipairs(refs) do
@@ -258,6 +273,8 @@ function core.run_pandoc_pipeline(bib_files, csl)
   if #all_refs == 0 then return nil end
 
   local merged_json = pandoc.json.encode(all_refs)
+
+  -- Use CSL-JSON input to generate formatted bibliography
   local args = {"--from=csljson", "--to=json", "--citeproc", "--csl=" .. csl}
   local result = pandoc.pipe("pandoc", args, merged_json)
 
@@ -285,27 +302,30 @@ function core.process_data(json_str, cfg)
     meta_map[id] = { type = type_clean, year = year }
   end
 
+  -- to find all Div blocks containing formatted references
   local function find_entries(blocks)
     for _, el in ipairs(blocks) do
-      if el.t == "Div" and el.identifier:match("^ref%-") then
-        local id = el.identifier:gsub("^ref%-", "")
-        local meta = meta_map[id]
-        if meta then
-          local entry_doc = pandoc.Pandoc(el.content)
-          local typst_code = pandoc.write(entry_doc, "typst")
-          typst_code = utils.trim(typst_code)
+      if el.t == "Div" then
+        if el.identifier:match("^ref%-") then
+          local id = el.identifier:gsub("^ref%-", "")
+          local meta = meta_map[id]
+          if meta then
+            local entry_doc = pandoc.Pandoc(el.content)
+            local typst_code = pandoc.write(entry_doc, "typst")
+            typst_code = utils.trim(typst_code)
 
-          if cfg.author_name and cfg.author_name ~= "" then
-            local pattern = cfg.author_name:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
-            local replacement = string.format(cfg.highlight, cfg.author_name)
-            typst_code = typst_code:gsub(pattern, replacement)
+            if cfg.author_name and cfg.author_name ~= "" then
+              local pattern = cfg.author_name:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+              local replacement = string.format(cfg.highlight, cfg.author_name)
+              typst_code = typst_code:gsub(pattern, replacement)
+            end
+
+            local label = cfg.group_labels[meta.type] or cfg.default_label
+            table.insert(entries, { label = label, year = meta.year, content = typst_code })
           end
-
-          local label = cfg.group_labels[meta.type] or cfg.default_label
-          table.insert(entries, { label = label, year = meta.year, content = typst_code })
+        else
+          if el.content then find_entries(el.content) end
         end
-      elseif el.t == "Div" then
-        if el.content then find_entries(el.content) end
       end
     end
   end
@@ -314,11 +334,10 @@ function core.process_data(json_str, cfg)
   return entries
 end
 
--- INTELLIGENTE SORTIERUNG (Explicit + Implicit Filler)
 function core.sort_entries(entries, cfg)
   local group_rank = {}
 
-  -- 1. Alle tatsächlich vorkommenden Labels sammeln (aus den Daten)
+  -- 1. to collect all present labels
   local present_labels_set = {}
   local present_labels_list = {}
   for _, e in ipairs(entries) do
@@ -327,9 +346,9 @@ function core.sort_entries(entries, cfg)
       table.insert(present_labels_list, e.label)
     end
   end
-  table.sort(present_labels_list) -- Alphabetisch sortieren für konsistentes Auffüllen
+  table.sort(present_labels_list)
 
-  -- 2. Config parsen (Explicit vs. Implicit in Config)
+  -- 2. to retain explicit order configuration
   local explicit_ranks = {}
   local config_implicit_list = {}
   local max_idx = 0
@@ -350,7 +369,7 @@ function core.sort_entries(entries, cfg)
     end
   end
 
-  -- 3. "Leftovers" finden (Labels in den Daten, aber nicht in Config)
+  -- 3. to identify labels present in data but missing from config
   local leftovers = {}
   for _, lbl in ipairs(present_labels_list) do
     local is_in_explicit = false
@@ -364,24 +383,20 @@ function core.sort_entries(entries, cfg)
     end
   end
 
-  -- 4. Merge: Pool aus Config-Implicit + Leftovers bauen
+  -- 4. to fill gaps in ranking
   local fill_pool = {}
   for _, v in ipairs(config_implicit_list) do table.insert(fill_pool, v) end
   for _, v in ipairs(leftovers) do table.insert(fill_pool, v) end
 
-  -- 5. Zipper: Lücken füllen
   local pool_idx = 1
   local rank_counter = 1
 
-  -- Schleife läuft, bis wir über den max_idx hinaus sind UND der Pool leer ist
   while true do
     if rank_counter > max_idx and pool_idx > #fill_pool then break end
 
     if explicit_ranks[rank_counter] then
-      -- Fester Platz
       group_rank[explicit_ranks[rank_counter]] = rank_counter
     else
-      -- Lücke -> aus Pool füllen
       if pool_idx <= #fill_pool then
         group_rank[fill_pool[pool_idx]] = rank_counter
         pool_idx = pool_idx + 1
@@ -390,7 +405,6 @@ function core.sort_entries(entries, cfg)
     rank_counter = rank_counter + 1
   end
 
-  -- 6. Sortieren
   table.sort(entries, function(a, b)
     if a.label ~= b.label then
       local ra = group_rank[a.label] or 999
@@ -407,30 +421,43 @@ end
 -- 4. SHORTCODE MAIN
 -- =============================================================================
 function Shortcode(args, kwargs, meta)
-  if kwargs["debug"] == "true" then
-    local cfg = config.get(kwargs)
+  local cfg = config.get(kwargs)
+
+  if kwargs["debug"] and utils.safe_string(kwargs["debug"]) == "true" then
     print("\n[DEBUG publication-list]")
-    print("Found Bibliography Files:")
-    for i, f in ipairs(cfg.bib_files) do print("  " .. i .. ": " .. f) end
+    for k, v in pairs(cfg) do
+      local val = (type(v) == "table") and "table" or tostring(v)
+      print(string.format("%-15s: %s", k, val))
+    end
+    print("[DEBUG END]\n")
     return pandoc.RawBlock("typst", "// Debug active")
   end
 
-  local cfg = config.get(kwargs)
-
   if #cfg.bib_files == 0 then
-    return pandoc.Strong(pandoc.Str("Error: No 'bib_files' found (checked arguments and YAML)."))
+    return pandoc.Strong(pandoc.Str("Error: 'bib-file' missing or empty."))
   end
   if not cfg.bib_style then
-    return pandoc.Strong(pandoc.Str("Error: 'bib_style' missing."))
+    return pandoc.Strong(pandoc.Str("Error: 'bib-style' missing."))
+  end
+
+  for _, f in ipairs(cfg.bib_files) do
+    if not utils.file_exists(f) then
+      return pandoc.Strong(pandoc.Str("Error: File not found: " .. f))
+    end
   end
   if not utils.file_exists(cfg.bib_style) then
-    return pandoc.Strong(pandoc.Str("Error: Style file not found: " .. cfg.bib_style))
+    return pandoc.Strong(pandoc.Str("Error: File not found: " .. cfg.bib_style))
   end
 
   local status, res = pcall(core.run_pandoc_pipeline, cfg.bib_files, cfg.bib_style)
-  if not status then return pandoc.Strong(pandoc.Str("Lua Error: " .. tostring(res))) end
 
-  if not res then return pandoc.RawBlock("typst", "#" .. cfg.func_name .. "(())") end
+  if not status then
+    return pandoc.Strong(pandoc.Str("Lua Error: " .. tostring(res)))
+  end
+
+  if not res then
+     return pandoc.RawBlock("typst", "#" .. cfg.func_name .. "(())")
+  end
 
   local entries = core.process_data(res, cfg)
   entries = core.sort_entries(entries, cfg)
@@ -443,7 +470,10 @@ function Shortcode(args, kwargs, meta)
 
   local body = table.concat(typst_items, ",\n")
 
-  return pandoc.RawBlock("typst", "#" .. cfg.func_name .. "((\n" .. body .. ",\n))")
+  -- Trailing comma ensures Typst interprets single-item results as arrays
+  local result = "#" .. cfg.func_name .. "((\n" .. body .. ",\n))"
+
+  return pandoc.RawBlock("typst", result)
 end
 
 return { ["publication-list"] = Shortcode }

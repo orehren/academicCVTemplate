@@ -151,12 +151,12 @@ To add your publication list, configure the bibliography file in the YAML and us
 
 ```yaml
 publication-list:
-  bib_file: "my_pubs.bib"
-  bib_style: "apa.csl"
+  bib-file: "my_pubs.bib"
+  bib-style: "apa.csl"
 ```
 
-*   `bib_file`: Path to your bibliography file(s), relative to your project root folder. Defaults to example bibliography files from different formats included in this extension.
-*   `bib_style`: Path to your CSL Style file, relative to your project root folder. Defaults to an altered APA 7. Edition CSL style included in this extension.
+*   `bib-file`: Path to your bibliography file(s), relative to your project root folder. Defaults to example bibliography files from different formats included in this extension.
+*   `bib-style`: Path to your CSL Style file, relative to your project root folder. Defaults to an altered APA 7. Edition CSL style included in this extension.
 
 You have the possibility to choose different bibliography file formats. This extension is able to handle the following bibliography formats:
 

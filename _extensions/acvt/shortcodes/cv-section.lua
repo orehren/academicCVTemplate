@@ -309,23 +309,23 @@ local function generate_cv_section(args, kwargs, meta)
   end
 
   -- 3. Argumente auflösen mit Tidy Select
-  local raw_exclude = get_arg(kwargs, "exclude_cols", "")
+  local raw_exclude = get_arg(kwargs, "exclude-cols", "")
   local exclude_cols_list = resolve_tidy_select(raw_exclude, all_columns)
 
   local exclude_set = {}
   for _, c in ipairs(exclude_cols_list) do exclude_set[c] = true end
 
-  local raw_combine = get_arg(kwargs, "combine_cols", "")
+  local raw_combine = get_arg(kwargs, "combine-cols", "")
   local combine_cols_list = resolve_tidy_select(raw_combine, all_columns)
 
   local combine_opts = {
     cols   = combine_cols_list,
-    as     = get_arg(kwargs, "combine_as", "details"),
-    sep    = get_arg(kwargs, "combine_sep", " "),
-    prefix = get_arg(kwargs, "combine_prefix", "")
+    as     = get_arg(kwargs, "combine-as", "details"),
+    sep    = get_arg(kwargs, "combine-sep", " "),
+    prefix = get_arg(kwargs, "combine-prefix", "")
   }
 
-  local column_order = get_arg(kwargs, "column_order", "")
+  local column_order = get_arg(kwargs, "column-order", "")
   local na_action = get_arg(kwargs, "na_action", "omit")
 
   local blocks = {}

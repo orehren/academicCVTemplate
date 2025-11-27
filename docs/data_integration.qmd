@@ -75,7 +75,7 @@ This shortcode acts as a bridge: it fetches the data from the sheet you specify 
 {{< cv-section sheet="working" func="resume-entry" >}}
 ```
 
-By default, the columns in your sheet are passed to the layout function in the order they appear. If you need to customize this mapping (e.g., if your sheet columns are in a different order than the layout expects), you can use the `column_order` argument.
+By default, the columns in your sheet are passed to the layout function in the order they appear. If you need to customize this mapping (e.g., if your sheet columns are in a different order than the layout expects), you can use the `column-order` argument.
 
 For a complete guide on how to control this mapping, combine columns, and filter data, please consult the **[`cv-section` section in the Shortcodes Reference](./shortcodes.qmd#sec-cv-section)**.
 

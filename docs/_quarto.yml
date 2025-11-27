@@ -4,14 +4,20 @@ project:
 
 website:
   title: "academicCVTemplate"
+  search:
+    location: navbar
+    type: overlay
   navbar:
+    tools:
+      - icon: github
+        href:  https://github.com/orehren/academicCVTemplate
     left:
       - href: index.qmd
         text: Home
       - href: installation.qmd
         text: Installation
-       - href: structure.qmd
-         text: Structure
+      - href: structure.qmd
+        text: Structure
       - href: tutorial.qmd
         text: Tutorial
       - href: yaml_reference.qmd

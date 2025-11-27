@@ -98,7 +98,7 @@ These R scripts handle data fetching and processing.
 The extension includes several static assets in `_extensions/orehren/acvt/assets/`.
 
 | Directory | Content |
-|:-----------------|:-----------------------------------------------------|
+|:------------------|:----------------------------------------------------|
 | `bib/` | Bibliography files (`bibliography.bib|.json|.ris|.xml|.yml`, `apa-cv.csl`). |
 | `images/` | Default profile picture (`picture.jpg|.png`) and example appendix files (`first_document.png`, `second_document.png`). |
 
@@ -140,7 +140,7 @@ Therefore to fully automate the whole document creation, in the Google Sheets yo
 
 While this opens up the easiest way to implement sections into your cv, this would also require you to have clear vision on how you want to populate the whole document (or at least every section).
 To alter the sequence of the columns in the Google Sheets on the fly, the shortcode allows to manipulate it with different arguments.
-This is why, for example, the `column_order` argument in the shortcode is useful: it allows you to manually define the position of each column directly in the shortcode call to ensure that your "Date" column is passed as Column 1, your "Title" as Column 2, and so on, matching the function's layout logic.
+This is why, for example, the `column-order` argument in the shortcode is useful: it allows you to manually define the position of each column directly in the shortcode call to ensure that your "Date" column is passed as Column 1, your "Title" as Column 2, and so on, matching the function's layout logic.
 
 ## 4. Typst Function Reference
 
