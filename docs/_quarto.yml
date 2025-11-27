@@ -16,18 +16,18 @@ website:
         text: Home
       - href: installation.qmd
         text: Installation
-      - href: structure.qmd
-        text: Structure
+      - href: data_integration.qmd
+        text: Data Integration
       - href: tutorial.qmd
-        text: Tutorial
-      - href: yaml_reference.qmd
-        text: YAML Reference
+        text: How to get started
       - href: shortcodes.qmd
         text: Shortcodes
       - href: styling.qmd
         text: Styling
-      - href: data_integration.qmd
-        text: Data Integration
+      - href: structure.qmd
+        text: Structure
+      - href: yaml_reference.qmd
+        text: YAML Reference
       - href: acknowledgements.qmd
         text: Acknowledgements
 
