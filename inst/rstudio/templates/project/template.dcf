@@ -1,0 +1,28 @@
+Binding: acvt_template
+Title: Academic CV Project
+OpenFiles: cv.qmd
+
+Parameter: firstname
+Widget: TextInput
+Label: First Name
+Default: "Arthur"
+
+Parameter: lastname
+Widget: TextInput
+Label: Last Name
+Default: "Author"
+
+Parameter: email
+Widget: TextInput
+Label: Email
+Default: "your.email@example.com"
+
+Parameter: renv
+Widget: CheckboxInput
+Label: Use renv with this project
+Default: On
+
+Parameter: git
+Widget: CheckboxInput
+Label: Create a git repository
+Default: On
