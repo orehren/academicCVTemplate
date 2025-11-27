@@ -9,6 +9,7 @@ Welcome to the documentation for the `academicCVTemplate`. This is a comprehensi
 ## Project Extension
 
 Unlike simple document templates, this is a full-featured project extension. It integrates:
+
 *   **Project Type:** Activated via `project: type: acvt` to handle the build pipeline.
 *   **Custom Format:** `acvt-typst` for high-quality PDF generation.
 *   **Filters & Shortcodes:** Powerful tools to fetch data, process content, and automate layout.
