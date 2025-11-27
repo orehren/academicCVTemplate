@@ -9,12 +9,23 @@
 # 5. Writes _cv_data.yml for access by Quarto/Lua.
 # ==============================================================================
 
-# --- Check Dependencies ---
-required_pkgs <- c("yaml", "rmarkdown", "cli", "googledrive", "googlesheets4", "purrr", "checkmate", "rlang", "janitor")
-missing_pkgs <- required_pkgs[!sapply(required_pkgs, requireNamespace, quietly = TRUE)]
-if (length(missing_pkgs) > 0) {
-  stop(paste("Missing packages:", paste(missing_pkgs, collapse = ", ")))
-}
+# --- Load Dependencies ---
+# This script runs in a clean R session invoked by Quarto. We must explicitly
+# load all the libraries it needs to function. These packages are declared as
+# dependencies in the parent R package's DESCRIPTION file, so they are guaranteed
+# to be installed.
+suppressPackageStartupMessages({
+  library(yaml)
+  library(rmarkdown)
+  library(cli)
+  library(googledrive)
+  library(googlesheets4)
+  library(purrr)
+  library(checkmate)
+  library(rlang)
+  library(janitor)
+})
+
 
 main <- function() {
   # ----------------------------------------------------------------------------
