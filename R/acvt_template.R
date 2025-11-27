@@ -14,7 +14,7 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
   if (skeleton_dir == "") {
     stop("Could not find the project template skeleton directory in the acvt package.", call. = FALSE)
   }
-  files_to_copy <- list.files(skeleton_dir, full.names = TRUE)
+  files_to_copy <- list.files(skeleton_dir, all.files = TRUE, full.names = TRUE, no.. = TRUE)
   file.copy(from = files_to_copy, to = path, recursive = TRUE)
 
   # 2. Read the copied template qmd file
@@ -33,7 +33,7 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
 
   # Robustly find and update email
   for (i in seq_along(yaml_data$author$contact)) {
-    if (grepl("envelope", yaml_data$author$contact[[i]]$icon)) {
+    if (!is.null(yaml_data$author$contact[[i]]$icon) && grepl("envelope", yaml_data$author$contact[[i]]$icon)) {
       yaml_data$author$contact[[i]]$text <- email
       yaml_data$author$contact[[i]]$url <- paste0("mailto:", email)
       break
@@ -45,17 +45,21 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
   new_file_content <- c("---", strsplit(new_yaml_content, "\n")[[1]], "---", body_content)
   writeLines(new_file_content, template_path)
 
-  # 6. Initialize renv if requested
+  # 6. Initialize renv and git in the new project directory
+  old_wd <- getwd()
+  on.exit(setwd(old_wd))
+  setwd(path)
+
   if (renv) {
-    renv::init(project = path)
+    renv::init()
   }
 
-  # 7. Initialize git if requested
   if (git) {
-    if (requireNamespace("git2r", quietly = TRUE)) {
-      git2r::init(path)
+    git_path <- Sys.which("git")
+    if (git_path == "") {
+      warning("Git is not installed or not in the system's PATH. Cannot initialize a git repository.")
     } else {
-      warning("git2r package not found, please install it to initialize a git repository.")
+      system("git init", ignore.stdout = TRUE, ignore.stderr = TRUE)
     }
   }
 }

@@ -16,8 +16,7 @@ Imports:
     checkmate,
     rlang,
     janitor,
-    renv,
-    git2r
+    renv
 Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
