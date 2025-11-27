@@ -16,29 +16,38 @@ These fields define the core identity of your document.
 
 ### `title`
 The document title, often used in the PDF metadata.
+
 **Type:** String
+
 ```yaml
 title: "Application for Tenure Track Position"
 ```
 
 ### `position`
 Your current job title or the position you are applying for. This appears prominently on the Title Page.
+
 **Type:** String
+
 ```yaml
 position: "Senior Data Scientist"
 ```
 
 ### `profile-photo`
 The path to your profile photo, relative to the project root.
+
 **Type:** String
+
 **Note:** Set to `null` or `""` to disable the photo.
+
 ```yaml
 profile-photo: "assets/images/my_photo.jpg"
 ```
 
 ### `aboutme`
 A short bio or summary paragraph displayed on the Title Page.
+
 **Type:** String (multiline)
+
 ```yaml
 aboutme: |
   Passionate researcher with 5+ years of experience in...
@@ -47,8 +56,11 @@ aboutme: |
 
 ### `famous-quote`
 An optional quote displayed in the document.
+
 **Type:** Object (`text`, `attribution`)
+
 **Fields:**
+
 *   `text`: The quote text. **Type:** String
 *   `attribution`: The author of the quote. **Type:** String
 
@@ -64,7 +76,9 @@ The `author` object contains your personal information and contact details.
 
 ### `author`
 **Type:** Object (`firstname`, `lastename`, `contact`, `socialmedia`)
+
 **Fields:**
+
 *   `firstname`: Your first name. **Type:** String
 *   `lastname`: Your last name. **Type:** String
 *   `contact`: A list of contact details. **Type:** List of Objects (`icon`, `text`, `url`)
@@ -72,6 +86,7 @@ The `author` object contains your personal information and contact details.
 
 #### Contact & Social Media Items
 Each item in the list is an object with:
+
 *   `icon`: A Font Awesome icon class (e.g., `fa envelope`, `fa brands github`). **Type:** String
 *   `text`: The text to display. **Type:** String
 *   `url`: (Optional) The link destination. **Type:** String
@@ -102,8 +117,11 @@ Configuration for the cover letter section.
 
 ### `recipient`
 Information about the addressee.
+
 **Type:** Object (`name`, `salutation`, `address`, `city`, `zip`)
+
 **Fields:**
+
 *   `name`: Full name. **Type:** String
 *   `salutation`: Person to greet. **Type:** String
 *   `address`: Street address. **Type:** String
@@ -122,6 +140,7 @@ recipient:
 
 ### `date` & `subject`
 **Type:** String
+
 ```yaml
 date: "October 24, 2025"
 subject: "Application for Research Position"
@@ -133,7 +152,9 @@ Configures the connection to your Google Sheet data source.
 
 ### `google-document`
 **Type:** Object (`auth-email`, `document-identifier`, `sheets-to-load`)
+
 **Fields:**
+
 *   `auth-email`: The email address used for Google authentication. **Type:** String
 *   `document-identifier`: The name or ID of your Google Sheet. **Type:** String
 *   `sheets-to-load`: A list of sheets to import. **Type:** List of Objects (`name`, `shortname`)
@@ -142,10 +163,12 @@ Configures the connection to your Google Sheet data source.
 You can define sheets using objects (recommended for control) or simple strings.
 
 **Object Format:**
+
 *   `name`: The exact name of the tab in your Google Sheet. **Type:** String
 *   `shortname`: The unique ID you will use in the `{{< cv-section >}}` shortcode. **Type:** String
 
 **String Format:**
+
 *   You can simply list the tab names. The `shortname` will be automatically generated (lowercased, spaces replaced by underscores, special chars removed).
     *   Example: `"Working Experiences"` -> `working_experiences`
 
@@ -170,6 +193,7 @@ Configures the automated bibliography generation.
 **Type:** Object (`bib_file`, `bib_style`, `author_name`, `typst_func_name`, `default_label`, `group_labels`, `group_order`)
 
 **Basic Configuration:**
+
 *   `bib_file`: Path to bibliography file(s). Use a list for multiple files. **Type:** String (or List of Strings)
 *   `bib_style`: Path to the CSL style file. **Type:** String
 *   `author_name`: The name to highlight (e.g., "Doe, J."). **Type:** String
@@ -177,6 +201,7 @@ Configures the automated bibliography generation.
 *   `func_name`: The Typst function to render the list (Default: `"publication-list"`). Useful for advanced customization. **Type:** String
 
 **Grouping & Sorting:**
+
 *   `default_label`: The default label for items that don't match a group (Default: `"Other"`). **Type:** String
 *   `group_labels`: A dictionary mapping **Pandoc types** to **Custom Labelss**. **Type:** Map (Key: String, Value: String)
     *   *Pandoc Types:* `article` (Journal), `book`, `conference` (Proceedings), `thesis`, `report`, `misc`.
@@ -212,8 +237,11 @@ publication-list:
 
 ### `style`
 Customize the visual identity.
+
 **Type:** Object (`color-accent`, `font-header`, `font-text`)
+
 **Fields:**
+
 *   `color-accent`: Hex color code (without `#`). **Type:** String
 *   `font-header`: List of font families for headings. **Type:** List of Strings
 *   `font-text`: List of font families for body text. **Type:** List of Strings
@@ -228,7 +256,9 @@ style:
 
 ### `render-output`
 Controls which documents are generated.
+
 **Options:** `"cv-only"`, `"letter-only"`, `"combined"`.
+
 *   `cv-only`: Outputs the curriculum vitae only.
 *   `letter-only`: Outputs the cover letter only.
 *   `combined` (Default): Outputs both, the cover letter and the curriculum vitae.
@@ -239,8 +269,11 @@ render-output: "combined"
 
 ### `attachments`
 Appends documents to the end of the PDF.
+
 **Type:** List of Objects (`name`, `file`)
+
 **Fields:** (per item)
+
 *   `name`: Display name. **Type:** String
 *   `file`: Path to the image file. **Type:** String
 

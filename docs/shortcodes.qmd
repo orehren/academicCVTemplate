@@ -6,7 +6,7 @@ title: "Shortcodes & Content"
 
 This chapter provides a detailed reference for the shortcodes included in the extension. These tools allow you to dynamically fetch, filter, and format your data from Google Sheets without writing complex code.
 
-## 1. `{{< cv-section >}}`
+## 1. `{{< cv-section >}}` {#sec-cv-section}
 
 The `cv-section` shortcode is the primary tool for building your CV. It acts as an iterator: it fetches a specific dataset (sheet) and processes it row by row, applying a selected Typst layout function to each entry.
 
@@ -78,7 +78,7 @@ For arguments like `exclude_cols` and `combine_cols`, you can use these helper f
 *   `matches("pattern")`: Selects columns matching a Lua pattern.
 *   `col_a:col_b`: Selects a range of columns from `col_a` to `col_b` (inclusive).
 
-## 2. `{{< publication-list >}}`
+## 2. `{{< publication-list >}}` {#sec-publication-list}
 
 This shortcode automatically generates a formatted bibliography from one or more bibliography files.
 

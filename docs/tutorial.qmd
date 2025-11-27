@@ -9,6 +9,7 @@ This tutorial will guide you through the process of creating a complete CV and c
 ## 1. The Template File
 
 The template comes with a file named `academicCV-template.qmd`. This file serves as the control center for your CV. It contains:
+
 1.  **YAML Header:** Metadata, configuration, and personal details.
 2.  **Shortcodes:** Placeholders that tell Quarto where to insert your CV sections and publications.
 
@@ -36,7 +37,7 @@ Add your contact & social media details. Each entry is a list, that consists of 
 
 * `icon`: An icon to display for this contact or social media detail. You can use any [Font Awesome](https://fontawesome.com/) icon by specifying its class (e.g., `fa envelope`, `fa brands github`).
 * `text`: The Text to be displayed for this contact or social media detail. You can choose any arbitrary text you like.
-* `url`: The link address for this contact or social media detail. This is the address, that will be opened, when click on the contact detail in the final document.
+* `url`: The link address for this contact or social media detail. This is the address, that will be opened, when clicking on the contact detail in the final document.
 
 Each of the detail informations are optional. For example:
 
