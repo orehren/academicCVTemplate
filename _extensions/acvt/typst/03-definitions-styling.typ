@@ -1,12 +1,11 @@
 // typst/03-definitions-styling.typ
 // defines color palett, typography and styles
 
-
-
-// -- 2. Color Palett Definition --
+// -- 1. Color Palett Definition --
 // ----------------
 
-#let color-accent = rgb( unescape_text( style.at("color-accent", default: "#dc3522") ) )
+// #let color-accent = rgb( unescape_text( style.at("color-accent", default: "#dc3522") ) )
+#let color-accent = rgb( unescape_text( meta-data.style.at("color-accent", default: "#dc3522") ) )
 
 // -- Colors (using the nord color palett) --
 #let color-nord0 = rgb("#2e3440")
@@ -16,10 +15,10 @@
 #let color-nord4 = rgb("#d8dee9")
 
 
-// -- 3. Typography Definition --
+// -- 2. Typography Definition --
 // ------------------------------
-#let font-header = style.at("font-header", default: ("Roboto", "Arial", "Dejavu Sans") )
-#let font-text = style.at("font-text", default: ("Source Sans Pro", "Arial", "Dejavu Sans") )
+#let font-header = meta-data.style.at("font-header", default: ("Roboto", "Arial", "Dejavu Sans") )
+#let font-text = meta-data.style.at("font-text", default: ("Source Sans Pro", "Arial", "Dejavu Sans") )
 
 // -- Font Sizes --
 #let font-size-xl = 22pt
@@ -32,7 +31,7 @@
 #let font-size-skill = 7pt
 
 
-// -- 4. Styles Definition --
+// -- 3. Styles Definition --
 // ------------------------------
 
 // Global Styles

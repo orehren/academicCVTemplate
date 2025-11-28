@@ -2,72 +2,177 @@
 // This file contains functions that generate major sections of the document,
 // such as the title page, footer, and publication list.
 
-
-// -- Footer Functions
-// -------------------------
 #let render-cover-letter(
-  author,
-  color-accent,
-  text-style-header,
-  recipient: none,
-  date: datetime.today(),
+  title: none,
+  author: (:),           // Erwartet dictionary mit firstname, lastname, contact, socialmedia
+  profile-photo: none,   // Pfad als String
+  recipient: (:),        // Erwartet dictionary mit salutation, name, addressee, address, city, zip, valediction
+  date: none,
   subject: none,
+  position: none,
+  famous-quote: none,    // Erwartet dictionary mit text, attribution
+  style: (:),            // Erwartet dictionary mit color-accent, font-header, font-text
   cover_letter_content: [],
 ) = {
 
-  // --- Header ---
-  // Using a grid to align sender and recipient information.
+  let gray-text = rgb("#5d5d5d")
+  let light-gray = rgb("#999999")
+
+  // --- 2. Seiteneinstellungen ---
+  set page(
+    paper: "a4",
+    margin: (top: 2cm, bottom: 2cm, left: 2cm, right: 2cm),
+    footer: [
+      #set text(fill: light-gray, size: 8pt)
+      #upper(if date != none { date })
+      #h(1fr)
+      #upper(
+        author.at("firstname", default: "") + " " +
+        author.at("lastname", default: "") + sym.dot.op + " " + title
+      )
+    ]
+  )
+
+  set text(font: font-text, size: 10pt, lang: "en")
+  set par(justify: true, leading: 0.8em)
+
+  // --- 3. HEADER BEREICH (Awesome CV Style) ---
   grid(
-    columns: (1fr, 1fr),
-    gutter: 2em,
-    [
-      #text(fill: color-accent, weight: "bold", author.firstname + " " + author.lastname) \
-      #find_contact(author, "fa address-card") \
-      #find_contact(author, "fa mobile-screen") \
-      #find_contact(author, "fa envelope")
+    columns: (2.5cm, 1fr),
+    gutter: 1cm,
+
+    // Spalte 1: Profilbild
+    if profile-photo != none and profile-photo != "" {
+      box(
+        radius: 50%,
+        clip: true,
+        stroke: 0.5pt + color-accent,
+        width: 2.5cm,
+        height: 2.5cm,
+        image(profile-photo, fit: "cover")
+      )
+    } else {
+      // Leerer Platzhalter, damit das Layout nicht springt, falls kein Bild da ist
+      circle(radius: 1.25cm, fill: rgb("#eeeeee"))
+    },
+
+    // Spalte 2: Kopfdaten (Rechtsbündig)
+    align(right)[
+      // Name
+      #text(font: font-header, size: 24pt, weight: "bold")[
+        #author.at("firstname", default: "") #author.at("lastname", default: "")
+      ]
+      #v(-5pt)
+
+      // Position
+      #if position != none and position != "" {
+        text(font: font-header, size: 9pt, fill: color-accent, weight: "bold", tracking: 1pt)[
+          #upper(position)
+        ]
+      }
+      #v(5pt)
+
+      // Kontakt & Social Media
+      #set text(size: 8pt, fill: gray-text)
+
+      // Hier rufen wir die gewünschte Hilfsfunktion auf
+      #if author.at("contact", default: none) != none and author.at("contact", default: none) != "" {
+        render-author-details-list(author.at("contact"), color-accent, separator: h(0.5em))
+      }
+
+      #if author.at("socialmedia", default: none) != none and author.at("socialmedia", default: none) != "" {
+        // Kleiner Abstand, falls beides existiert
+        if author.at("contact", default: none) != none and author.at("socialmedia", default: none) != "" { v(2pt) }
+        render-author-details-list(author.at("socialmedia"), color-accent, separator: h(0.5em))
+      }
+
+      // Zitat (Famous Quote)
+      #if famous-quote != none and famous-quote != "" {
+        v(5pt)
+        let q-text = famous-quote.at("text", default: "")
+        let q-attr = famous-quote.at("attribution", default: "")
+
+        if q-text != "" {
+          text(size: 9pt, fill: color-accent, style: "italic")[
+            “#q-text” #if q-attr != "" { [- #q-attr] }
+          ]
+        }
+      }
+    ]
+  )
+
+  v(1.5cm) // Abstand nach Header
+
+  // --- 4. EMPFÄNGER & DATUM ---
+  grid(
+    columns: (1fr, auto),
+    // Linke Seite: Empfängeradresse
+    align(left)[
+      #set text(font: font-header)
+
+      // Firmenname / Addressee
+      #if recipient.at("addressee", default: none) != none and recipient.at("addressee", default: none) != "" {
+        text(weight: "bold")[#recipient.at("addressee")]
+      }
+
+      // Straße
+      #if recipient.at("address", default: none) != none and recipient.at("address", default: none) != "" {
+        text(fill: gray-text)[#recipient.at("address")]
+      }
+
+      // PLZ & Stadt
+      #let zip = recipient.at("zip", default: "")
+      #let city = recipient.at("city", default: "")
+      #if zip != "" or city != "" {
+        text(fill: gray-text)[#zip #city]
+      }
     ],
-    [
-    #if recipient != none or recipient == "" [
-      #recipient.name \
-      #recipient.address \
-      #recipient.zip #recipient.city
+    // Rechte Seite: Datum
+    align(right + bottom)[
+      #text(fill: light-gray, style: "italic")[
+        #if date != none and date != "" { date }
       ]
     ]
   )
 
-  // --- Date and Subject ---
-  v(2em)
-  align(right)[#date]
-  v(2em)
-  if subject != none or subject == "" {
-    block(
-      width: 100%,
-      [
-        #set text(..text-style-header)
-        #align(left)[
-            #strong[#text(fill: color-accent)[#subject.slice(0, 3)]#subject.slice(3)]
-            #box(width: 1fr, line(length: 99%))
-        ]
-      ]
-    )
-    v(2em)
+  v(1cm)
+
+  // --- 5. BETREFF & ANREDE ---
+
+  if subject != none and subject != "" {
+    text(font: font-header, weight: "bold")[#underline[#subject]]
+    v(0.5em)
   }
 
-  // --- Salutation ---
-  if recipient != none or recipient == "" {
-    "Dear " + recipient.salutation + ","
+  // Anrede (Salutation + Name)
+  let salutation = recipient.at("salutation", default: "Dear")
+  let name = recipient.at("name", default: "")
+
+  text(fill: gray-text)[#salutation #name,]
+
+  v(0.5em)
+
+  // --- 6. BODY CONTENT ---
+
+  if cover_letter_content != none and cover_letter_content != "" {
+    cover_letter_content
   }
 
-  // --- Body ---
-  v(1em)
-  cover_letter_content
+  v(1cm)
 
-  // --- Closing ---
-  v(2em)
-  "Sincerely,"
-  v(1em)
-  author.firstname + " " + author.lastname
+  // --- 7. GRUẞFORMEL (Valediction) ---
+
+  let valediction = recipient.at("valediction", default: "Sincerely,")
+
+  text(fill: black)[
+    #valediction
+    #text(font: font-header, weight: "bold")[
+      #author.at("firstname", default: "") #author.at("lastname", default: "")
+    ]
+  ]
 }
+
+
 // Creates the footer content.
 #let create-footer(author) = {
     set text(..text-style-footer)
@@ -83,7 +188,7 @@
 // -------------------------
 
 // Creates the title page layout.
-#let title-page(author, profile-photo: none) = {
+#let title-page(author, profile-photo: none, position: none) = {
     set page(footer: none)
     v(1fr)
 

@@ -1,5 +1,5 @@
 --- inject_metadata.lua - a Lua filter to automatically inject document metadata
---- into a Typst template.
+--- into a Typst template as a single dictionary named 'meta-data'.
 
 local M = {}
 
@@ -52,11 +52,13 @@ end
 
 ---
 -- Formats a Lua table (structured as a dictionary) into a Typst dictionary string literal.
+-- Keys are quoted to support hyphens (e.g. "profile-photo").
 ---
 local function format_typst_dictionary(tbl)
   local parts = {}
   for key, item in pairs(tbl) do
-    local typst_key = tostring(key)
+    -- Quote keys to handle special characters (like hyphens in 'famous-quote')
+    local typst_key = '"' .. tostring(key) .. '"'
     table.insert(parts, typst_key .. ": " .. to_typ_value(item))
   end
   return '(' .. table.concat(parts, ", ") .. ')'
@@ -115,7 +117,7 @@ end
 
 function M.Pandoc(doc)
   local quarto_meta = doc.meta or {}
-  local typst_definitions = {}
+  local typst_entries = {}
 
   for key, value in pairs(quarto_meta) do
 
@@ -125,24 +127,29 @@ function M.Pandoc(doc)
 
     local typst_val_str = to_typ_value(value)
 
+    -- Optional: Skip empty content to keep the dict clean.
+    -- If you prefer having explicit 'none' values in the dict, remove this check.
     if is_metadata_clutter(typst_val_str) then
       goto continue
     end
 
-    table.insert(typst_definitions, "#let " .. key .. " = " .. typst_val_str)
+    -- Add to the dictionary list.
+    -- We quote the key (e.g. "profile-photo") to ensure valid Typst syntax for keys with hyphens.
+    table.insert(typst_entries, '  "' .. key .. '": ' .. typst_val_str)
 
     ::continue::
   end
 
-  local typst_definitions_string = table.concat(typst_definitions, "\n") .. "\n"
+  -- Wrap everything in a single dictionary named 'meta-data'
+  local typst_content = "#let meta-data = (\n" .. table.concat(typst_entries, ",\n") .. "\n)\n"
 
   local file, err = io.open(TYPST_METADATA_FILE, "w")
   if file then
-    file:write(typst_definitions_string)
+    file:write(typst_content)
     file:close()
   else
     pandoc.stderr:write(
-      string.format("WARNING (inject_metadata.lua): Could not write to '%s': %s\n", TYPST_METADATA_FILE, err)
+      string.format("WARNING (inject-metadata.lua): Could not write to '%s': %s\n", TYPST_METADATA_FILE, err)
     )
   end
 

@@ -7,6 +7,22 @@
   if value == none { default } else { value }
 }
 
+#let has-content(dict, key) = {
+  let val = dict.at(key, default: none)
+  return val != none and val != ""
+}
+
+#let has-nested-content(dict, ..keys) = {
+  let current = dict
+  for key in keys.pos() {
+    if current == none or type(current) != dictionary or current.at(key, default: none) == none {
+      return false
+    }
+    current = current.at(key)
+  }
+  return current != ""
+}
+
 // Cleans up text potentially escaped from external sources (e.g., Pandoc).
 #let unescape_text(text) = {
   let cleaned = text

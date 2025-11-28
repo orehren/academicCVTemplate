@@ -9,6 +9,6 @@
     header: align(right)[
         #box(width: 1fr, line(length: 100%))
         #set text(..text-style-header)
-        #text(fill: color-accent)[#title.slice(0, 3)]#title.slice(3)
+        #text(fill: color-accent)[#meta-data.title.slice(0, 3)]#meta-data.title.slice(3)
     ],
 )
