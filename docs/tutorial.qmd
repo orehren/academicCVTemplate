@@ -89,8 +89,10 @@ If you want to include a cover letter, configure the recipient details and write
 
 ```yaml
 recipient:
-  name: "Dr. Alan Turing"
-  salutation: "Dr. Turing,"
+  name: "Dr. Turing"
+  salutation: "Dear"
+  valediction: "Sincerely
+  addressee: Dr. Alan Turing"
   address: "Department of Computer Science"
   city: "Bletchley Park"
   zip: "MK3 6EB"
