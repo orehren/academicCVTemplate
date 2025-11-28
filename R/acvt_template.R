@@ -12,21 +12,22 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
   # 1. Create the project directory
   dir.create(path, recursive = TRUE, showWarnings = FALSE)
 
-  # 2. Locate the source extension directory in the package
-  source_dir <- system.file("quarto/_extensions/orehren/acvt", package = "acvt")
-  if (source_dir == "") {
-    stop("Could not find the Quarto extension directory in the acvt package.", call. = FALSE)
+  # 2. Locate the source skeleton directory in the package
+  skeleton_dir <- system.file("rstudio/templates/project/skeleton", package = "acvt")
+  if (skeleton_dir == "") {
+    stop("Could not find the project template skeleton directory in the acvt package.", call. = FALSE)
   }
 
-  # 3. Copy the entire extension to its destination
-  dest_ext_parent_dir <- file.path(path, "_extensions", "orehren")
-  dir.create(dest_ext_parent_dir, recursive = TRUE)
-  file.copy(from = source_dir, to = dest_ext_parent_dir, recursive = TRUE)
+  # 3. Copy the entire _extensions directory
+  source_ext_dir <- file.path(skeleton_dir, "_extensions")
+  dest_ext_dir <- file.path(path, "_extensions")
+  dir.create(dest_ext_dir, recursive = TRUE)
+  file.copy(from = source_ext_dir, to = path, recursive = TRUE)
 
-  # 4. Copy the project files from the *newly copied* extension to the project root
-  newly_copied_ext_dir <- file.path(dest_ext_parent_dir, "acvt")
-  file.copy(from = file.path(newly_copied_ext_dir, "_quarto.yml"), to = path)
-  file.copy(from = file.path(newly_copied_ext_dir, "academicCV-template.qmd"), to = path)
+  # 4. Copy project files from the single source of truth to the project root
+  source_of_truth_dir <- file.path(dest_ext_dir, "orehren", "acvt")
+  file.copy(from = file.path(source_of_truth_dir, "_quarto.yml"), to = path)
+  file.copy(from = file.path(source_of_truth_dir, "academicCV-template.qmd"), to = path)
 
   # 5. Rename the template qmd file
   file.rename(from = file.path(path, "academicCV-template.qmd"), to = file.path(path, "cv.qmd"))
