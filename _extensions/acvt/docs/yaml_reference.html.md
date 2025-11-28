@@ -118,12 +118,14 @@ Configuration for the cover letter section.
 ### `recipient`
 Information about the addressee.
 
-**Type:** Object (`name`, `salutation`, `address`, `city`, `zip`)
+**Type:** Object (`name`, `salutation`, `valediction`, `addressee` `address`, `city`, `zip`)
 
 **Fields:**
 
-*   `name`: Full name. **Type:** String
-*   `salutation`: Person to greet. **Type:** String
+*   `salutation`: Form of greeting to use. **Type:** String
+*   `valediction`: Form of complimentary close to use. **Type:** String
+*   `name`: Name of the Person to address in salutation. **Type:** String
+*   `addressee`: First line of the address (Name/Company). **Type:** String
 *   `address`: Street address. **Type:** String
 *   `city`: City. **Type:** String
 *   `zip`: Postal code. **Type:** String
@@ -131,8 +133,10 @@ Information about the addressee.
 **Example:**
 ```yaml
 recipient:
-  name: "Dr. Alan Turing"
-  salutation: "Dr. Turing,"
+  salutation: "Dear,"
+  valediction: "Sincerely,"
+  name: "Dr. Turing"
+  addressee: "Dr. Alan Turing"
   address: "Bletchley Park"
   city: "Milton Keynes"
   zip: "MK3 6EB"
