@@ -7,6 +7,12 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  # Source of Truth (R-Package Struktur)
+  SRC_PATH: "inst/rstudio/templates/project/skeleton/_extensions/orehren/acvt"
+  # Target für Quarto CLI (Root Struktur)
+  ROOT_EXT_PATH: "_extensions/orehren/acvt"
+
 jobs:
   publish-and-commit:
     runs-on: ubuntu-latest
@@ -20,19 +26,44 @@ jobs:
       - name: Set up Quarto and R
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # --- SCHRITT 1: Synchronisierung (inst -> root) ---
+      - name: Sync Extension to Root
+        run: |
+          echo "Synchronizing extension from inst/ to root..."
+          
+          # Alten Root-Ordner bereinigen (falls vorhanden)
+          rm -rf _extensions
+          
+          # Zielstruktur erstellen
+          mkdir -p "$ROOT_EXT_PATH"
+          
+          # Kopieren (Recursive)
+          cp -r "$SRC_PATH/"* "$ROOT_EXT_PATH/"
+          
+          echo "Sync abgeschlossen. Inhalt von $ROOT_EXT_PATH:"
+          ls -R "$ROOT_EXT_PATH"
+        shell: bash
+
+      # --- SCHRITT 2: Dateien vorbereiten (Patching) ---
+      # Wir patchen die Datei im ROOT Ordner, da Quarto diese zum Rendern nutzt.
+      # Falls diese Änderung permanent sein soll, müsste man sie auch in SRC_PATH machen.
       - name: Prepare Source Files (Patch Config & Clear Metadata)
         run: |
-          CONF_FILE="_extensions/acvt/_extension.yml"
-          TYP_FILE="_extensions/acvt/typst/02-definitions-metadata.typ"
+          CONF_FILE="$ROOT_EXT_PATH/_extension.yml"
+          TYP_FILE="$ROOT_EXT_PATH/typst/02-definitions-metadata.typ"
 
+          echo "Patching Configuration: $CONF_FILE"
+          # Pfad anpassen (stellt sicher, dass extension.yml auf das korrekte R-Script zeigt)
           sed -i 's|: .*_fetch_cv_data\.R|: _extensions/orehren/acvt/R/_fetch_cv_data.R|' "$CONF_FILE"
 
           if [ -f "$TYP_FILE" ]; then
+            echo "Clearing Metadata: $TYP_FILE"
             truncate -s 0 "$TYP_FILE"
           fi
 
-          git status
-          git diff "$CONF_FILE"
+          # Optional: Den Patch auch zurück in die Source kopieren, damit er committet wird
+          cp "$CONF_FILE" "$SRC_PATH/_extension.yml"
+          cp "$TYP_FILE" "$SRC_PATH/typst/02-definitions-metadata.typ"
         shell: bash
 
       - name: Render Quarto Website
@@ -40,10 +71,19 @@ jobs:
         with:
           path: docs
 
-      - name: Move intermediate Markdown files
+      # --- SCHRITT 3: Markdown Dateien bewegen ---
+      # Wir schieben die generierten MDs in den SOURCE Ordner (Source of Truth)
+      # und syncen dann erneut zum Root, damit alles konsistent ist.
+      - name: Move intermediate Markdown files and Re-Sync
         run: |
-          mkdir -p _extensions/acvt/docs
-          find docs/ -type f -name "*.md" -exec mv {} _extensions/acvt/docs/ \;
+          DOCS_TARGET="$SRC_PATH/docs"
+          mkdir -p "$DOCS_TARGET"
+          
+          echo "Moving generated markdown files to Source of Truth ($DOCS_TARGET)..."
+          find docs/ -type f -name "*.md" -exec mv {} "$DOCS_TARGET/" \;
+          
+          echo "Re-Syncing updated files from Source to Root..."
+          cp -r "$SRC_PATH/docs" "$ROOT_EXT_PATH/"
         shell: bash
 
       - name: Commit changes back to main
@@ -51,14 +91,19 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          git add -f _extensions/acvt/docs/*.md
-          git add -f _extensions/acvt/_extension.yml
-          git add -f _extensions/acvt/typst/02-definitions-metadata.typ
+          # 1. Wir adden die Source of Truth (R-Paket Struktur)
+          git add -f "$SRC_PATH/docs/*.md"
+          git add -f "$SRC_PATH/_extension.yml"
+          git add -f "$SRC_PATH/typst/02-definitions-metadata.typ"
+          
+          # 2. Wir adden den Root Ordner (für Quarto CLI User)
+          # Hier adden wir den kompletten Ordner, um sicherzugehen, dass er synchron ist
+          git add -f _extensions
 
           if git diff --staged --quiet; then
             echo "Keine Änderungen zu committen."
           else
-            git commit -m "Docs: Update offline markdown & config cleanup [skip ci]"
+            git commit -m "Docs: Auto-sync inst to root & update markdowns [skip ci]"
             git push
           fi
 
