@@ -2,7 +2,9 @@
 
 This is a [Quarto](https://quarto.org/) extension for creating beautiful, modern, and professional academic CVs and cover letters using the [Typst](https://typst.app/) typesetting system.
 
-<center><img src="https://raw.githubusercontent.com/orehren/acvt/main/screenshot.png" alt="Template Screenshot" width="60%"/></center>
+<img src="https://raw.githubusercontent.com/orehren/acvt/main/screenshot.png" alt="Template Screenshot" width="60%"/>
+
+![Screenshot of the Template showing a simple cover page of the template with a profile picture, name of the author and contact details highlighted in the center of the document. Accent Color is a greyish blue](https://raw.githubusercontent.com/orehren/acvt/main/screenshot.png#center)
 
 ## Features
 
