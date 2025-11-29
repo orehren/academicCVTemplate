@@ -1,5 +1,5 @@
-^inst$
-^docs$
-^scripts$
-^renv$
-^R$
+inst
+docs
+scripts
+renv
+R

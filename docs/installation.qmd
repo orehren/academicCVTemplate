@@ -15,7 +15,7 @@ You can start a new project with the template or add it to an existing Quarto pr
 To start fresh, run this command in your terminal:
 
 ```bash
-quarto use template orehren/academicCVTemplate
+quarto use template orehren/acvt
 ```
 
 Follow the prompts to name your directory (e.g., `my-cv`).
@@ -25,7 +25,7 @@ Follow the prompts to name your directory (e.g., `my-cv`).
 If you already have a Quarto project, run this command in your project root:
 
 ```bash
-quarto add orehren/academicCVTemplate
+quarto add orehren/acvt
 ```
 
 This downloads the extension files into the `_extensions/` directory.

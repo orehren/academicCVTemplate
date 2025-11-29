@@ -2,8 +2,7 @@
 
 This is a [Quarto](https://quarto.org/) extension for creating beautiful, modern, and professional academic CVs and cover letters using the [Typst](https://typst.app/) typesetting system.
 
-![Template Screenshot](https://via.placeholder.com/600x400.png?text=Template+Screenshot+Here)
-*(Note: A screenshot of the final PDF output should be added here.)*
+<center><img src="https://raw.githubusercontent.com/orehren/acvt/main/screenshot.png" alt="Template Screenshot" width="60%"/></center>
 
 ## Features
 
@@ -17,22 +16,20 @@ This is a [Quarto](https://quarto.org/) extension for creating beautiful, modern
 If you would like to add the template to an existing project directory:
 
 ```bash
-quarto install extension orehren/academicCVTemplate
+quarto install extension orehren/acvt
 ```
 
 Alternatively, you can create a new Quarto project bundled with a `.qmd` template file to get started:
 
 ``` bash
-quarto use template orehren/academiccvtemplate
+quarto use template orehren/academicCVTemplate
 ```
 
 This will install the format extension and create an example qmd file that you can use as a starting place for your document.
 
 ## Documentation
 
-**For complete instructions on how to install, use, and customize this template, please visit the official documentation website:**
-
-**(Link to the hosted documentation website will be added here once it is live.)**
+**For complete instructions on how to install, use, and customize this template, please visit the official documentation website: [https://orehren.github.io/acvt](https://orehren.github.io/acvt/)**
 
 The full documentation includes:
 *   A step-by-step **Installation Guide**.
@@ -42,4 +39,4 @@ The full documentation includes:
 
 ## Acknowledgements
 
-This project was inspired by and builds upon the work of several open-source projects, including Awesome-CV and quarto-awesomecv-typst. For a full list of acknowledgements, please see the documentation.
+This project was inspired by and builds upon the work of several open-source projects, including Awesome-CV and quarto-awesomecv-typst. For a full list of acknowledgements, please see the [documentation](https://orehren.github.io/acvt/).
