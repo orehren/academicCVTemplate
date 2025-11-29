@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+  <records>
+    <!-- Entry 1 -->
+    <record>
+      <rec-number>1</rec-number>
+      <ref-type name="Journal Article">17</ref-type>
+      <contributors>
+        <authors>
+          <author>Doe, Jane</author>
+          <author>Smith, John</author>
+        </authors>
+      </contributors>
+      <titles>
+        <title>A Brilliant Paper on R</title>
+        <secondary-title>Journal of R Studies</secondary-title>
+      </titles>
+      <periodical>
+        <full-title>Journal of R Studies</full-title>
+      </periodical>
+      <pages>100-110</pages>
+      <volume>12</volume>
+      <dates>
+        <year>2023</year>
+      </dates>
+    </record>
+
+    <!-- Entry 2 -->
+    <record>
+      <rec-number>2</rec-number>
+      <ref-type name="Conference Proceedings">10</ref-type>
+      <contributors>
+        <authors>
+          <author>Wang, Li</author>
+          <author>Author, A.</author>
+        </authors>
+      </contributors>
+      <titles>
+        <title>Automated CV Generation from XML Data</title>
+        <secondary-title>Proceedings of the International Conference on Data Formats</secondary-title>
+      </titles>
+      <pages>50-55</pages>
+      <dates>
+        <year>2024</year>
+      </dates>
+    </record>
+
+    <!-- Entry 3 -->
+    <record>
+      <rec-number>3</rec-number>
+      <foreign-keys>
+        <key app="BibTeX">example_article</key>
+      </foreign-keys>
+      <ref-type name="Journal Article">17</ref-type>
+      <contributors>
+        <authors>
+          <author>Author, A.</author>
+        </authors>
+      </contributors>
+      <titles>
+        <title>Example Article Title</title>
+        <secondary-title>Journal of Examples</secondary-title>
+      </titles>
+      <periodical>
+        <full-title>Journal of Examples</full-title>
+      </periodical>
+      <pages>1-10</pages>
+      <volume>1</volume>
+      <number>1</number>
+      <dates>
+        <year>2023</year>
+      </dates>
+    </record>
+
+    <!-- Entry 4 -->
+    <record>
+      <rec-number>4</rec-number>
+      <foreign-keys>
+        <key app="BibTeX">example_book</key>
+      </foreign-keys>
+      <ref-type name="Book">6</ref-type>
+      <contributors>
+        <authors>
+          <author>Buthor, B.</author>
+        </authors>
+      </contributors>
+      <titles>
+        <title>Example Book Title</title>
+      </titles>
+      <publisher>Example Publisher</publisher>
+      <dates>
+        <year>2022</year>
+      </dates>
+    </record>
+  </records>
+</xml>

@@ -1,0 +1,49 @@
+title: acvt
+author: Oliver Rehren
+version: 0.9.0
+description: "A Quarto extension for creating academic CVs and cover letters using Typst."
+quarto-required: ">=1.8.0"
+license: MIT
+contributes:
+  project:
+    project:
+      type: default
+      output-dir: _output
+      pre-render: _extensions/orehren/acvt/R/_fetch_cv_data.R
+    format: acvt-typst
+    metadata-files:
+      - _cv_data.yml
+  formats:
+    common:
+      output-file: "CV_Application"
+      shortcodes:
+        - shortcodes/cv-section.lua
+        - shortcodes/publication-list.lua
+      execute:
+        echo: false
+        warning: false
+        error: false
+      style:
+        color-accent: "#dc3522"
+        font-header: ["Roboto", "Arial", "Dejavu Sans"]
+        font-text: ["Source Sans Pro", "Arial", "Dejavu Sans"]
+      surpress-bibliography: true
+      publication-list:
+        bib-style: "assets/bib/apa-cv.csl"
+        highlight-author: color
+      profile-photo: "assets/images/picture.jpg"
+    typst:
+      keep-typ: false
+      filters:
+        - path: filters/inject-metadata.lua
+        - path: filters/extract-cover-letter.lua
+        - path: filters/embed-attachments.lua
+      template: typst/template.typ
+      template-partials:
+        - typst/01-definitions-helper-functions.typ
+        - typst/02-definitions-metadata.typ
+        - typst/03-definitions-styling.typ
+        - typst/04-definitions-parts-functions.typ
+        - typst/page.typ
+        - typst/typst-show.typ
+        - typst/typst-template.typ
