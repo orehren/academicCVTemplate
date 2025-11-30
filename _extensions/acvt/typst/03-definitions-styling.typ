@@ -4,10 +4,6 @@
 // -- 1. Color Palett Definition --
 // ----------------
 
-<<<<<<< HEAD:_extensions/acvt/typst/03-definitions-styling.typ
-// #let color-accent = rgb( unescape_text( style.at("color-accent", default: "#dc3522") ) )
-=======
->>>>>>> fix/rstudio-template-discovery:inst/rstudio/templates/project/skeleton/_extensions/orehren/acvt/typst/03-definitions-styling.typ
 #let color-accent = rgb( unescape_text( meta-data.style.at("color-accent", default: "#dc3522") ) )
 
 // -- Colors (using the nord color palett) --

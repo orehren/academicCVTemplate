@@ -5,8 +5,8 @@
 #show quote.where(block: true): it => {
     set align(center)
     set text(..text-style-quote)
-    let attribution = if famous-quote.at("attribution") != none {
-      align(end, [\~ #famous-quote.at("attribution") \~])
+    let attribution = if has-nested-content(meta-data, "famous-quote", "attribution") {
+      align(end, [\~ #meta-data.famous-quote.at("attribution") \~])
       } else { none }
 
     block(
