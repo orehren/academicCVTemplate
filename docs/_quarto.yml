@@ -16,10 +16,10 @@ website:
         text: Home
       - href: installation.qmd
         text: Installation
-      - href: data_integration.qmd
-        text: Data Integration
       - href: tutorial.qmd
         text: How to get started
+      - href: data_integration.qmd
+        text: Data Integration
       - href: shortcodes.qmd
         text: Shortcodes
       - href: styling.qmd
