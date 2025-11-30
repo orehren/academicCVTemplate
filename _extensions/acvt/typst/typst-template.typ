@@ -46,7 +46,7 @@
 
       // Display optional quote
       // if has-content(meta-data.at("famous-quote", default: (:)), "text") {
-      if has-nested-content(meta-data, "famous-quote", "text") {
+      if has-content(meta-data, "famous-quote", "text") {
           quote(attribution: meta-data.famous-quote.at("attribution", default: none), block: true, quotes: true)[#meta-data.famous-quote.at("text", default: none)]
       }
 

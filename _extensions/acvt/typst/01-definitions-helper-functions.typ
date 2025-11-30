@@ -2,21 +2,11 @@
 // Defines helper functions for the template
 #import "@preview/fontawesome:0.5.0": *
 
-// Checks, if a variable is in the global scope and sets a default value if not
-// #let get-optional(value, default) = {
-//  if value == none { default } else { value }
-// }
-
-// #let has-content(dict, key) = {
-//  let val = dict.at(key, default: none)
-//  return val != none and val != ""
-// }
-
 // --- Helper: Ensure value is always an array ---
 #let to-array(val) = if type(val) == array { val } else { (val,) }
 
-// --- Helper: Check if object (nested and not nested) has content
-#let has-nested-content(dict, ..keys) = {
+// --- Helper: Check if (nested) object has content
+#let has-content(dict, ..keys) = {
   let current = dict
   for key in keys.pos() {
     if current == none or type(current) != dictionary or current.at(key, default: none) == none {

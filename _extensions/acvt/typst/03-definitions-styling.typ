@@ -17,19 +17,18 @@
 // -- 2. Typography Definition --
 // ------------------------------
 
-// --- Define Global Safe Fallbacks ---
-#let fallback-text = ("Libertinus Serif",)
-#let fallback-header = ("New Computer Modern",)
+// --- Define Global Safe Fallback ---
+#let font-fallback = ("Libertinus Serif",)
 
 // --- Load User Fonts & Merge with Fallbacks ---
 
 // 1. Header Font
 #let user-font-header = meta-data.style.at("font-header", default: "Roboto")
-#let font-header = to-array(user-font-header) + fallback-header
+#let font-header = to-array(user-font-header) + font-fallback
 
 // 2. Text Font
 #let user-font-text = meta-data.style.at("font-text", default: "Source Sans Pro")
-#let font-text = to-array(user-font-text) + fallback-text
+#let font-text = to-array(user-font-text) + font-fallback
 
 // -- Font Sizes --
 #let font-size-xl = 22pt
