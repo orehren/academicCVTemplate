@@ -6,17 +6,20 @@ OpenFiles: cv.qmd
 Parameter: firstname
 Widget: TextInput
 Label: First Name
-Default: "Arthur"
+Default: Arthur
+Position: left
 
 Parameter: lastname
 Widget: TextInput
 Label: Last Name
-Default: "Author"
+Default: Author
+Position: right
 
 Parameter: email
 Widget: TextInput
 Label: Email
-Default: "your.email@example.com"
+Default: your.email@example.com
+Position: left
 
 Parameter: renv
 Widget: CheckboxInput
