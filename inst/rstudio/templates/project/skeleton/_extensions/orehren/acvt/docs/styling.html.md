@@ -37,6 +37,29 @@ style:
   font-text: ["Garamond", "Times New Roman", "serif"]
 ```
 
+### Fonts & Rendering
+This template is designed to look best with the Roboto, Source Sans and Lato font families.
+
+**Recommendation:**
+
+For the intended visual result, please install these fonts on your system:
+
+*   [Download Robto](https://fonts.google.com/specimen/Roboto)
+*   [Download Source Sans Pro](https://fonts.google.com/specimen/Source+Sans+3)
+*   [Download Lato](https://fonts.google.com/specimen/Lato)
+
+**Understanding Font Warnings:**
+
+When rendering, you might see warnings in the console like:
+
+`warning: unknown font family: lato`
+
+This is **normal behavior** if you haven't installed the specific fonts. It means:
+
+1.  Typst looked for "Lato" but couldn't find it on your system.
+2.  Typst is now automatically falling back to the built-in fonts (Libertinus Serif).
+3.  Your PDF will still be generated correctly, but it will use a serif font style instead of the intended sans-serif style.
+
 ## 2. Advanced Styling (Typst Inline Code)
 
 A powerful feature is the ability to use **Typst inline code** directly within your Google Sheet data.

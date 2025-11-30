@@ -16,8 +16,20 @@
 
 // -- 2. Typography Definition --
 // ------------------------------
-#let font-header = meta-data.style.at("font-header", default: ("Roboto", "Arial", "Dejavu Sans") )
-#let font-text = meta-data.style.at("font-text", default: ("Source Sans Pro", "Arial", "Dejavu Sans") )
+
+// --- Define Global Safe Fallbacks ---
+#let fallback-text = ("Libertinus Serif",)
+#let fallback-header = ("New Computer Modern",)
+
+// --- Load User Fonts & Merge with Fallbacks ---
+
+// 1. Header Font
+#let user-font-header = meta-data.style.at("font-header", default: "Roboto")
+#let font-header = to-array(user-font-header) + fallback-header
+
+// 2. Text Font
+#let user-font-text = meta-data.style.at("font-text", default: "Source Sans Pro")
+#let font-text = to-array(user-font-text) + fallback-text
 
 // -- Font Sizes --
 #let font-size-xl = 22pt
