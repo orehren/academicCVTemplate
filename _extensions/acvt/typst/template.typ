@@ -4,15 +4,15 @@
 
 $definitions.typ()$
 
-$00-definitions-helper-functions.typ()$
+$definitions-00a-helper-functions.typ()$
 
-$01a-meta-data-injection$
+$definitions-01a-injected-meta-data$
 
-$01b-cover-letter-injection$
+$definitions-01b-injected-cover-letter$
+  
+$definitions-02a-styling.typ()$
 
-$02-definitions-styling.typ()$
-
-$03-definitions-parts-functions.typ()$
+$definitions-03a-parts-functions.typ()$
 
 // ================
 // 2. Content

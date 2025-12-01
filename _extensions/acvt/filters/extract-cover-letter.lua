@@ -88,7 +88,7 @@ function Pandoc(doc)
   end
 
   -- Injiziere den Code als RawBlock in die Metadaten
-  doc.meta['01b-cover-letter-injection'] = pandoc.RawBlock('typst', raw_typst_code)
+  doc.meta['definitions-01b-injected-cover-letter'] = pandoc.RawBlock('typst', raw_typst_code)
   
   return doc
 end

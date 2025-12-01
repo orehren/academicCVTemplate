@@ -58,7 +58,7 @@ If you already have a Quarto project, run this command in your project root:
 quarto add orehren/acvt
 ```
 
-This downloads the extension files into the `_extensions/` directory. You then need to copy the files `_quarto.yml` from 
+This downloads the extension files into the `_extensions/` directory. You then need to copy the files `_quarto.yml` from the `orehren/acvt` folder to the project base folder.
 
 ## 2. Install R Packages
 

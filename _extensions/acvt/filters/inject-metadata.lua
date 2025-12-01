@@ -142,7 +142,7 @@ function M.Pandoc(doc)
   -- Wrap everything in a single dictionary named 'meta-data'
   local typst_content = "#let meta-data = (\n" .. table.concat(typst_entries, ",\n") .. "\n)\n"
 
-  doc.meta['01a-meta-data-injection'] = pandoc.RawBlock('typst', typst_content)
+  doc.meta['definitions-01a-injected-meta-data'] = pandoc.RawBlock('typst', typst_content)
 
   return doc
 end

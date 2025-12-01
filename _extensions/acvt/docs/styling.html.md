@@ -96,9 +96,9 @@ For users who want more control, you can directly modify the Typst style files l
 
 ### Key Files
 
-*   **`03-definitions-styling.typ`:** This is the main stylesheet. It defines all the core styles, such as colors and font sizes, as `#let` variables. This is the best place to start for most advanced changes. For example, you can change the default font sizes:
+*   **`definitions-02a-styling.typ`:** This is the main stylesheet. It defines all the core styles, such as colors and font sizes, as `#let` variables. This is the best place to start for most advanced changes. For example, you can change the default font sizes:
     ```typst
-    // in 03-definitions-styling.typ
+    // in definitions-02a-styling.typ
     #let font-size-large = 18pt
     #let font-size-middle = 12pt
     #let font-size-small = 10pt
@@ -113,7 +113,7 @@ For users who want more control, you can directly modify the Typst style files l
     }
     ```
 
-*   **`04-definitions-parts-functions.typ`:** This file contains the functions that render larger components, like the `title-page`. You can modify the layout of these components here. For example, you could change the alignment or spacing of elements on the title page.
+*   **`definitions-03a-parts-functions.typ`:** This file contains the functions that render larger components, like the `title-page`. You can modify the layout of these components here. For example, you could change the alignment or spacing of elements on the title page.
 
 ### How to Apply Changes
 
@@ -134,10 +134,11 @@ For users who want to modify the core layout, the Typst files are located in the
 | :--- | :--- |
 | `template.typ` | The main entry point. Orchestrates the loading of partials. |
 | `typst-template.typ` | Contains the main document structure and logic. |
-| `01-definitions-helper-functions.typ` | Helper functions for data processing and icons. |
-| `02-definitions-metadata.typ` | **Auto-generated.** Contains the metadata injected from your YAML. |
-| `03-definitions-styling.typ` | Defines colors, fonts, and text styles. |
-| `04-definitions-parts-functions.typ` | Defines the layout components (`resume-entry`, `visualize-skills-list`, title page, footer). |
+| `definitions-00a-helper-functions.typ` | Helper functions for data processing and icons. |
+| `definitions-01a-injected-meta-data` | **Auto-generated.** Contains the metadata injected from your YAML. |
+| `definitions-01b-injected-cover-letter` | **Auto-generated.** Contains the content of the cover letter. |
+| `definitions-02a-styling.typ` | Defines colors, fonts, and text styles. |
+| `definitions-03a-parts-functions.typ` | Defines the layout components (`resume-entry`, `visualize-skills-list`, title page, footer). |
 | `page.typ` | Page setup (margins, size). |
 | `typst-show.typ` | Global show rules. |
 

@@ -10,9 +10,9 @@ This page explains the architecture of the `academicCVTemplate` extension.
 
 To avoid exceeding Google API limits and to speed up rendering, the extension uses a caching system.
 
--   **Cache Files:** Fetched data is stored in two files: the hidden `.cv_cache.rds` (used by R for intermediate caching) and `_cv_data.yml` (used by the extension to inject data).
+-   **Cache Files:** Fetched data is stored in a hidden cache file. The file is called `.cv_data.json` is located in your project base directory and will be used by the shortcodes to inject the content of your sheets into the document.
 -   **Validity:** The cache is valid for **24 hours**.
--   **Forcing Update:** If you update your Google Sheet and want to see changes immediately, you must **delete** both the `.cv_cache.rds` and `_cv_data.yml` files from your project root. The next render will force a fresh fetch.
+-   **Forcing Update:** If you update your Google Sheet and want to see changes immediately, you must **delete** the `.cv_data.json` file from your project root folder. The next render will force a fresh fetch.
 
 ## 2. Extension Components
 
@@ -25,7 +25,7 @@ The extension operates as a Quarto Project Extension using several interacting c
 *Location:* `acvt/R/`
 
 The script `_fetch_cv_data.R` runs **before** any content in your `.qmd` file is processed.
-It handles authentication, fetches data from Google Sheets, and writes the structured data to `_cv_data.yml` and `.cv_cache.rds` in the project root folder.
+It handles authentication, fetches data from Google Sheets, and writes the structured data to `.cv_data.json` in the project root folder.
 
 ### Filters
 
@@ -34,9 +34,8 @@ It handles authentication, fetches data from Google Sheets, and writes the struc
 *Location:* `acvt/filters/`
 
 Lua filters intervene in the Pandoc conversion process to inject data and handle special content.
-They achieve this by generating or modifying the `02-definitions-metadata.typ` file:
 
--   `inject-metadata.lua`: Reads the entire YAML data (including `_cv_data.yml`) and converts it into Typst variables.
+-   `inject-metadata.lua`: Reads the entire YAML data and converts it into Typst variables. The Variables are then passed to the typst template.
 -   `extract-cover-letter.lua`: Extracts the content under `## Coverletter` and makes it available to the template.
 -   `embed-attachments.lua`: Handles the inclusion of appendix documents.
 
@@ -48,12 +47,12 @@ They achieve this by generating or modifying the `02-definitions-metadata.typ` f
 
 These Lua scripts provide the user-facing commands used in the `.qmd` file:
 
--   `cv-section.lua`: Implements `{{< cv-section >}}`. This is the default shortcode used to display most sections of the CV.
+-   `cv-section.lua`: Implements `{{< cv-section >}}`. This is the default shortcode used to display most sections of the CV. It reads the content of your sheets from `.cv_data.json`
 -   `publication-list.lua`: Implements `{{< publication-list >}}`. A shortcode for rendering publication lists.
 
 ### Template & Partials
 
-*Files*: `template.typ`, `typst-template.typ`, `01-definitions-helper-functions.typ`, `02-definitions-metadata.typ`, `03-definitions-styling.typ`, `04-definitions-parts-functions.typ`, `page.typ`
+*Files*: `template.typ`, `typst-template.typ`, `definitions-00a-helper-functions.typ`, `definitions-02a-styling.typ`, `definitions-03a-parts-functions.typ`, `page.typ`
 
 *Location*: `acvt/typst/`
 
@@ -66,10 +65,9 @@ Instead, modify the specific partials it loads:
 | Partial File | Purpose |
 |:-----------------------------------|:-----------------------------------|
 | `typst-template.typ` | Defines the main document structure (Logic for Cover Letter vs. CV). |
-| `01-definitions-helper-functions.typ` | Helper functions for data processing and icons. |
-| `02-definitions-metadata.typ` | **Auto-generated.** Contains the variables injected by filters. |
-| `03-definitions-styling.typ` | Defines the visual identity (colors, fonts, text styles). |
-| `04-definitions-parts-functions.typ` | Contains the layout functions (`resume-entry`, etc.). |
+| `definitions-00a-helper-functions.typ` | Helper functions for data processing and icons. |
+| `definitions-02a-styling.typ` | Defines the visual identity (colors, fonts, text styles). |
+| `definitions-03a-parts-functions.typ` | Contains the layout functions (`resume-entry`, etc.). |
 | `page.typ` | Configures page dimensions and margins. |
 
 **Output:** By default, the generated document is saved to the `_output/` directory.

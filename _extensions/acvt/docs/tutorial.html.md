@@ -59,7 +59,7 @@ This will render two contact details (e-mail address and the living location) an
 
 ### 2.3. Profile Photo
 
-To change the profile photo, replace the file at `_extensions/acvt/assets/images/picture.jpg` or update the path in the YAML:
+To change the profile photo, replace the file at `_extensions/orehren/acvt/assets/images/picture.jpg` or update the path in the YAML:
 
 ```yaml
 profile-photo: "path/to/your/photo.jpg"
