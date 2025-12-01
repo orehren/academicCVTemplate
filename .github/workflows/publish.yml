@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
 
 env:
-  # Source of Truth (R-Paket Struktur)
+  # Source of Truth (R package structure)
   SRC_PATH: "inst/rstudio/templates/project/skeleton/_extensions/orehren/acvt"
-  # Target für Quarto CLI (Root)
+  # Target for Quarto CLI (Root)
   ROOT_EXT_PATH: "_extensions/acvt"
 
 jobs:
@@ -26,47 +26,38 @@ jobs:
       - name: Set up Quarto and R
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # --- SCHRITT 1: Synchronisierung (inst -> root) ---
+      # --- STEP 1: Synchronizing (inst -> root) ---
       - name: Sync Extension and Template Files to Root
         run: |
           echo "Synchronizing extension from inst/ to root..."
           
-          # 1. Extension Ordner syncen
+          # 1. Extension Folder syncing
           rm -rf _extensions
           mkdir -p "$ROOT_EXT_PATH"
           cp -r "$SRC_PATH/"* "$ROOT_EXT_PATH/"
           
-          # 2. Template Dateien (Quarto Config & QMD) ins Root kopieren
-          # Wir kopieren sie aus dem SRC_PATH direkt in das aktuelle Verzeichnis (.)
+          # 2. Copy Template Files (Quarto Config & QMD) into Root
           echo "Copying template files (_quarto.yml, academicCV-template.qmd) to Repo Root..."
           
           cp "$SRC_PATH/_quarto.yml" ./_quarto.yml
           cp "$SRC_PATH/academicCV-template.qmd" ./academicCV-template.qmd
 
-          echo "Sync abgeschlossen."
+          echo "Sync finished."
           ls -la
         shell: bash
 
-      # --- SCHRITT 2: Dateien vorbereiten (Patching) ---
+      # --- STEP 2: Prepare Files (Patching) ---
       - name: Prepare Source Files (Patch Config & Clear Metadata)
         run: |
           CONF_FILE="$ROOT_EXT_PATH/_extension.yml"
-  
-          # TYP_FILE="$ROOT_EXT_PATH/typst/02-definitions-metadata.typ"
 
           echo "Patching Configuration: $CONF_FILE"
           
-          # Pfad auf Root-Struktur anpassen
+          # edit path to match extension root 
           sed -i 's|: .*_fetch_cv_data\.R|: _extensions/orehren/acvt/R/_fetch_cv_data.R|' "$CONF_FILE"
 
-          # if [ -f "$TYP_FILE" ]; then
-          #   echo "Clearing Metadata: $TYP_FILE"
-          #   truncate -s 0 "$TYP_FILE"
-          # fi
-
-          # Patch zurück in die Source kopieren (damit Sync konsistent bleibt)
+          # copy patch back in to the source to keep sync consistent
           cp "$CONF_FILE" "$SRC_PATH/_extension.yml"
-          # cp "$TYP_FILE" "$SRC_PATH/typst/02-definitions-metadata.typ"
         shell: bash
 
       - name: Render Quarto Website
@@ -74,7 +65,7 @@ jobs:
         with:
           path: docs
 
-      # --- SCHRITT 3: Markdown Dateien bewegen ---
+      # --- STEP 3: Move Markdown Files ---
       - name: Move intermediate Markdown files and Re-Sync
         run: |
           DOCS_TARGET="$SRC_PATH/docs"
@@ -92,20 +83,19 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # 1. Source of Truth adden
+          # 1. Add Source of Truth
           git add -f "$SRC_PATH/docs/*.md"
           git add -f "$SRC_PATH/_extension.yml"
-          # git add -f "$SRC_PATH/typst/02-definitions-metadata.typ"
           
-          # 2. Root Extension adden
+          # 2. Add Root Extension
           git add -f _extensions
 
-          # 3. Template Dateien im Root adden (NEU)
+          # 3. Add Template Files to Root
           git add -f _quarto.yml
           git add -f academicCV-template.qmd
 
           if git diff --staged --quiet; then
-            echo "Keine Änderungen zu committen."
+            echo "No changes to commit."
           else
             git commit -m "Docs: Auto-sync inst to root & update markdowns [skip ci]"
             git push
