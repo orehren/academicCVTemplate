@@ -252,15 +252,15 @@
 
 // Creates a dynamic two-column grid for CV entries.
 #let resume-entry(..args) = {
-    let cv-entries = args.named()
-    let entry-values = cv-entries.values().map((value) => eval(value, mode: "markup"))
+    let entry-values = args.pos().map((value) => eval(value, mode: "markup"))
+
     map-cv-entry-values(entry-values)
 }
 
 // Creates research-interests
 #let research-interests(..args) = {
-    let cv-entries = args.named()
-    let entry-values = cv-entries.values().map((value) => eval(value, mode: "markup"))
+    let entry-values = args.pos().map((value) => eval(value, mode: "markup"))
+
     map-cv-entry-values(entry-values, startindex: 4)
 }
 

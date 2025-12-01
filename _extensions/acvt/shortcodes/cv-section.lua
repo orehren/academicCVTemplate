@@ -2,6 +2,7 @@
 -- 1. UTILS
 -- =============================================================================
 
+-- Recursively unwrap Pandoc elements to get raw values
 local function unwrap(obj)
   if obj == nil then return nil end
   local t = pandoc.utils.type(obj)
@@ -17,19 +18,24 @@ local function unwrap(obj)
   return pandoc.utils.stringify(obj)
 end
 
+-- Check if a value is considered NA/Empty
 local function is_na(val)
   if not val then return true end
   local s = tostring(val)
   return (s == "" or s == "NA" or s == ".na.character")
 end
 
+-- Escape strings for Typst (handle quotes and backslashes)
 local function clean_string(val)
   local s = tostring(val)
+  -- Normalize fancy quotes
   s = s:gsub("“", '"'):gsub("”", '"'):gsub("‘", "'"):gsub("’", "'")
+  -- Escape backslashes and double quotes
   s = s:gsub("\\", "\\\\"):gsub('"', '\\"')
   return '"' .. s .. '"'
 end
 
+-- Safely retrieve an argument from kwargs
 local function get_arg(kwargs, key, default)
   local val = kwargs[key]
   if not val then return default end
@@ -38,34 +44,52 @@ local function get_arg(kwargs, key, default)
   return s
 end
 
--- Einfache Liste parsen (Legacy Support)
-local function parse_list_arg(val)
-  local res = {}
-  local s = pandoc.utils.stringify(val)
-  if s and s ~= "" then
-    for item in string.gmatch(s, "([^,]+)") do
-      table.insert(res, item:match("^%s*(.-)%s*$"))
-    end
-  end
-  return res
-end
-
--- Helper to read JSON file directly
+-- Read the hidden JSON data file directly
 local function read_cv_data_json()
   local f = io.open(".cv_data.json", "r")
   if not f then return nil end
   local content = f:read("*a")
   f:close()
   if not content or content == "" then return nil end
-  -- quarto.json is available in Lua filters running in Quarto
+  -- quarto.json is available in Lua filters running in Quarto context
   return quarto.json.decode(content)
 end
 
+-- String Interpolation Helper
+-- Replaces placeholders like {ColumnName} with values from the row map.
+local function interpolate_str(template, row_map)
+  -- Find all placeholders
+  local res = template:gsub("{(.-)}", function(col_name)
+    -- Trim whitespace in key (e.g., { Name } -> Name)
+    col_name = col_name:match("^%s*(.-)%s*$")
+
+    local val = row_map[col_name]
+
+    -- If value is NA or not found, return empty string for interpolation
+    if is_na(val) then
+      return ""
+    else
+      return tostring(val)
+    end
+  end)
+  return res
+end
+
+-- Helper: Extract all column names used in a template string
+local function extract_used_cols(template)
+  local cols = {}
+  for col_name in template:gmatch("{(.-)}") do
+    col_name = col_name:match("^%s*(.-)%s*$")
+    table.insert(cols, col_name)
+  end
+  return cols
+end
+
 -- =============================================================================
--- 2. TIDY SELECT LOGIC (NEU)
+-- 2. TIDY SELECT LOGIC (For 'exclude-cols')
 -- =============================================================================
 
--- Hilfsfunktion: Index einer Spalte finden
+-- Find index of a column by name
 local function get_col_index(cols, name)
   for i, v in ipairs(cols) do
     if v == name then return i end
@@ -73,15 +97,14 @@ local function get_col_index(cols, name)
   return nil
 end
 
--- Hauptfunktion: Löst Strings wie 'starts_with("a"), b:d' in eine Liste von Spaltennamen auf
+-- Resolve selectors like 'starts_with("a"), b:d' into a list of column names
 local function resolve_tidy_select(selector_str, all_columns)
   if not selector_str or selector_str == "" then return {} end
 
   local selected_cols = {}
-  local seen = {} -- Um Duplikate zu vermeiden
+  local seen = {}
 
-  -- Wir splitten am Komma, müssen aber aufpassen, keine Kommas innerhalb von Klammern zu splitten.
-  -- Für diesen Zweck nehmen wir an, dass Funktionsaufrufe keine verschachtelten Kommas haben.
+  -- Split by comma, assuming no nested commas in function calls for simplicity
   for part in string.gmatch(selector_str, "([^,]+)") do
     part = part:match("^%s*(.-)%s*$") -- trim
 
@@ -92,7 +115,6 @@ local function resolve_tidy_select(selector_str, all_columns)
       local idx_end = get_col_index(all_columns, end_col)
 
       if idx_start and idx_end then
-        -- Richtung erkennen (vorwärts oder rückwärts)
         local step = 1
         if idx_start > idx_end then step = -1 end
         for i = idx_start, idx_end, step do
@@ -104,12 +126,11 @@ local function resolve_tidy_select(selector_str, all_columns)
         end
       end
 
-    -- 2. Funktionen (starts_with, etc.)
+    -- 2. Functions (starts_with, etc.)
     else
       local func, arg = part:match("^([%w_]+)%(['\"](.+)['\"]%)$")
 
       if func then
-        -- Loop durch alle Spalten und prüfen
         for _, col in ipairs(all_columns) do
           local match = false
           if func == "starts_with" then
@@ -117,9 +138,8 @@ local function resolve_tidy_select(selector_str, all_columns)
           elseif func == "ends_with" then
             if col:find(arg .. "$") then match = true end
           elseif func == "contains" then
-            if col:find(arg, 1, true) then match = true end -- true = plain search (kein pattern)
+            if col:find(arg, 1, true) then match = true end
           elseif func == "matches" then
-             -- Lua Pattern Matching
             if col:find(arg) then match = true end
           end
 
@@ -129,18 +149,13 @@ local function resolve_tidy_select(selector_str, all_columns)
           end
         end
 
-      -- 3. Exakter Name (Literal)
+      -- 3. Literal Name
       else
-        -- Prüfen ob der Spaltenname existiert
         if get_col_index(all_columns, part) then
            if not seen[part] then
              table.insert(selected_cols, part)
              seen[part] = true
            end
-        else
-           -- Optional: Warnung oder Ignorieren. Wir ignorieren es hier.
-           -- Kann auch ein hardcoded String sein, falls das Argument nicht existiert?
-           -- Im Kontext von combine_cols eher unwahrscheinlich.
         end
       end
     end
@@ -151,161 +166,17 @@ end
 
 
 -- =============================================================================
--- 3. CORE LOGIC
--- =============================================================================
-
--- A. Sammeln
-local function collect_row_fields(row_list, exclude_set, na_mode)
-  local fields = {}
-
-  for _, item in ipairs(row_list) do
-    local k = item.key
-    local v = item.value
-
-    -- Prüfung auf exclude_set (ist jetzt ein Set von Namen)
-    if k and k ~= "" and not exclude_set[k] then
-
-      if is_na(v) then
-        if na_mode == "keep" then
-          table.insert(fields, { key = k, val = "none" })
-        elseif na_mode == "string" then
-          table.insert(fields, { key = k, val = '"NA"' })
-        end
-      else
-        local v_clean = clean_string(v)
-        table.insert(fields, { key = k, val = v_clean })
-      end
-    end
-  end
-  return fields
-end
-
--- B. Kombinieren
-local function apply_combine(fields, opts)
-  if #opts.cols == 0 then return fields end
-
-  -- Umwandeln der cols Liste in ein Set für schnelleren Lookup
-  local target_set = {}
-  for _, c in ipairs(opts.cols) do target_set[c] = true end
-
-  local combined_parts = {}
-  local remaining_fields = {}
-  local consumed_keys = {}
-
-  -- Wir müssen die Reihenfolge der `opts.cols` einhalten beim Kombinieren!
-  -- Aber: `fields` hat die Reihenfolge der Daten.
-  -- Strategie: Wir iterieren durch `opts.cols` (die gewünschte Reihenfolge) und suchen den Wert.
-
-  for _, target_key in ipairs(opts.cols) do
-    for _, field in ipairs(fields) do
-      if field.key == target_key then
-        if field.val ~= "none" then
-          local raw_val = field.val:sub(2, -2):gsub('\\"', '"')
-          table.insert(combined_parts, opts.prefix .. raw_val)
-        end
-        consumed_keys[field.key] = true
-        break
-      end
-    end
-  end
-
-  -- Den Rest einsammeln
-  for _, field in ipairs(fields) do
-    if not consumed_keys[field.key] then
-      table.insert(remaining_fields, field)
-    end
-  end
-
-  if #combined_parts > 0 then
-    local joined_text = table.concat(combined_parts, opts.sep)
-    local final_val = clean_string(joined_text)
-    table.insert(remaining_fields, { key = opts.as, val = final_val })
-  end
-
-  return remaining_fields
-end
-
--- C. Sortieren
-local function apply_order(fields, order_str)
-  if not order_str or order_str == "" then return fields end
-
-  -- Hier nutzen wir noch die einfache Logik, da 'order' meist explizite Namen sind
-  -- Man könnte tidy select hier auch einbauen, ist aber komplexer wegen a=1 Syntax.
-
-  local index_moves = {}
-  local prio_list = {}
-  local has_index_moves = false
-
-  for item in string.gmatch(order_str, "([^,]+)") do
-    item = item:match("^%s*(.-)%s*$")
-    local col_name, target_pos = item:match("^(.+)=(%d+)$")
-
-    if col_name and target_pos then
-      index_moves[tonumber(target_pos)] = col_name
-      has_index_moves = true
-    else
-      table.insert(prio_list, item)
-    end
-  end
-
-  local fields_map = {}
-  for _, f in ipairs(fields) do fields_map[f.key] = f end
-
-  local result = {}
-  local used_keys = {}
-
-  if has_index_moves then
-    local pool = {}
-    local moved_keys_check = {}
-    for _, name in pairs(index_moves) do moved_keys_check[name] = true end
-
-    for _, f in ipairs(fields) do
-      if not moved_keys_check[f.key] then table.insert(pool, f) end
-    end
-
-    local pool_idx = 1
-    local total_len = #fields
-
-    for i = 1, total_len do
-      if index_moves[i] and fields_map[index_moves[i]] then
-        table.insert(result, fields_map[index_moves[i]])
-      else
-        if pool_idx <= #pool then
-          table.insert(result, pool[pool_idx])
-          pool_idx = pool_idx + 1
-        end
-      end
-    end
-    while pool_idx <= #pool do
-      table.insert(result, pool[pool_idx])
-      pool_idx = pool_idx + 1
-    end
-    return result
-
-  else
-    for _, target_key in ipairs(prio_list) do
-      if fields_map[target_key] then
-        table.insert(result, fields_map[target_key])
-        used_keys[target_key] = true
-      end
-    end
-    for _, f in ipairs(fields) do
-      if not used_keys[f.key] then table.insert(result, f) end
-    end
-    return result
-  end
-end
-
--- =============================================================================
--- 4. MAIN
+-- 3. MAIN LOGIC
 -- =============================================================================
 local function generate_cv_section(args, kwargs, meta)
+  -- 1. Required Arguments
   local sheet = get_arg(kwargs, "sheet", "")
   local func  = get_arg(kwargs, "func", "")
 
   if sheet == "" or func == "" then return pandoc.Strong(pandoc.Str("Missing sheet/func")) end
 
-  -- Try to load from meta or file
+  -- 2. Load Data Source
+  -- Try meta (injected via filter) first, then fallback to file reading
   local cv_data_source = nil
   if meta.cv_data and meta.cv_data[sheet] then
     cv_data_source = meta.cv_data
@@ -320,58 +191,182 @@ local function generate_cv_section(args, kwargs, meta)
      return pandoc.Strong(pandoc.Str("Sheet not found"))
   end
 
-  -- 1. Daten laden & Unwrappen
+  -- Unwrap data structure
   local rows_raw = unwrap(cv_data_source[sheet])
   local rows = (pandoc.utils.type(rows_raw) == "MetaList" or (type(rows_raw)=="table" and rows_raw[1])) and rows_raw or {rows_raw}
 
   if #rows == 0 then return pandoc.RawBlock("typst", "") end
 
-  -- 2. Verfügbare Spalten ermitteln (aus der ersten Zeile)
-  -- Struktur der Zeile ist: { {key="col1", value="..."}, {key="col2", value="..."} }
+  -- ---------------------------------------------------------------------------
+  -- PARSE CONFIGURATION
+  -- ---------------------------------------------------------------------------
+
+  -- A. Parse 'pos-X' arguments
+  local mapping_templates = {}
+  local max_pos_index = -1
+
+  for k, v in pairs(kwargs) do
+    local idx_str = k:match("^pos%-(%d+)$")
+    if idx_str then
+      local idx = tonumber(idx_str)
+      mapping_templates[idx] = pandoc.utils.stringify(v)
+      if idx > max_pos_index then max_pos_index = idx end
+    end
+  end
+
+  -- B. Parse 'exclude-cols'
+  -- Retrieve all available column names from the first row for Tidy Select
   local all_columns = {}
   for _, field in ipairs(rows[1]) do
     if field.key then table.insert(all_columns, field.key) end
   end
 
-  -- 3. Argumente auflösen mit Tidy Select
   local raw_exclude = get_arg(kwargs, "exclude-cols", "")
   local exclude_cols_list = resolve_tidy_select(raw_exclude, all_columns)
 
+  -- Create a set for fast lookup of excluded columns
   local exclude_set = {}
   for _, c in ipairs(exclude_cols_list) do exclude_set[c] = true end
 
-  local raw_combine = get_arg(kwargs, "combine-cols", "")
-  local combine_cols_list = resolve_tidy_select(raw_combine, all_columns)
+  -- C. Identify explicitly consumed columns via 'pos-X'
+  -- These columns should be skipped during the auto-fill phase to avoid duplication.
+  local explicit_consumed_global = {}
 
-  local combine_opts = {
-    cols   = combine_cols_list,
-    as     = get_arg(kwargs, "combine-as", "details"),
-    sep    = get_arg(kwargs, "combine-sep", " "),
-    prefix = get_arg(kwargs, "combine-prefix", "")
-  }
+  for _, tmpl in pairs(mapping_templates) do
+    if tmpl:find("{") then
+      -- It's a template string (e.g. "{Start} - {End}")
+      local cols = extract_used_cols(tmpl)
+      for _, c in ipairs(cols) do explicit_consumed_global[c] = true end
+    else
+      -- It's a direct reference or static text.
+      -- We assume if it matches a column name exactly, it consumes that column.
+      explicit_consumed_global[tmpl] = true
+    end
+  end
 
-  local column_order = get_arg(kwargs, "column-order", "")
+  -- D. NA Action
   local na_action = get_arg(kwargs, "na_action", "omit")
 
   local blocks = {}
 
+  -- ---------------------------------------------------------------------------
+  -- ROW PROCESSING LOOP
+  -- ---------------------------------------------------------------------------
   for _, row_list in ipairs(rows) do
-    -- A. Sammeln
-    local fields = collect_row_fields(row_list, exclude_set, na_action)
 
-    -- B. Kombinieren
-    fields = apply_combine(fields, combine_opts)
+    -- Create map for interpolation: Key -> Val
+    local row_map = {}
+    -- Keep list of keys in original order for auto-fill iteration
+    local ordered_keys = {}
 
-    -- C. Sortieren
-    fields = apply_order(fields, column_order)
+    for _, item in ipairs(row_list) do
+      row_map[item.key] = item.value
+      table.insert(ordered_keys, item.key)
+    end
 
-    -- D. Output
-    if #fields > 0 then
-      local arg_strings = {}
-      for _, item in ipairs(fields) do
-        table.insert(arg_strings, item.key .. ": " .. item.val)
+    -- Track consumed keys for this specific row
+    local consumed_keys = {}
+    -- Mark global explicit columns as consumed
+    for k, _ in pairs(explicit_consumed_global) do consumed_keys[k] = true end
+    -- Also mark excluded columns as consumed (so they are skipped in auto-fill)
+    for k, _ in pairs(exclude_set) do consumed_keys[k] = true end
+
+    local final_args = {}
+    local auto_fill_ptr = 1 -- Pointer to ordered_keys
+    local current_slot = 0
+
+    -- Determine loop limit:
+    -- We must cover all 'pos-X' slots.
+    -- We also want to auto-fill remaining valid columns.
+    -- Since we don't know exactly how many valid auto-fill columns remain,
+    -- we iterate carefully until both conditions are met.
+    local safety_limit = max_pos_index + #ordered_keys + 10 -- Safety buffer
+
+    while current_slot < safety_limit do
+
+      -- Check exit condition:
+      -- We are past the highest explicit position AND we have exhausted the auto-fill columns.
+      if current_slot > max_pos_index and auto_fill_ptr > #ordered_keys then
+        break
       end
-      local call = "#" .. func .. "(" .. table.concat(arg_strings, ", ") .. ")"
+
+      -- Case A: Slot is explicitly defined via 'pos-X'
+      if mapping_templates[current_slot] then
+        local tmpl = mapping_templates[current_slot]
+        local val = ""
+
+        if tmpl:find("{") then
+          -- Interpolation logic
+          val = interpolate_str(tmpl, row_map)
+        else
+          -- Direct mapping or static text
+          if row_map[tmpl] then
+            val = row_map[tmpl] -- It is a column name
+            -- Handle NA for direct mapping
+             if is_na(val) then
+               if na_action == "string" then val = "NA"
+               elseif na_action == "keep" then val = "none" -- Typst none
+               else val = "" end
+             end
+          else
+            val = tmpl -- It is static text (or unknown column)
+          end
+        end
+
+        table.insert(final_args, clean_string(val))
+
+      -- Case B: Slot is empty -> Auto-Fill
+      else
+        -- Find the next column that is not 'consumed'
+        local found_next = false
+        while auto_fill_ptr <= #ordered_keys do
+          local candidate_key = ordered_keys[auto_fill_ptr]
+          auto_fill_ptr = auto_fill_ptr + 1
+
+          if not consumed_keys[candidate_key] then
+             -- Found a candidate!
+             local val = row_map[candidate_key]
+
+             -- Handle NA for auto-fill
+             if is_na(val) then
+                if na_action == "string" then
+                  table.insert(final_args, clean_string("NA"))
+                elseif na_action == "keep" then
+                   -- For Typst, passing empty string usually renders nothing, which is desired.
+                   -- 'none' might be useful depending on Typst function signature.
+                   table.insert(final_args, "none")
+                else
+                   -- Default: "omit" -> empty string
+                   table.insert(final_args, '""')
+                end
+             else
+               table.insert(final_args, clean_string(val))
+             end
+
+             found_next = true
+             break
+          end
+        end
+
+        if not found_next then
+          -- No more data available for auto-fill.
+          -- If we are past the max_pos_index, we can stop.
+          if current_slot > max_pos_index then
+            break
+          else
+            -- If we are before max_pos_index (gap between auto-fill and a later pos-X),
+            -- we must fill with empty strings to maintain grid alignment.
+            table.insert(final_args, '""')
+          end
+        end
+      end
+
+      current_slot = current_slot + 1
+    end
+
+    -- Construct Typst Call
+    if #final_args > 0 then
+      local call = "#" .. func .. "(" .. table.concat(final_args, ", ") .. ")"
       table.insert(blocks, call)
     end
   end
