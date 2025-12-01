@@ -74,9 +74,9 @@ google-document:
 
 attachments:
   - name: "First Document"
-    file: "_extensions/acvt/assets/images/first_document.png"
-  - name: "Second Document"
-    file: "_extensions/acvt/assets/images/second_document.png"
+    file: "_extensions/orehren/acvt/assets/images/first_document.png"
+  # - name: "Second Document"
+  #   file: "_extensions/orehren/acvt/assets/images/second_document.png"
 
 # -- Publication List ----------------------------------------------
 # Configuration for the publication list. See `?render_publication_list`.
@@ -84,12 +84,12 @@ publication-list:
   author-name: "Author, A." # Optional: Will be inferred if not set
   highlight-author: "bold" # '#text(fill: rgb("516db0"), weight: "bold")[%s]' # "bold", "italic", "color", or a custom Typst string
   bib-file:
-    - _extensions/acvt/assets/bib/bibliography.bib
-    - _extensions/acvt/assets/bib/bibliography.ris
-    - _extensions/acvt/assets/bib/bibliography.json
-    - _extensions/acvt/assets/bib/bibliography.xml
-    - _extensions/acvt/assets/bib/bibliography.yml
-  bib-style: _extensions/acvt/assets/bib/apa-cv.csl
+    - _extensions/orehren/acvt/assets/bib/bibliography.bib
+    - _extensions/orehren/acvt/assets/bib/bibliography.ris
+  #   - _extensions/orehren/acvt/assets/bib/bibliography.json
+  #   - _extensions/orehren/acvt/assets/bib/bibliography.xml
+  #   - _extensions/orehren/acvt/assets/bib/bibliography.yml
+  # bib-style: _extensions/orehren/acvt/assets/bib/apa-cv.csl
 
 # -- Output Options ------------------------------------------------
 render-output: "combined" # "cv-only", "letter-only", or "combined"
