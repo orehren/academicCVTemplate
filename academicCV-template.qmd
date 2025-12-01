@@ -64,7 +64,7 @@ style:
 # profile-photo: null # to disable the picture
 
 google-document:
-  auth-email: o.rehren@gmail.com # TRUE
+  auth-email: example@geeemail.com # TRUE
   document-identifier: "Application_CV_Data"
   sheets-to-load:
     - name: "Working Experiences"
@@ -102,21 +102,11 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 
 ## Research Interests
 
-<!-- {{< cv-section sheet="interests" func="research-interests" combine-cols="details_6, details_7" exclude-cols="label_7" column-order="label_2=5, details_2=1" >}} -->
+{{< cv-section sheet="interests" func="research-interests" combine-cols="details_6, details_7" exclude-cols="label_7" column-order="label_2=5, details_2=1" >}}
 
 ## Working Experiences
 
-<!-- {{< cv-section sheet="working" func="resume-entry" combine-cols='starts_with("detail")' combine-as="details" combine-prefix="· " column-order="location=1" exclude-cols = "start, end" combine-sep = "\\ \\ " >}} -->
-
-{{< cv-section
-    sheet="working"
-    func="resume-entry"
-    pos-0="label_2"
-    pos-1="**{title}**"
-    pos-3="{location} | {note_label}"
-    pos-4="{start} -- {end}"
-    exclude-cols="date, label_3"
->}}
+{{< cv-section sheet="working" func="resume-entry" combine-cols='starts_with("detail")' combine-as="details" combine-prefix="· " exclude-cols = "start, end" combine-sep = "\\ \\ " >}}
 
 ## Publications
 
