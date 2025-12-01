@@ -9,10 +9,8 @@ contributes:
     project:
       type: default
       output-dir: _output
-      pre-render: _extensions/orehren/acvt/R/_fetch_cv_data.R
+      pre-render: _extensions/acvt/R/_fetch_cv_data.R
     format: acvt-typst
-    metadata-files:
-      - _cv_data.yml
   formats:
     common:
       output-file: "CV_Application"

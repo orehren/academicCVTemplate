@@ -76,23 +76,6 @@ main <- function(...) {
     cli::cli_abort("Missing configuration: document-identifier or sheets-to-load.")
   }
 
-  cli::cli_process_start("Authenticating with Google")
-  tryCatch(
-    {
-      googledrive::drive_auth(email = auth_email %||% TRUE)
-      googlesheets4::gs4_auth(token = googledrive::drive_token())
-      cli::cli_process_done()
-    },
-    error = function(e) {
-      cli::cli_process_failed()
-      cli::cli_abort(c(
-        "Authentication failed.",
-        "i" = "Please run `googledrive::drive_auth()` interactively once.",
-        "x" = e$message
-      ))
-    }
-  )
-
   final_sheets_config <- list()
   for (item in sheets_config) {
     if (is.list(item)) {
@@ -102,20 +85,60 @@ main <- function(...) {
     }
   }
 
-  cli::cli_alert_info("Loading Sheets from Google...")
+  # Check for Mock Data
+  mock_dir <- "_csv_data"
+  raw_data_list <- list()
 
-  real_doc_id <- doc_identifier
-  if (!grepl("^[a-zA-Z0-9_-]{30,}$", doc_identifier)) {
-    cli::cli_alert_info("Resolving name '{doc_identifier}'...")
-    drive_res <- googledrive::drive_get(doc_identifier)
-    if (nrow(drive_res) == 0) cli::cli_abort("Sheet '{doc_identifier}' not found.")
-    real_doc_id <- drive_res$id[1]
+  if (dir.exists(mock_dir)) {
+    cli::cli_alert_info("Mock data directory found. Using local CSVs instead of Google Sheets.")
+
+    for (sheet_name in names(final_sheets_config)) {
+      csv_path <- file.path(mock_dir, paste0(sheet_name, ".csv"))
+      short_name <- final_sheets_config[[sheet_name]]
+
+      if (file.exists(csv_path)) {
+        cli::cli_alert_info("Reading {.file {csv_path}} as '{short_name}'")
+        # Use read.csv for base R compatibility, assuming headers are present
+        raw_data_list[[short_name]] <- read.csv(csv_path, check.names = FALSE, stringsAsFactors = FALSE)
+      } else {
+        cli::cli_alert_warning("Mock CSV not found: {csv_path}")
+      }
+    }
+
+  } else {
+    # Original Google Sheets Logic
+    cli::cli_process_start("Authenticating with Google")
+    tryCatch(
+      {
+        googledrive::drive_auth(email = auth_email %||% TRUE)
+        googlesheets4::gs4_auth(token = googledrive::drive_token())
+        cli::cli_process_done()
+      },
+      error = function(e) {
+        cli::cli_process_failed()
+        cli::cli_abort(c(
+          "Authentication failed.",
+          "i" = "Please run `googledrive::drive_auth()` interactively once.",
+          "x" = e$message
+        ))
+      }
+    )
+
+    cli::cli_alert_info("Loading Sheets from Google...")
+
+    real_doc_id <- doc_identifier
+    if (!grepl("^[a-zA-Z0-9_-]{30,}$", doc_identifier)) {
+      cli::cli_alert_info("Resolving name '{doc_identifier}'...")
+      drive_res <- googledrive::drive_get(doc_identifier)
+      if (nrow(drive_res) == 0) cli::cli_abort("Sheet '{doc_identifier}' not found.")
+      real_doc_id <- drive_res$id[1]
+    }
+
+    raw_data_list <- load_cv_sheets(
+      doc_identifier = real_doc_id,
+      sheets_to_load = final_sheets_config
+    )
   }
-
-  raw_data_list <- load_cv_sheets(
-    doc_identifier = real_doc_id,
-    sheets_to_load = final_sheets_config
-  )
 
   # --- 5. Transformation ---
   # We keep the transformation to list-of-lists (key/value) to preserve

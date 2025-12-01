@@ -1,0 +1,9 @@
+/.quarto/
+**/*.quarto_ipynb
+_output/
+.cv_data.json
+
+.gitignore
+.Rhistory
+.Rprofile
+*Rproj*

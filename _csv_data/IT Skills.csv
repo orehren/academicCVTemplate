@@ -1,0 +1,17 @@
+area,skill,value,level
+Research ,PsychoPy / E-Prime,0.5,Intermediate
+Research ,SoSci Survey / Lime Survey / Qualtrics,0.9,Expert
+Statistics,R / RStudio,0.9,Proficient
+Statistics,SPSS / G*Power,0.5,Intermediate
+Publishing and Data Science,Quarto,0.75,Proficient
+Publishing and Data Science,Jupyter,0.5,Intermediate
+Publishing and Data Science,Overleaf,1,Expert
+Neural Simulation,Matlab / Oktave,0.5,Intermediate
+Neural Simulation,ANNarchy / Simbrain / Emergent,0.5,Intermediate
+PKM and Data Mangement,Git / SVN,0.5,Intermediate
+PKM and Data Mangement,Obsidian,0.75,Proficient
+Markup Languages,HTML / CSS / Typst / LaTeX / Markdown,0.75,Proficient
+Programming Languages,Python,0.5,Intermediate
+Programming Languages,PHP,0.5,Intermediate
+Programming Languages,Java,0.5,Intermediate
+Programming Languages,R Statistic Language,0.9,Proficient
