@@ -7,8 +7,6 @@ local M = {}
 -- 1. CONFIGURATION & HELPER
 -- ---
 
-local TYPST_METADATA_FILE = quarto.utils.resolve_path("../typst/02-definitions-metadata.typ")
-
 -- Escapes a Lua string for use as a Typst string literal.
 ---
 local function escape_typst_string(s)
@@ -140,18 +138,11 @@ function M.Pandoc(doc)
     ::continue::
   end
 
+
   -- Wrap everything in a single dictionary named 'meta-data'
   local typst_content = "#let meta-data = (\n" .. table.concat(typst_entries, ",\n") .. "\n)\n"
 
-  local file, err = io.open(TYPST_METADATA_FILE, "w")
-  if file then
-    file:write(typst_content)
-    file:close()
-  else
-    pandoc.stderr:write(
-      string.format("WARNING (inject-metadata.lua): Could not write to '%s': %s\n", TYPST_METADATA_FILE, err)
-    )
-  end
+  doc.meta['01a-meta-data-injection'] = pandoc.RawBlock('typst', typst_content)
 
   return doc
 end

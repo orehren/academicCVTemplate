@@ -27,7 +27,7 @@
                           position: meta-data.at("position", default: none),
                           famous-quote: meta-data.at("famous-quote", default: none),
                           style: meta-data.at("style", default: (:)),
-                          cover_letter_content: meta-data.at("cover_letter_content", default: none)
+                          cover_letter_content: cover_letter_content
       )
     }
 

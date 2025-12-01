@@ -1,48 +1,17 @@
 --[[
 extract-cover-letter.lua – move the "Coverletter" section into document metadata
-and append it to the metadata.typ file.
+as a raw typst variable, instead of writing to a file.
 ]]
 
 local section_identifiers = {
   coverletter = true,
 }
-local collected = {}
+local collected_coverletter_blocks = {} -- Hier speichern wir die Blöcke zwischen
 local toplevel = 6
-
-local TYPST_METADATA_FILE = quarto.utils.resolve_path("../typst/02-definitions-metadata.typ")
-
-
----
--- Handles the side-effect of writing collected blocks to a file.
----
-local function write_coverletter_to_typst(content_blocks)
-  if not content_blocks or #content_blocks == 0 then
-    return
-  end
-
-  local content_as_string = pandoc.write(pandoc.Pandoc(content_blocks), 'typst')
-  local typst_definition = '#let cover_letter_content = [' .. content_as_string .. ']\n'
-
-  -- "a" = append mode
-  local file, err = io.open(TYPST_METADATA_FILE, "a")
-
-  if not file then
-    -- 'pandoc.stderr' is used because it's the correct channel
-    -- for filter warnings, unlike 'print()'.
-    pandoc.stderr:write(
-      string.format("WARNING (Lua Filter): Could not open '%s': %s\n", TYPST_METADATA_FILE, err)
-    )
-    return
-  end
-
-  file:write(typst_definition)
-  file:close()
-end
-
 
 ---
 -- Main state-machine to separate section content from body content.
--- Populates the global 'collected' table as a side-effect.
+-- Populates the local 'collected_coverletter_blocks' table.
 ---
 local function extract_section_content (blocks)
   local body_blocks = {}
@@ -57,8 +26,9 @@ local function extract_section_content (blocks)
     toplevel = block.level
 
     if section_identifiers[block.identifier] then
-      collected[block.identifier] = {}
-      return block.identifier -- New state: collecting
+      -- Start collecting -> Reset collection for safety or append? 
+      -- Assuming one cover letter section, we can just use the global table.
+      return block.identifier 
     else
       body_blocks[#body_blocks + 1] = block
       return false -- New state: not collecting
@@ -71,11 +41,14 @@ local function extract_section_content (blocks)
       return false -- New state: not collecting
     end
 
-    local collect = collected[looking_at_section]
-    collect[#collect + 1] = block
+    -- Add to our internal collection instead of a complex table structure
+    -- since we only care about 'coverletter' right now.
+    if looking_at_section == "coverletter" then
+      table.insert(collected_coverletter_blocks, block)
+    end
+    
     return looking_at_section
   end
-
 
   for _, block in ipairs(blocks) do
     if block.t == 'Header' then
@@ -90,17 +63,37 @@ local function extract_section_content (blocks)
   return body_blocks
 end
 
-
 ---
 -- PANDOC FILTER DEFINITIONS
 ---
 
-Pandoc = function (doc)
+-- 1. Blocks läuft zuerst: Trennt den Cover Letter vom Rest des Dokuments
+function Blocks(blocks)
+  return extract_section_content(blocks)
+end
+
+-- 2. Pandoc läuft danach: Nimmt die separierten Blöcke und injiziert sie als Variable
+function Pandoc(doc)
+  local raw_typst_code = ""
+
+  if #collected_coverletter_blocks > 0 then
+    -- Konvertiere die gesammelten Blöcke in Typst-Syntax
+    local content_as_string = pandoc.write(pandoc.Pandoc(collected_coverletter_blocks), 'typst')
+    
+    -- Baue die Typst-Variable
+    raw_typst_code = '#let cover_letter_content = [\n' .. content_as_string .. '\n]'
+  else
+    -- Fallback: Leere Variable definieren, damit Typst nicht meckert
+    raw_typst_code = '#let cover_letter_content = none'
+  end
+
+  -- Injiziere den Code als RawBlock in die Metadaten
+  doc.meta['01b-cover-letter-injection'] = pandoc.RawBlock('typst', raw_typst_code)
+  
   return doc
 end
 
-Blocks = function (blocks)
-  local body_blocks = extract_section_content(blocks)
-  write_coverletter_to_typst(collected["coverletter"])
-  return body_blocks
-end
+return {
+  { Blocks = Blocks },
+  { Pandoc = Pandoc }
+}

@@ -40,10 +40,9 @@ contributes:
         - path: filters/embed-attachments.lua
       template: typst/template.typ
       template-partials:
-        - typst/01-definitions-helper-functions.typ
-        - typst/02-definitions-metadata.typ
-        - typst/03-definitions-styling.typ
-        - typst/04-definitions-parts-functions.typ
+        - typst/00-definitions-helper-functions.typ
+        - typst/02-definitions-styling.typ
+        - typst/03-definitions-parts-functions.typ
         - typst/page.typ
         - typst/typst-show.typ
         - typst/typst-template.typ

@@ -51,21 +51,22 @@ jobs:
       - name: Prepare Source Files (Patch Config & Clear Metadata)
         run: |
           CONF_FILE="$ROOT_EXT_PATH/_extension.yml"
-          TYP_FILE="$ROOT_EXT_PATH/typst/02-definitions-metadata.typ"
+  
+          # TYP_FILE="$ROOT_EXT_PATH/typst/02-definitions-metadata.typ"
 
           echo "Patching Configuration: $CONF_FILE"
           
           # Pfad auf Root-Struktur anpassen
           sed -i 's|: .*_fetch_cv_data\.R|: _extensions/orehren/acvt/R/_fetch_cv_data.R|' "$CONF_FILE"
 
-          if [ -f "$TYP_FILE" ]; then
-            echo "Clearing Metadata: $TYP_FILE"
-            truncate -s 0 "$TYP_FILE"
-          fi
+          # if [ -f "$TYP_FILE" ]; then
+          #   echo "Clearing Metadata: $TYP_FILE"
+          #   truncate -s 0 "$TYP_FILE"
+          # fi
 
           # Patch zurück in die Source kopieren (damit Sync konsistent bleibt)
           cp "$CONF_FILE" "$SRC_PATH/_extension.yml"
-          cp "$TYP_FILE" "$SRC_PATH/typst/02-definitions-metadata.typ"
+          # cp "$TYP_FILE" "$SRC_PATH/typst/02-definitions-metadata.typ"
         shell: bash
 
       - name: Render Quarto Website
@@ -94,7 +95,7 @@ jobs:
           # 1. Source of Truth adden
           git add -f "$SRC_PATH/docs/*.md"
           git add -f "$SRC_PATH/_extension.yml"
-          git add -f "$SRC_PATH/typst/02-definitions-metadata.typ"
+          # git add -f "$SRC_PATH/typst/02-definitions-metadata.typ"
           
           # 2. Root Extension adden
           git add -f _extensions
