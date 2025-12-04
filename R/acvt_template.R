@@ -5,7 +5,7 @@
 #' @param path The path to the new project.
 #' @param ... Additional arguments.
 #' @export
-acvt_template <- function(path...) {
+acvt_template <- function(path, ...) {
 
   # Ensure path is absolute
   path <- normalizePath(path, mustWork = FALSE)
