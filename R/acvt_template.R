@@ -37,8 +37,8 @@ acvt_template <- function(path, firstname, lastname, renv, git, ...) {
             to = file.path(path, "_quarto.yml"))
 
   # Copy directly to 'cv.qmd' so it matches the .dcf OpenFiles directive immediately
-  target_qmd <- file.path(path, "cv.qmd")
-  file.copy(from = file.path(source_of_truth_dir, "academicCV-template.qmd"),
+  target_qmd <- file.path(path, "cv.md")
+  file.copy(from = file.path(source_of_truth_dir, "README.md"), #"academicCV-template.qmd"),
             to = target_qmd)
 
   # 5. Personalize YAML Header

@@ -1,6 +1,6 @@
 Binding: acvt_template
 Title: Academic CV Project
-OpenFiles: cv.qmd
+OpenFiles: cv.md
 
 Parameter: firstname
 Widget: TextInput
