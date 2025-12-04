@@ -8,7 +8,7 @@
 #' @param git A boolean indicating whether to initialize a git repository.
 #' @param ... Additional arguments (not used).
 #' @export
-acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
+acvt_template <- function(path, firstname, lastname, renv, git, ...) {
   # 1. Create the project directory
   dir.create(path, recursive = TRUE, showWarnings = FALSE)
 
@@ -43,14 +43,6 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
   yaml_data <- yaml::read_yaml(text = paste(yaml_content, collapse = "\n"))
   yaml_data$author$firstname <- firstname
   yaml_data$author$lastname <- lastname
-
-  for (i in seq_along(yaml_data$author$contact)) {
-    if (grepl("envelope", yaml_data$author$contact[[i]]$icon)) {
-      yaml_data$author$contact[[i]]$text <- email
-      yaml_data$author$contact[[i]]$url <- paste0("mailto:", email)
-      break
-    }
-  }
 
   new_yaml_content <- yaml::as.yaml(yaml_data, indent.mapping.sequence = TRUE)
   new_file_content <- c("---", strsplit(new_yaml_content, "\n")[[1]], "---", body_content)
