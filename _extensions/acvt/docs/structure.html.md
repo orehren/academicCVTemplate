@@ -72,29 +72,36 @@ Instead, modify the specific partials it loads:
 
 **Output:** By default, the generated document is saved to the `_output/` directory.
 
-### R Components
+### R Components (Package Logic)
 
-*Files:* `_fetch_data.R`, `load_cv_sheets.R`, `load_cv_sheets_helpers.R`, `read_cv_sheets.R`, `read_cv_sheets_helpers.R`, `validation_helpers.R`
+*Files:* Located in `R/` (Source) or `acvt/R/` (Extension)
 
-*Location:* `acvt/R`
+The R scripts are divided into two categories: **Runtime Scripts** (used during rendering) and **Package Utilities** (used for setup and maintenance).
 
-These R scripts handle data fetching and processing.
+**1. Runtime Scripts (Data Fetching)**
 
 | Filename | Purpose |
-|:-----------------------------------|:-----------------------------------|
+|:-------------------------|:---------------------------------------------|
 | `_fetch_cv_data.R` | The main pre-render script. Orchestrates authentication and data loading. |
 | `load_cv_sheets.R` | Functions to download sheets from Google Drive. |
-| `load_cv_sheets_helpers.R` | Helper functions to download sheets from Google Drive. |
 | `read_cv_sheet.R` | Functions to parse individual sheets. |
-| `read_cv_sheet_helpers.R` | Helper functions to parse individual sheets. |
-| `validation_helpers.R` | Input validation logic. |
+| `setup_acvt.R` | Contains `setup_acvt()`. The interactive wizard for installing dependencies and configuring Google Auth. |
+
+**2. Package Utilities (Setup & Maintenance)**
+
+| Filename | Purpose |
+|:-------------------------|:---------------------------------------------|
+| `acvt_template.R` | Contains `acvt_template()`. The logic behind the RStudio "New Project" wizard. |
+| `update_template.R` | Contains `update_current_cv_project()`. Updates the extension files in an existing project. |
+|  | Contains `update_template_from_git()`. Downloads the latest template version from GitHub. |
+| `zzz_dev.R` | Contains `dev_sync_template()`. A developer tool to sync local source files to the installed library. |
 
 ### Assets
 
 The extension includes several static assets in `_extensions/orehren/acvt/assets/`.
 
 | Directory | Content |
-|:------------------|:----------------------------------------------------|
+|:-------------------|:---------------------------------------------------|
 | `bib/` | Bibliography files (`bibliography.bib`, `.json`, `.ris`, `.xml`, or `.yml`). |
 | `images/` | Default profile picture (`picture.jpg` or `.png`) and example appendix files (`first_document.png`, `second_document.png`). |
 
@@ -131,11 +138,14 @@ The `resume-entry` function fills the grid cells sequentially using the columns 
 4.  **Column 4:** Maps to **Content Column: Cell 4** (e.g., Description text).
 5.  **Column 5:** Maps to **Sidebar Column: Cell 5** (e.g., Bullet points/Details).
 
-Without any manual ordering via a shortcode argument, the Typst function maps the content of the columns sequentially, one after the other. The first column content goes to the left column (Cell 1), the next to the right column (Cell 2), the third back to the left column (Cell 3—below the first entry), and so on.
+Without any manual ordering via a shortcode argument, the Typst function maps the content of the columns sequentially, one after the other.
+The first column content goes to the left column (Cell 1), the next to the right column (Cell 2), the third back to the left column (Cell 3—below the first entry), and so on.
 
 Therefore, to fully automate document creation, the content in your Google Sheets should ideally be placed in the exact sequence you want it displayed in the grid.
 
-However, relying solely on the spreadsheet order requires a clear vision of how you want to populate every section. To alter the sequence of the columns dynamically, you can use the `column-order` argument in the shortcode. This allows you to manually define the position of each column directly in the shortcode call, ensuring that your "Date" column is passed as Column 1, your "Title" as Column 2, and so on, regardless of their order in the source sheet.
+However, relying solely on the spreadsheet order requires a clear vision of how you want to populate every section.
+To alter the sequence of the columns dynamically, you can use the `column-order` argument in the shortcode.
+This allows you to manually define the position of each column directly in the shortcode call, ensuring that your "Date" column is passed as Column 1, your "Title" as Column 2, and so on, regardless of their order in the source sheet.
 
 ## 4. Typst Function Reference
 
@@ -154,3 +164,29 @@ You can also write and provide your own custom Typst functions.
 To do this, declare a new function in `typst/04-definitions-parts-functions.typ` and then call it via the `func` argument in the shortcode.
 
 See [**Shortcodes & Content**](./shortcodes.qmd) for usage examples.
+
+## 5. Package Architecture & Maintenance
+
+The `acvt` R package acts as a container and manager for the Quarto extension.
+It ensures that users can easily create, configure, and update their CV projects.
+
+### The "Source of Truth"
+
+The master version of the template files (QMD, YAML, CSS, Lua) is stored inside the R package structure at: `inst/rstudio/templates/project/skeleton/`
+
+### Update Workflows
+
+The package provides three distinct mechanisms to handle template updates, depending on the target:
+
+1.  **Project Update (`update_current_cv_project`):**
+    -   *Source:* The installed R package library.
+    -   *Target:* The `_extensions/` folder of your current project.
+    -   *Use Case:* You updated the R package and want to apply fixes to an existing CV.
+2.  **Template Hotfix (`update_template_from_git`):**
+    -   *Source:* The GitHub repository (ZIP download).
+    -   *Target:* The installed R package library.
+    -   *Use Case:* You want to fetch the latest template version for *new* projects without reinstalling the full package.
+3.  **Developer Sync (`dev_sync_template`):**
+    -   *Source:* Your local source code folder (`inst/`).
+    -   *Target:* The installed R package library.
+    -   *Use Case:* For package developers to test changes in the "New Project" wizard immediately.
