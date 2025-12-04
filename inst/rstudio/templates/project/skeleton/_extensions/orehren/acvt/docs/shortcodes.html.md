@@ -4,79 +4,142 @@ title: "Shortcodes & Content"
 
 # Shortcodes Reference
 
-This chapter provides a detailed reference for the shortcodes included in the extension. These tools allow you to dynamically fetch, filter, and format your data from Google Sheets without writing complex code.
+This chapter provides a detailed reference for the shortcodes included in the extension. These tools allow you to dynamically fetch, filter, and format your data from Google Sheets or local files without writing complex code.
 
 ## 1. `{{< cv-section >}}` {#sec-cv-section}
 
-The `cv-section` shortcode is the primary tool for building your CV. It acts as an iterator: it fetches a specific dataset (sheet) and processes it row by row, applying a selected Typst layout function to each entry.
+The `cv-section` shortcode is the primary tool for building your CV. It acts as a bridge between your data and the layout: it fetches a specific dataset (sheet) and processes it row by row, mapping data columns to the arguments of a selected Typst layout function.
 
 ### Arguments
 
 | Argument | Description | Default | Example |
 | :--- | :--- | :--- | :--- |
 | `sheet` | **Required.** The `shortname` of the data sheet to load (defined in your YAML configuration). | - | `sheet="working"` |
-| `func` | **Required.** The Typst function to use for rendering. | - | `func="resume-entry"` |
-| `exclude-cols` | Columns to exclude from the output. Supports tidy selection. | `""` | `exclude-cols="id, notes"` |
-| `combine-cols` | Columns to combine into a single text block. Supports tidy selection. | `""` | `combine-cols="starts_with('detail')"` |
-| `combine-as` | The key name for the combined column. | `"details"` | `combine-as="description"` |
-| `combine-sep` | Separator string for combined items. | `" "` | `combine-sep="\n"` |
-| `combine-prefix` | String to prepend to each combined item. | `""` | `combine-prefix="• "` |
-| `column-order` | Explicitly reorder columns. | `""` | `column-order="title=1"` |
-| `na-action` | Action for empty values: `"omit"` (remove key), `"keep"` (pass `none`), `"string"` (pass `"NA"`). | `"omit"` | `na-action="keep"` |
+| `func` | **Required.** The Typst function to use for rendering. This determines the grid layout. | - | `func="resume-entry"` |
+| `pos-<N>` | **The Mapping Engine.** Defines the content for the **Nth** argument (grid position) of the Typst function. Supports string interpolation (e.g., `"{ColA} - {ColB}"`). | - | `pos-0="{Date}"` |
+| `exclude-cols` | Columns to exclude from the **Auto-Fill** process. Supports tidy selection helpers. | `""` | `exclude-cols="id, notes"` |
+| `na-action` | Action for empty values: `"omit"` (pass empty string), `"keep"` (pass `none`), `"string"` (pass `"NA"`). | `"omit"` | `na-action="string"` |
 
-### Layout Control
+---
 
-The `cv-section` shortcode acts as a bridge between your data and the layout. Understanding how this bridge works gives you full control over the final document.
+### The Mapping Logic (Hybrid Mode)
 
-1.  **Sequential Processing:** The Typst function you select (e.g., `#resume-entry`) processes the **content of the columns** passed to it in a strict sequence (1st column content -> Left Column, 2nd column content -> Right Column, etc.).
-2.  **Column Headers:** The headers in your Google Sheet are critical because they allow the shortcode to identify data. However, they are **not** displayed in the final PDF. They are only used to map data to the correct position in the layout sequence.
+The power of `cv-section` lies in its **Hybrid Mapping Logic**. It combines precise control (via `pos-X`) with convenient automation (Auto-Fill).
 
-You can control this mapping using `column-order` or `combine-cols`.
+The logic works slot by slot (Argument 0, Argument 1, Argument 2, ...) for the chosen Typst function:
 
-#### Examples
+1.  **Check for Explicit Mapping:** Is `pos-<current_slot>` defined in the shortcode?
+    *   **YES:** Use the provided string. You can use **String Interpolation** to combine columns or add static text (e.g., `"{Title} at {Company}"`). The columns used here are marked as "consumed".
+    *   **NO:** Switch to **Auto-Fill**. Pick the next available column from your data that hasn't been consumed or excluded yet.
 
-**1. Basic Reordering (`column_order`)**
-Suppose your sheet has `Title`, `Location`, `Date`, but the layout expects `Date` first.
+This allows you to customize specific parts of the layout (e.g., combining dates) while letting the rest of the data fill in automatically.
+
+### String Interpolation
+
+When using `pos-<N>`, you can reference column names by wrapping them in curly braces `{}`.
+
+*   **Simple Reference:** `pos-0="{Location}"` inserts the value of the 'Location' column.
+*   **Combination:** `pos-0="{Start} -- {End}"` combines two columns.
+*   **Formatting:** `pos-1="**{Title}**"` adds Markdown formatting (if supported) or static text around the value.
+*   **Static Text:** `pos-2="Projects"` ignores data columns and passes the static string "Projects".
+
+### Examples
+
+#### 1. The "Auto-Pilot" (Zero Configuration)
+If your spreadsheet columns are already in the correct order for the Typst function (e.g., `Date`, `Title`, `Company`), you don't need any mapping arguments.
+
 ```markdown
 {{< cv-section 
     sheet="working" 
     func="resume-entry" 
-    column-order="Date=1, Title=2, Location=3" 
 >}}
 ```
 
-**2. Partial Reordering (Fill-up)**
-You only need to specify the columns that must be moved. The rest will fill in the remaining slots in their original order.
+- **Result:** Arg 0 gets Col 1, Arg 1 gets Col 2, etc.   
+
+#### 2. Reordering & Interpolation
+
+Suppose your data has columns `Start`, `End`, `Job`, `Employer`, but the layout expects the Date (combined) first, then the Job.
+
 ```markdown
 {{< cv-section 
     sheet="working" 
     func="resume-entry" 
-    column-order="Date=1" 
+    pos-0="{Start} -- {End}" 
+    pos-1="{Job}"
 >}}
 ```
 
-**3. Combining Columns (`combine_cols`)**
-Use Tidy Select helpers to merge multiple "detail" columns into a single bulleted list.
-```markdown
+*   **Slot 0:** Combines 'Start' and 'End'.
+*   **Slot 1:** Uses 'Job'.
+*   **Slot 2+:** Auto-fills with remaining columns (e.g., 'Employer') automatically.
+
+#### 3. Adding Static Text & Formatting
+
+You can inject labels or format specific fields directly in the shortcode.
+
+codeMarkdown
+
+```
 {{< cv-section 
     sheet="working" 
     func="resume-entry" 
-    combine-cols="starts_with('detail')" 
-    combine-as="description" 
-    combine-prefix="• " 
-    combine-sep="\n" 
+    pos-1="**{Role}**" 
+    pos-2="Team: {TeamName} at {Company}" 
 >}}
 ```
 
-### Tidy Selection Helpers
+#### 4. Handling Gaps (Skipping Slots)
 
-For arguments like `exclude_cols` and `combine_cols`, you can use these helper functions to select multiple columns at once:
+Sometimes a layout function has a slot you want to leave empty (e.g., a subtitle slot you don't use). You can explicitly set it to an empty string to skip it, or simply map the next slot to a later index.
+
+**Option A: Explicit Empty String**
+
+```markdown
+{{< cv-section 
+    sheet="working" 
+    func="resume-entry"
+    pos-1="{Title}"
+    pos-2="" 
+>}}
+```
+
+*   **Slot 0:** Auto-fills (e.g., Date).
+*   **Slot 1:** Explicitly 'Title'.
+*   **Slot 2:** Explicitly empty.
+*   **Slot 3:** Auto-fills with next available data (e.g., Description).
+
+**Option B: Jumping Indexes**
+
+```markdown
+{{< cv-section 
+    sheet="working" 
+    func="resume-entry"
+    pos-5="{Description}"
+>}}
+```
+
+*   **Slots 0-4:** Auto-fill with the first 5 available columns.
+*   **Slot 5:** Explicitly uses 'Description'.
+
+### Tidy Selection Helpers (`exclude-cols`)
+
+To prevent specific columns (like internal IDs or notes) from appearing during the **Auto-Fill** phase, use `exclude-cols`. You can list names or use helper functions:
 
 *   `starts_with("prefix")`: Selects columns starting with the prefix (e.g., `starts_with("detail")`).
 *   `ends_with("suffix")`: Selects columns ending with the suffix.
 *   `contains("string")`: Selects columns containing the substring.
 *   `matches("pattern")`: Selects columns matching a Lua pattern.
-*   `col_a:col_b`: Selects a range of columns from `col_a` to `col_b` (inclusive).
+*   `col_a:col_b`: Selects a range of columns from `col_a` to `col_b` (inclusive).    
+
+
+```markdown
+{{< cv-section 
+    sheet="working" 
+    func="resume-entry"
+    exclude-cols="id, notes, starts_with('internal_')"
+>}}
+```
 
 ## 2. `{{< publication-list >}}` {#sec-publication-list}
 
