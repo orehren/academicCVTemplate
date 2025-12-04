@@ -1,8 +1,8 @@
 -- =============================================================================
--- 1. UTILS
+-- 1. UTILS & TIDY SELECT
 -- =============================================================================
 
--- Recursively unwrap Pandoc elements to get raw values
+-- Recursively unwrap Pandoc elements
 local function unwrap(obj)
   if obj == nil then return nil end
   local t = pandoc.utils.type(obj)
@@ -18,24 +18,19 @@ local function unwrap(obj)
   return pandoc.utils.stringify(obj)
 end
 
--- Check if a value is considered NA/Empty
 local function is_na(val)
   if not val then return true end
   local s = tostring(val)
   return (s == "" or s == "NA" or s == ".na.character")
 end
 
--- Escape strings for Typst (handle quotes and backslashes)
 local function clean_string(val)
   local s = tostring(val)
-  -- Normalize fancy quotes
   s = s:gsub("“", '"'):gsub("”", '"'):gsub("‘", "'"):gsub("’", "'")
-  -- Escape backslashes and double quotes
   s = s:gsub("\\", "\\\\"):gsub('"', '\\"')
   return '"' .. s .. '"'
 end
 
--- Safely retrieve an argument from kwargs
 local function get_arg(kwargs, key, default)
   local val = kwargs[key]
   if not val then return default end
@@ -44,52 +39,18 @@ local function get_arg(kwargs, key, default)
   return s
 end
 
--- Read the hidden JSON data file directly
 local function read_cv_data_json()
   local f = io.open(".cv_data.json", "r")
   if not f then return nil end
   local content = f:read("*a")
   f:close()
   if not content or content == "" then return nil end
-  -- quarto.json is available in Lua filters running in Quarto context
   return quarto.json.decode(content)
 end
 
--- String Interpolation Helper
--- Replaces placeholders like {ColumnName} with values from the row map.
-local function interpolate_str(template, row_map)
-  -- Find all placeholders
-  local res = template:gsub("{(.-)}", function(col_name)
-    -- Trim whitespace in key (e.g., { Name } -> Name)
-    col_name = col_name:match("^%s*(.-)%s*$")
+-- --- TIDY SELECT LOGIC ---
+-- Moved up so it can be used by interpolation logic
 
-    local val = row_map[col_name]
-
-    -- If value is NA or not found, return empty string for interpolation
-    if is_na(val) then
-      return ""
-    else
-      return tostring(val)
-    end
-  end)
-  return res
-end
-
--- Helper: Extract all column names used in a template string
-local function extract_used_cols(template)
-  local cols = {}
-  for col_name in template:gmatch("{(.-)}") do
-    col_name = col_name:match("^%s*(.-)%s*$")
-    table.insert(cols, col_name)
-  end
-  return cols
-end
-
--- =============================================================================
--- 2. TIDY SELECT LOGIC (For 'exclude-cols')
--- =============================================================================
-
--- Find index of a column by name
 local function get_col_index(cols, name)
   for i, v in ipairs(cols) do
     if v == name then return i end
@@ -97,14 +58,12 @@ local function get_col_index(cols, name)
   return nil
 end
 
--- Resolve selectors like 'starts_with("a"), b:d' into a list of column names
 local function resolve_tidy_select(selector_str, all_columns)
   if not selector_str or selector_str == "" then return {} end
 
   local selected_cols = {}
   local seen = {}
 
-  -- Split by comma, assuming no nested commas in function calls for simplicity
   for part in string.gmatch(selector_str, "([^,]+)") do
     part = part:match("^%s*(.-)%s*$") -- trim
 
@@ -166,6 +125,64 @@ end
 
 
 -- =============================================================================
+-- 2. INTERPOLATION LOGIC (Enhanced)
+-- =============================================================================
+
+-- Helper: Extract all column names used in a template string
+-- Now supports tidy select syntax inside {}
+local function extract_used_cols(template, all_columns)
+  local cols = {}
+  for inner in template:gmatch("{(.-)}") do
+    -- Check for separator syntax: { selector | separator }
+    local selector = inner:match("^(.-)%s*|") or inner
+    selector = selector:match("^%s*(.-)%s*$") -- trim
+
+    local resolved = resolve_tidy_select(selector, all_columns)
+    for _, c in ipairs(resolved) do
+      table.insert(cols, c)
+    end
+  end
+  return cols
+end
+
+-- String Interpolation Helper
+-- Replaces {selector | sep} with joined values
+local function interpolate_str(template, row_map, all_columns)
+  local res = template:gsub("{(.-)}", function(inner)
+
+    -- 1. Parse Syntax: { selector | separator }
+    -- Default separator is space if not provided
+    local selector = inner
+    local separator = " "
+
+    local s, sep = inner:match("^(.-)%s*|%s*(.*)$")
+    if s then
+      selector = s
+      separator = sep
+    end
+
+    selector = selector:match("^%s*(.-)%s*$") -- trim
+
+    -- 2. Resolve Columns
+    local cols = resolve_tidy_select(selector, all_columns)
+
+    -- 3. Collect Values (Skip NAs)
+    local values = {}
+    for _, col_name in ipairs(cols) do
+      local val = row_map[col_name]
+      if not is_na(val) then
+        table.insert(values, tostring(val))
+      end
+    end
+
+    -- 4. Join
+    return table.concat(values, separator)
+  end)
+  return res
+end
+
+
+-- =============================================================================
 -- 3. MAIN LOGIC
 -- =============================================================================
 local function generate_cv_section(args, kwargs, meta)
@@ -176,7 +193,6 @@ local function generate_cv_section(args, kwargs, meta)
   if sheet == "" or func == "" then return pandoc.Strong(pandoc.Str("Missing sheet/func")) end
 
   -- 2. Load Data Source
-  -- Try meta (injected via filter) first, then fallback to file reading
   local cv_data_source = nil
   if meta.cv_data and meta.cv_data[sheet] then
     cv_data_source = meta.cv_data
@@ -191,7 +207,6 @@ local function generate_cv_section(args, kwargs, meta)
      return pandoc.Strong(pandoc.Str("Sheet not found"))
   end
 
-  -- Unwrap data structure
   local rows_raw = unwrap(cv_data_source[sheet])
   local rows = (pandoc.utils.type(rows_raw) == "MetaList" or (type(rows_raw)=="table" and rows_raw[1])) and rows_raw or {rows_raw}
 
@@ -200,6 +215,12 @@ local function generate_cv_section(args, kwargs, meta)
   -- ---------------------------------------------------------------------------
   -- PARSE CONFIGURATION
   -- ---------------------------------------------------------------------------
+
+  -- Get all available columns from first row for Tidy Select resolution
+  local all_columns = {}
+  for _, field in ipairs(rows[1]) do
+    if field.key then table.insert(all_columns, field.key) end
+  end
 
   -- A. Parse 'pos-X' arguments
   local mapping_templates = {}
@@ -215,32 +236,24 @@ local function generate_cv_section(args, kwargs, meta)
   end
 
   -- B. Parse 'exclude-cols'
-  -- Retrieve all available column names from the first row for Tidy Select
-  local all_columns = {}
-  for _, field in ipairs(rows[1]) do
-    if field.key then table.insert(all_columns, field.key) end
-  end
-
   local raw_exclude = get_arg(kwargs, "exclude-cols", "")
   local exclude_cols_list = resolve_tidy_select(raw_exclude, all_columns)
-
-  -- Create a set for fast lookup of excluded columns
   local exclude_set = {}
   for _, c in ipairs(exclude_cols_list) do exclude_set[c] = true end
 
   -- C. Identify explicitly consumed columns via 'pos-X'
-  -- These columns should be skipped during the auto-fill phase to avoid duplication.
   local explicit_consumed_global = {}
 
   for _, tmpl in pairs(mapping_templates) do
     if tmpl:find("{") then
-      -- It's a template string (e.g. "{Start} - {End}")
-      local cols = extract_used_cols(tmpl)
+      -- Pass all_columns to resolve tidy selectors inside templates
+      local cols = extract_used_cols(tmpl, all_columns)
       for _, c in ipairs(cols) do explicit_consumed_global[c] = true end
     else
-      -- It's a direct reference or static text.
-      -- We assume if it matches a column name exactly, it consumes that column.
-      explicit_consumed_global[tmpl] = true
+      -- Direct reference check
+      if get_col_index(all_columns, tmpl) then
+        explicit_consumed_global[tmpl] = true
+      end
     end
   end
 
@@ -254,9 +267,7 @@ local function generate_cv_section(args, kwargs, meta)
   -- ---------------------------------------------------------------------------
   for _, row_list in ipairs(rows) do
 
-    -- Create map for interpolation: Key -> Val
     local row_map = {}
-    -- Keep list of keys in original order for auto-fill iteration
     local ordered_keys = {}
 
     for _, item in ipairs(row_list) do
@@ -264,79 +275,60 @@ local function generate_cv_section(args, kwargs, meta)
       table.insert(ordered_keys, item.key)
     end
 
-    -- Track consumed keys for this specific row
     local consumed_keys = {}
-    -- Mark global explicit columns as consumed
     for k, _ in pairs(explicit_consumed_global) do consumed_keys[k] = true end
-    -- Also mark excluded columns as consumed (so they are skipped in auto-fill)
     for k, _ in pairs(exclude_set) do consumed_keys[k] = true end
 
     local final_args = {}
-    local auto_fill_ptr = 1 -- Pointer to ordered_keys
+    local auto_fill_ptr = 1
     local current_slot = 0
-
-    -- Determine loop limit:
-    -- We must cover all 'pos-X' slots.
-    -- We also want to auto-fill remaining valid columns.
-    -- Since we don't know exactly how many valid auto-fill columns remain,
-    -- we iterate carefully until both conditions are met.
-    local safety_limit = max_pos_index + #ordered_keys + 10 -- Safety buffer
+    local safety_limit = max_pos_index + #ordered_keys + 10
 
     while current_slot < safety_limit do
 
-      -- Check exit condition:
-      -- We are past the highest explicit position AND we have exhausted the auto-fill columns.
       if current_slot > max_pos_index and auto_fill_ptr > #ordered_keys then
         break
       end
 
-      -- Case A: Slot is explicitly defined via 'pos-X'
+      -- Case A: Explicit Mapping
       if mapping_templates[current_slot] then
         local tmpl = mapping_templates[current_slot]
         local val = ""
 
         if tmpl:find("{") then
-          -- Interpolation logic
-          val = interpolate_str(tmpl, row_map)
+          -- Pass all_columns to support tidy select inside interpolation
+          val = interpolate_str(tmpl, row_map, all_columns)
         else
-          -- Direct mapping or static text
           if row_map[tmpl] then
-            val = row_map[tmpl] -- It is a column name
-            -- Handle NA for direct mapping
+            val = row_map[tmpl]
              if is_na(val) then
                if na_action == "string" then val = "NA"
-               elseif na_action == "keep" then val = "none" -- Typst none
+               elseif na_action == "keep" then val = "none"
                else val = "" end
              end
           else
-            val = tmpl -- It is static text (or unknown column)
+            val = tmpl
           end
         end
 
         table.insert(final_args, clean_string(val))
 
-      -- Case B: Slot is empty -> Auto-Fill
+      -- Case B: Auto-Fill
       else
-        -- Find the next column that is not 'consumed'
         local found_next = false
         while auto_fill_ptr <= #ordered_keys do
           local candidate_key = ordered_keys[auto_fill_ptr]
           auto_fill_ptr = auto_fill_ptr + 1
 
           if not consumed_keys[candidate_key] then
-             -- Found a candidate!
              local val = row_map[candidate_key]
 
-             -- Handle NA for auto-fill
              if is_na(val) then
                 if na_action == "string" then
                   table.insert(final_args, clean_string("NA"))
                 elseif na_action == "keep" then
-                   -- For Typst, passing empty string usually renders nothing, which is desired.
-                   -- 'none' might be useful depending on Typst function signature.
                    table.insert(final_args, "none")
                 else
-                   -- Default: "omit" -> empty string
                    table.insert(final_args, '""')
                 end
              else
@@ -349,13 +341,9 @@ local function generate_cv_section(args, kwargs, meta)
         end
 
         if not found_next then
-          -- No more data available for auto-fill.
-          -- If we are past the max_pos_index, we can stop.
           if current_slot > max_pos_index then
             break
           else
-            -- If we are before max_pos_index (gap between auto-fill and a later pos-X),
-            -- we must fill with empty strings to maintain grid alignment.
             table.insert(final_args, '""')
           end
         end
@@ -364,7 +352,6 @@ local function generate_cv_section(args, kwargs, meta)
       current_slot = current_slot + 1
     end
 
-    -- Construct Typst Call
     if #final_args > 0 then
       local call = "#" .. func .. "(" .. table.concat(final_args, ", ") .. ")"
       table.insert(blocks, call)
