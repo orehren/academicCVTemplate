@@ -9,9 +9,10 @@ acvt_template(path, ...)
 \arguments{
 \item{path}{The path to the new project.}
 
-\item{...}{Dynamic arguments passed by RStudio based on the .dcf file (e.g. firstname, lastname, renv, git).}
+\item{...}{Dynamic arguments passed by RStudio based on the .dcf file.}
 }
 \description{
 Implements the logic for the RStudio Project Wizard.
-Accepts dynamic arguments via ellipsis to remain flexible regarding the .dcf configuration.
+Accepts dynamic arguments via ellipsis.
+Adds a temporary self-destructing hook to open the main file on first launch.
 }
