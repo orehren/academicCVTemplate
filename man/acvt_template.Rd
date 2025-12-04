@@ -4,18 +4,10 @@
 \alias{acvt_template}
 \title{Create a new Academic CV Project}
 \usage{
-acvt_template(path, firstname, lastname, renv, git, ...)
+acvt_template(path...)
 }
 \arguments{
 \item{path}{The path to the new project.}
-
-\item{firstname}{The user's first name.}
-
-\item{lastname}{The user's last name.}
-
-\item{renv}{A boolean indicating whether to initialize renv.}
-
-\item{git}{A boolean indicating whether to initialize a git repository.}
 
 \item{...}{Additional arguments.}
 }
