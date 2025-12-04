@@ -15,7 +15,7 @@ acvt_template <- function(path, firstname, lastname, renv, git, ...) {
   path <- normalizePath(path, mustWork = FALSE)
 
   # 1. Create Project Directory
-  dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  # dir.create(path, recursive = TRUE, showWarnings = FALSE)
 
   # 2. Locate Skeleton
   skeleton_dir <- system.file("rstudio/templates/project/skeleton", package = "acvt")
