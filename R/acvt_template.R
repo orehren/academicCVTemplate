@@ -3,13 +3,9 @@
 #' Implements the logic for the RStudio Project Wizard.
 #'
 #' @param path The path to the new project.
-#' @param firstname The user's first name.
-#' @param lastname The user's last name.
-#' @param renv A boolean indicating whether to initialize renv.
-#' @param git A boolean indicating whether to initialize a git repository.
 #' @param ... Additional arguments.
 #' @export
-acvt_template <- function(path, firstname, lastname, renv, git, ...) {
+acvt_template <- function(path...) {
 
   # Ensure path is absolute
   path <- normalizePath(path, mustWork = FALSE)
@@ -37,8 +33,8 @@ acvt_template <- function(path, firstname, lastname, renv, git, ...) {
             to = file.path(path, "_quarto.yml"))
 
   # Copy directly to 'cv.qmd' so it matches the .dcf OpenFiles directive immediately
-  target_qmd <- file.path(path, "cv.md")
-  file.copy(from = file.path(source_of_truth_dir, "README.md"), #"academicCV-template.qmd"),
+  target_qmd <- file.path(path, "cv.qmd")
+  file.copy(from = file.path(source_of_truth_dir, "academicCV-template.qmd"),
             to = target_qmd)
 
   # 5. Personalize YAML Header
