@@ -57,12 +57,12 @@ acvt_template <- function(path, firstname, lastname, renv, git, ...) {
 
   # 7. Explicitly open the file in the IDE
   # This is the imperative fallback if the declarative .dcf 'OpenFiles' fails.
-  if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
-    # We use the absolute path to ensure RStudio finds it regardless of the current WD
-    rstudioapi::navigateToFile(target_qmd)
-  }
+  # if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+  #   # We use the absolute path to ensure RStudio finds it regardless of the current WD
+  #   rstudioapi::navigateToFile(target_qmd)
+  # }
 
-  return(invisible(TRUE))
+  #return(invisible(TRUE))
 }
 
 
