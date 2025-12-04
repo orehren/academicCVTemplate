@@ -4,13 +4,14 @@
 \alias{acvt_template}
 \title{Create a new Academic CV Project}
 \usage{
-acvt_template(path...)
+acvt_template(path, ...)
 }
 \arguments{
 \item{path}{The path to the new project.}
 
-\item{...}{Additional arguments.}
+\item{...}{Dynamic arguments passed by RStudio based on the .dcf file (e.g. firstname, lastname, renv, git).}
 }
 \description{
 Implements the logic for the RStudio Project Wizard.
+Accepts dynamic arguments via ellipsis to remain flexible regarding the .dcf configuration.
 }
