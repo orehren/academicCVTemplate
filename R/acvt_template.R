@@ -36,10 +36,10 @@ acvt_template <- function(path, firstname, lastname, email, renv, git, ...) {
             to = file.path(path, "_quarto.yml"))
 
   file.copy(from = file.path(source_of_truth_dir, "academicCV-template.qmd"),
-            to = file.path(path, "cv.qmd"))
+            to = file.path(path, "academicCV-template.qmd"))
 
   # 5. Personalize YAML Header
-  .update_template_yaml(file.path(path, "cv.qmd"), firstname, lastname)
+  .update_template_yaml(file.path(path, "academicCV-template.qmd"), firstname, lastname)
 
   # 6. Initialize Version Control & Environment
   # FIX: We do NOT use setwd() here to avoid confusing RStudio's context switching.
