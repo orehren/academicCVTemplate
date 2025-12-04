@@ -1,363 +1,472 @@
 -- =============================================================================
--- 1. CORE UTILITIES
+-- 1. CONSTANTS & PERFORMANCE OPTIMIZATIONS
 -- =============================================================================
 
-local function unwrap(obj)
-  if obj == nil then return nil end
-  local t = pandoc.utils.type(obj)
-  if t == 'MetaList' or t == 'List' then
-    local res = {}
-    for i, v in ipairs(obj) do res[i] = unwrap(v) end
-    return res
-  elseif t == 'MetaMap' or t == 'Map' or t == 'table' then
-    local res = {}
-    for k, v in pairs(obj) do res[k] = unwrap(v) end
-    return res
+-- Localizing global functions avoids repeated global table lookups in tight loops,
+-- significantly improving performance in Lua.
+local t_insert = table.insert
+local t_concat = table.concat
+local s_match  = string.match
+local s_gmatch = string.gmatch
+local s_gsub   = string.gsub
+local s_find   = string.find
+local p_type   = pandoc.utils.type
+local p_str    = pandoc.utils.stringify
+
+-- Centralized patterns prevent magic strings scattered throughout the logic.
+local PATTERN_POS_ARG       = "^pos%-(%d+)$"
+local PATTERN_INTERPOLATION = "{(.-)}"
+local PATTERN_PIPE_SYNTAX   = "^(.-)%s*|%s*(.*)$"
+local PATTERN_TRIM          = "^%s*(.-)%s*$"
+local PATTERN_RANGE         = "^([%w_]+):([%w_]+)$"
+local PATTERN_FUNCTION      = "^([%w_]+)%(['\"](.+)['\"]%)$"
+
+local DEFAULT_NA_ACTION = "omit"
+local DEFAULT_SEPARATOR = " "
+
+
+-- =============================================================================
+-- 2. TYPE SAFETY & STRING HANDLING
+-- =============================================================================
+
+local function extract_pandoc_content(pandoc_obj)
+  if pandoc_obj == nil then return nil end
+
+  local obj_type = p_type(pandoc_obj)
+
+  if obj_type == 'MetaList' or obj_type == 'List' then
+    local list_content = {}
+    for i, item in ipairs(pandoc_obj) do
+      list_content[i] = extract_pandoc_content(item)
+    end
+    return list_content
+
+  elseif obj_type == 'MetaMap' or obj_type == 'Map' or obj_type == 'table' then
+    local map_content = {}
+    for key, value in pairs(pandoc_obj) do
+      map_content[key] = extract_pandoc_content(value)
+    end
+    return map_content
   end
-  return pandoc.utils.stringify(obj)
+
+  return p_str(pandoc_obj)
 end
 
-local function is_na(val)
-  if not val then return true end
-  local s = tostring(val)
-  return (s == "" or s == "NA" or s == ".na.character")
+local function is_value_empty_or_na(value)
+  if not value then return true end
+  local string_val = tostring(value)
+  return (string_val == "" or string_val == "NA" or string_val == ".na.character")
 end
 
-local function clean_string(val)
-  local s = tostring(val)
-  s = s:gsub("“", '"'):gsub("”", '"'):gsub("‘", "'"):gsub("’", "'")
-  s = s:gsub("\\", "\\\\"):gsub('"', '\\"')
-  return '"' .. s .. '"'
+local function escape_string_for_typst(value)
+  -- Typst syntax is sensitive to unescaped quotes and backslashes.
+  -- We must sanitize content to prevent compilation errors in the final document.
+  return '"' .. tostring(value)
+    :gsub("“", '"')
+    :gsub("”", '"')
+    :gsub("‘", "'")
+    :gsub("’", "'")
+    :gsub("\\", "\\\\")
+    :gsub('"', '\\"') .. '"'
 end
 
-local function get_arg(kwargs, key, default)
-  local val = kwargs[key]
-  if not val then return default end
-  local s = pandoc.utils.stringify(val)
-  return (s == "") and default or s
+local function get_argument_or_default(kwargs, key, default_value)
+  local value = kwargs[key]
+  if not value then return default_value end
+
+  local string_value = p_str(value)
+  if string_value == "" then return default_value end
+
+  return string_value
 end
 
-local function read_cv_data_json()
-  local f = io.open(".cv_data.json", "r")
-  if not f then return nil end
-  local content = f:read("*a")
-  f:close()
-  return (content and content ~= "") and quarto.json.decode(content) or nil
+local function load_cached_database()
+  local file_handle = io.open(".cv_data.json", "r")
+  if not file_handle then return nil end
+
+  local content = file_handle:read("*a")
+  file_handle:close()
+
+  if not content or content == "" then return nil end
+  return quarto.json.decode(content)
 end
 
--- Lookup table for NA handling strategies
-local NA_ACTIONS = {
+local NA_STRATEGIES = {
   string = "NA",
-  keep   = nil, -- Returns nil to signal 'none' to the caller
+  keep   = nil, -- Returning nil signals the formatter to output the Typst keyword 'none'
   omit   = ""
 }
 
--- Resolves NA values based on configuration without nested ifs
-local function resolve_na(action_key)
-  local res = NA_ACTIONS[action_key]
-  if res == nil and action_key ~= "keep" then return "" end
-  return res
+local function resolve_missing_value(strategy_key)
+  local result = NA_STRATEGIES[strategy_key]
+  -- Fallback ensures robust handling even if configuration is invalid
+  if result == nil and strategy_key ~= "keep" then return "" end
+  return result
 end
 
 
 -- =============================================================================
--- 2. COLUMN SELECTION STRATEGIES
+-- 3. COLUMN SELECTION ENGINE (Strategy Pattern)
 -- =============================================================================
 
-local function get_col_index(cols, name)
-  for i, v in ipairs(cols) do
-    if v == name then return i end
+local function find_column_index(available_columns, column_name)
+  for index, name in ipairs(available_columns) do
+    if name == column_name then return index end
   end
   return nil
 end
 
-local function select_range(part, all_columns, result_list, seen_set)
-  local start_col, end_col = part:match("^([%w_]+):([%w_]+)$")
+local function add_if_new(target_list, seen_set, column_name)
+  if seen_set[column_name] then return end
+  t_insert(target_list, column_name)
+  seen_set[column_name] = true
+end
+
+local function try_select_range(selector_part, available_columns, result_list, seen_set)
+  local start_col, end_col = s_match(selector_part, PATTERN_RANGE)
   if not (start_col and end_col) then return false end
 
-  local idx_start = get_col_index(all_columns, start_col)
-  local idx_end = get_col_index(all_columns, end_col)
+  local idx_start = find_column_index(available_columns, start_col)
+  local idx_end   = find_column_index(available_columns, end_col)
 
   if not (idx_start and idx_end) then return false end
 
   local step = (idx_start <= idx_end) and 1 or -1
   for i = idx_start, idx_end, step do
-    local col = all_columns[i]
-    if not seen_set[col] then
-      table.insert(result_list, col)
-      seen_set[col] = true
-    end
+    add_if_new(result_list, seen_set, available_columns[i])
   end
   return true
 end
 
-local PREDICATES = {
-  starts_with = function(col, arg) return col:find("^" .. arg) end,
-  ends_with   = function(col, arg) return col:find(arg .. "$") end,
-  contains    = function(col, arg) return col:find(arg, 1, true) end,
-  matches     = function(col, arg) return col:find(arg) end
+local COLUMN_MATCHERS = {
+  starts_with = function(col, arg) return s_find(col, "^" .. arg) end,
+  ends_with   = function(col, arg) return s_find(col, arg .. "$") end,
+  contains    = function(col, arg) return s_find(col, arg, 1, true) end,
+  matches     = function(col, arg) return s_find(col, arg) end
 }
 
-local function select_predicate(part, all_columns, result_list, seen_set)
-  local func_name, arg = part:match("^([%w_]+)%(['\"](.+)['\"]%)$")
+local function try_select_predicate(selector_part, available_columns, result_list, seen_set)
+  local func_name, arg = s_match(selector_part, PATTERN_FUNCTION)
   if not func_name then return false end
 
-  local matcher = PREDICATES[func_name]
-  if not matcher then return false end
+  local matcher_function = COLUMN_MATCHERS[func_name]
+  if not matcher_function then return false end
 
-  for _, col in ipairs(all_columns) do
-    if matcher(col, arg) and not seen_set[col] then
-      table.insert(result_list, col)
-      seen_set[col] = true
+  for _, col_name in ipairs(available_columns) do
+    if matcher_function(col_name, arg) then
+      add_if_new(result_list, seen_set, col_name)
     end
   end
   return true
 end
 
-local function select_literal(part, all_columns, result_list, seen_set)
-  if not get_col_index(all_columns, part) then return false end
-
-  if not seen_set[part] then
-    table.insert(result_list, part)
-    seen_set[part] = true
-  end
+local function try_select_literal(selector_part, available_columns, result_list, seen_set)
+  if not find_column_index(available_columns, selector_part) then return false end
+  add_if_new(result_list, seen_set, selector_part)
   return true
 end
 
-local function resolve_tidy_select(selector_str, all_columns)
-  if not selector_str or selector_str == "" then return {} end
+-- Memoization prevents expensive regex re-parsing when the same selector
+-- is applied to multiple rows (which is the common case).
+local SELECTOR_CACHE = {}
 
-  local selected = {}
-  local seen = {}
+local function resolve_column_selectors(selector_string, available_columns)
+  if not selector_string or selector_string == "" then return {} end
 
-  for part in string.gmatch(selector_str, "([^,]+)") do
-    part = part:match("^%s*(.-)%s*$") -- trim
-    local handled = select_range(part, all_columns, selected, seen)
-    if not handled then handled = select_predicate(part, all_columns, selected, seen) end
-    if not handled then select_literal(part, all_columns, selected, seen) end
+  local cache_key = selector_string .. t_concat(available_columns, "|")
+  if SELECTOR_CACHE[cache_key] then return SELECTOR_CACHE[cache_key] end
+
+  local selected_columns = {}
+  local seen_columns = {}
+
+  for part in s_gmatch(selector_string, "([^,]+)") do
+    local clean_part = s_match(part, PATTERN_TRIM)
+
+    -- Chain of Responsibility allows easy extension of selection logic
+    local _ = try_select_range(clean_part, available_columns, selected_columns, seen_columns)
+           or try_select_predicate(clean_part, available_columns, selected_columns, seen_columns)
+           or try_select_literal(clean_part, available_columns, selected_columns, seen_columns)
   end
 
-  return selected
+  SELECTOR_CACHE[cache_key] = selected_columns
+  return selected_columns
 end
 
 
 -- =============================================================================
--- 3. INTERPOLATION ENGINE
+-- 4. TEMPLATE INTERPOLATION ENGINE
 -- =============================================================================
 
-local function parse_interpolation_syntax(inner)
-  local s, sep = inner:match("^(.-)%s*|%s*(.*)$")
-  if s then return s:match("^%s*(.-)%s*$"), sep end
-  return inner:match("^%s*(.-)%s*$"), " "
+local function parse_interpolation_syntax(content_inside_braces)
+  local selector_part, separator_part = s_match(content_inside_braces, PATTERN_PIPE_SYNTAX)
+
+  if selector_part then
+    return s_match(selector_part, PATTERN_TRIM), separator_part
+  end
+
+  return s_match(content_inside_braces, PATTERN_TRIM), DEFAULT_SEPARATOR
 end
 
--- Helper to reduce nesting in extract_consumed_cols
-local function mark_interpolation_cols(tmpl, all_columns, consumed_map)
-  for inner in tmpl:gmatch("{(.-)}") do
-    local selector, _ = parse_interpolation_syntax(inner)
-    local resolved = resolve_tidy_select(selector, all_columns)
-    for _, c in ipairs(resolved) do consumed_map[c] = true end
+local function process_template_match(content_inside_braces, available_columns, consumed_map)
+  local selector, _ = parse_interpolation_syntax(content_inside_braces)
+  local resolved_cols = resolve_column_selectors(selector, available_columns)
+
+  for _, col_name in ipairs(resolved_cols) do
+    consumed_map[col_name] = true
   end
 end
 
-local function extract_consumed_cols(templates, all_columns)
-  local consumed = {}
-  for _, tmpl in pairs(templates) do
-    if tmpl:find("{") then
-      mark_interpolation_cols(tmpl, all_columns, consumed)
-    elseif get_col_index(all_columns, tmpl) then
-      consumed[tmpl] = true
+local function analyze_template_consumption(template_string, available_columns, consumed_map)
+  if s_find(template_string, "{") then
+    for content in s_gmatch(template_string, PATTERN_INTERPOLATION) do
+      process_template_match(content, available_columns, consumed_map)
     end
+    return
   end
-  return consumed
+
+  if find_column_index(available_columns, template_string) then
+    consumed_map[template_string] = true
+  end
 end
 
-local function interpolate_str(template, row_map, all_columns)
-  return template:gsub("{(.-)}", function(inner)
-    local selector, separator = parse_interpolation_syntax(inner)
-    local cols = resolve_tidy_select(selector, all_columns)
+local function identify_consumed_columns(templates, available_columns)
+  local consumed_map = {}
+  for _, template_string in pairs(templates) do
+    analyze_template_consumption(template_string, available_columns, consumed_map)
+  end
+  return consumed_map
+end
+
+local function interpolate_values(template_string, row_data, available_columns)
+  return s_gsub(template_string, PATTERN_INTERPOLATION, function(content)
+    local selector, separator = parse_interpolation_syntax(content)
+    local target_columns = resolve_column_selectors(selector, available_columns)
 
     local values = {}
-    for _, col_name in ipairs(cols) do
-      local val = row_map[col_name]
-      if not is_na(val) then
-        table.insert(values, tostring(val))
+    for _, col_name in ipairs(target_columns) do
+      local cell_value = row_data[col_name]
+      if not is_value_empty_or_na(cell_value) then
+        t_insert(values, tostring(cell_value))
       end
     end
 
-    return table.concat(values, separator)
+    return t_concat(values, separator)
   end)
 end
 
 
 -- =============================================================================
--- 4. CONFIGURATION PARSER
+-- 5. CONFIGURATION PARSER
 -- =============================================================================
 
-local function parse_config(kwargs, all_columns)
+local function parse_positional_argument(arg_name, arg_value, config)
+  local position_index = tonumber(s_match(arg_name, PATTERN_POS_ARG))
+
+  if not position_index then return end
+
+  config.templates[position_index] = p_str(arg_value)
+
+  if position_index > config.max_position_index then
+    config.max_position_index = position_index
+  end
+end
+
+local function parse_shortcode_arguments(kwargs, available_columns)
   local config = {
     templates = {},
-    max_pos = -1,
-    exclude_set = {},
-    na_action = get_arg(kwargs, "na_action", "omit")
+    max_position_index = -1,
+    excluded_columns_set = {},
+    na_strategy = get_argument_or_default(kwargs, "na_action", DEFAULT_NA_ACTION)
   }
 
-  for k, v in pairs(kwargs) do
-    local idx = tonumber(k:match("^pos%-(%d+)$"))
-    if idx then
-      config.templates[idx] = pandoc.utils.stringify(v)
-      if idx > config.max_pos then config.max_pos = idx end
-    end
+  for key, value in pairs(kwargs) do
+    parse_positional_argument(key, value, config)
   end
 
-  local exclude_list = resolve_tidy_select(get_arg(kwargs, "exclude-cols", ""), all_columns)
-  for _, c in ipairs(exclude_list) do config.exclude_set[c] = true end
+  local exclude_string = get_argument_or_default(kwargs, "exclude-cols", "")
+  local excluded_list = resolve_column_selectors(exclude_string, available_columns)
+
+  for _, col_name in ipairs(excluded_list) do
+    config.excluded_columns_set[col_name] = true
+  end
 
   return config
 end
 
 
 -- =============================================================================
--- 5. ROW PROCESSING (Flat Logic)
+-- 6. ROW PROCESSING (Iterator Pattern)
 -- =============================================================================
 
-local function get_explicit_value(tmpl, context)
-  if tmpl:find("{") then
-    return interpolate_str(tmpl, context.row_map, context.all_columns)
+local function resolve_explicit_template(template_string, context)
+  if s_find(template_string, "{") then
+    return interpolate_values(template_string, context.row_data, context.available_columns)
   end
 
-  -- Direct column reference
-  if context.row_map[tmpl] then
-    local val = context.row_map[tmpl]
-    if is_na(val) then return resolve_na(context.config.na_action) end
-    return val
+  local cell_value = context.row_data[template_string]
+  if cell_value then
+    if is_value_empty_or_na(cell_value) then
+      return resolve_missing_value(context.config.na_strategy)
+    end
+    return cell_value
   end
 
-  return tmpl -- Static text
+  return template_string
 end
 
--- Separates the search logic from the value extraction logic
-local function find_next_unused_key(context)
-  while context.auto_ptr <= #context.ordered_keys do
-    local key = context.ordered_keys[context.auto_ptr]
-    context.auto_ptr = context.auto_ptr + 1
-
-    if not context.consumed[key] then return key end
+local function extract_value_if_valid(row_data, column_name, na_strategy)
+  local cell_value = row_data[column_name]
+  if is_value_empty_or_na(cell_value) then
+    return resolve_missing_value(na_strategy)
   end
-  return nil
+  return cell_value
 end
 
-local function get_autofill_value(context)
-  local key = find_next_unused_key(context)
-  if not key then return nil end
+-- Encapsulating the iteration state in a closure keeps the main processing loop
+-- stateless and flat, adhering to the "Never Nesting" philosophy.
+local function create_autofill_iterator(context)
+  local column_cursor = 1
+  local ordered_columns = context.ordered_columns
+  local consumed_map = context.consumed_map
+  local row_data = context.row_data
+  local na_strategy = context.config.na_strategy
 
-  local val = context.row_map[key]
-  if is_na(val) then return resolve_na(context.config.na_action) end
+  return function()
+    while column_cursor <= #ordered_columns do
+      local column_name = ordered_columns[column_cursor]
+      column_cursor = column_cursor + 1
 
-  return val
+      if not consumed_map[column_name] then
+        return extract_value_if_valid(row_data, column_name, na_strategy)
+      end
+    end
+    return nil -- Signal exhaustion
+  end
 end
 
-local function process_row(row_list, config, global_consumed, all_columns)
+local function format_output_value(raw_value, slot_index, context)
+  if raw_value ~= nil then
+    return escape_string_for_typst(raw_value)
+  end
+
+  -- We must fill gaps in the grid to maintain alignment with the Typst function signature.
+  if slot_index <= context.config.max_position_index then
+    return '""'
+  elseif context.config.na_strategy == "keep" then
+    return "none"
+  end
+
+  return nil -- Signal to stop processing
+end
+
+local function fetch_next_content(slot_index, context, autofill_iterator)
+  local template_string = context.config.templates[slot_index]
+
+  if template_string then
+    return resolve_explicit_template(template_string, context)
+  end
+
+  return autofill_iterator()
+end
+
+local function process_single_row(row_item_list, config, global_consumed_map, available_columns)
   local context = {
-    row_map = {},
-    ordered_keys = {},
-    consumed = {},
-    auto_ptr = 1,
+    row_data = {},
+    ordered_columns = {},
+    consumed_map = {},
     config = config,
-    all_columns = all_columns
+    available_columns = available_columns
   }
 
-  for _, item in ipairs(row_list) do
-    context.row_map[item.key] = item.value
-    table.insert(context.ordered_keys, item.key)
+  for _, item in ipairs(row_item_list) do
+    context.row_data[item.key] = item.value
+    t_insert(context.ordered_columns, item.key)
   end
 
-  for k in pairs(global_consumed) do context.consumed[k] = true end
-  for k in pairs(config.exclude_set) do context.consumed[k] = true end
+  for k in pairs(global_consumed_map) do context.consumed_map[k] = true end
+  for k in pairs(config.excluded_columns_set) do context.consumed_map[k] = true end
 
-  local final_args = {}
-  local current_slot = 0
-  local safety_limit = config.max_pos + #context.ordered_keys + 5
+  local get_next_autofill = create_autofill_iterator(context)
+  local final_arguments = {}
+  local current_slot_index = 0
+  local safety_limit = config.max_position_index + #context.ordered_columns + 5
 
-  while current_slot < safety_limit do
-    if current_slot > config.max_pos and context.auto_ptr > #context.ordered_keys then
+  while current_slot_index < safety_limit do
+    local raw_value = fetch_next_content(current_slot_index, context, get_next_autofill)
+
+    -- Stop if we have satisfied all explicit templates and run out of auto-fill data.
+    if raw_value == nil and current_slot_index > config.max_position_index then
       break
     end
 
-    local val = nil
-    local tmpl = config.templates[current_slot]
-
-    if tmpl then
-      val = get_explicit_value(tmpl, context)
-    else
-      val = get_autofill_value(context)
+    local formatted_value = format_output_value(raw_value, current_slot_index, context)
+    if formatted_value then
+      t_insert(final_arguments, formatted_value)
     end
 
-    if val == nil then
-      if current_slot <= config.max_pos then
-        table.insert(final_args, '""')
-      elseif config.na_action == "keep" then
-        table.insert(final_args, "none")
-      end
-    else
-      table.insert(final_args, clean_string(val))
-    end
-
-    current_slot = current_slot + 1
+    current_slot_index = current_slot_index + 1
   end
 
-  return final_args
+  return final_arguments
 end
 
 
 -- =============================================================================
--- 6. MAIN ENTRY POINT
+-- 7. MAIN ENTRY POINT
 -- =============================================================================
 
 local function generate_cv_section(args, kwargs, meta)
-  local sheet_name = get_arg(kwargs, "sheet", "")
-  local func_name  = get_arg(kwargs, "func", "")
+  local sheet_name = get_argument_or_default(kwargs, "sheet", "")
+  local func_name  = get_argument_or_default(kwargs, "func", "")
 
   if sheet_name == "" or func_name == "" then
-    return pandoc.Strong(pandoc.Str("Missing sheet/func"))
+    return pandoc.Strong(pandoc.Str("Error: Missing 'sheet' or 'func' argument."))
   end
 
-  local raw_data = nil
+  -- We prioritize metadata injection (from R) over file reading for speed,
+  -- but fallback to JSON for robustness if the filter chain is modified.
+  local raw_data_source = nil
   if meta.cv_data and meta.cv_data[sheet_name] then
-    raw_data = meta.cv_data[sheet_name]
+    raw_data_source = meta.cv_data[sheet_name]
   else
-    local json = read_cv_data_json()
-    if json and json.cv_data then raw_data = json.cv_data[sheet_name] end
-  end
-
-  if not raw_data then
-    return pandoc.Strong(pandoc.Str("Sheet not found: " .. sheet_name))
-  end
-
-  local rows_unwrapped = unwrap(raw_data)
-  local rows = (pandoc.utils.type(rows_unwrapped) == "MetaList" or (type(rows_unwrapped)=="table" and rows_unwrapped[1]))
-               and rows_unwrapped or {rows_unwrapped}
-
-  if #rows == 0 then return pandoc.RawBlock("typst", "") end
-
-  local all_columns = {}
-  for _, field in ipairs(rows[1]) do
-    if field.key then table.insert(all_columns, field.key) end
-  end
-
-  local config = parse_config(kwargs, all_columns)
-  local global_consumed = extract_consumed_cols(config.templates, all_columns)
-
-  local blocks = {}
-  for _, row in ipairs(rows) do
-    local args_list = process_row(row, config, global_consumed, all_columns)
-    if #args_list > 0 then
-      table.insert(blocks, "#" .. func_name .. "(" .. table.concat(args_list, ", ") .. ")")
+    local json_db = load_cached_database()
+    if json_db and json_db.cv_data then
+      raw_data_source = json_db.cv_data[sheet_name]
     end
   end
 
-  if #blocks == 0 then return pandoc.RawBlock("typst", "") end
-  return pandoc.RawBlock("typst", table.concat(blocks, "\n"))
+  if not raw_data_source then
+    return pandoc.Strong(pandoc.Str("Error: Sheet '" .. sheet_name .. "' not found."))
+  end
+
+  local unwrapped_data = extract_pandoc_content(raw_data_source)
+
+  local rows = (p_type(unwrapped_data) == "MetaList" or (type(unwrapped_data)=="table" and unwrapped_data[1]))
+               and unwrapped_data or {unwrapped_data}
+
+  if #rows == 0 then return pandoc.RawBlock("typst", "") end
+
+  -- Calculating column metadata once per sheet avoids redundant processing in the row loop.
+  local available_columns = {}
+  for _, field in ipairs(rows[1]) do
+    if field.key then t_insert(available_columns, field.key) end
+  end
+
+  local config = parse_shortcode_arguments(kwargs, available_columns)
+  local global_consumed_map = identify_consumed_columns(config.templates, available_columns)
+
+  local typst_function_calls = {}
+  for _, row in ipairs(rows) do
+    local arguments_list = process_single_row(row, config, global_consumed_map, available_columns)
+
+    if #arguments_list > 0 then
+      local call_string = "#" .. func_name .. "(" .. t_concat(arguments_list, ", ") .. ")"
+      t_insert(typst_function_calls, call_string)
+    end
+  end
+
+  if #typst_function_calls == 0 then return pandoc.RawBlock("typst", "") end
+  return pandoc.RawBlock("typst", t_concat(typst_function_calls, "\n"))
 end
 
 return { ["cv-section"] = generate_cv_section }
