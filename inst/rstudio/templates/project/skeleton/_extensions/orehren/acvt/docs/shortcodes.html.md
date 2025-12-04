@@ -16,7 +16,7 @@ The `cv-section` shortcode is the primary tool for building your CV. It acts as 
 | :--- | :--- | :--- | :--- |
 | `sheet` | **Required.** The `shortname` of the data sheet to load (defined in your YAML configuration). | - | `sheet="working"` |
 | `func` | **Required.** The Typst function to use for rendering. This determines the grid layout. | - | `func="resume-entry"` |
-| `pos-<N>` | **The Mapping Engine.** Defines the content for the **Nth** argument (grid position) of the Typst function. Supports string interpolation (e.g., `"{ColA} - {ColB}"`). | - | `pos-0="{Date}"` |
+| `pos-<N>` | **The Mapping Engine.** Defines the content for the **Nth** argument (grid position) of the Typst function. Supports string interpolation and **column aggregation** (e.g., `"{starts_with('det') \| , }"`). | - | `pos-0="{Date}"` |
 | `exclude-cols` | Columns to exclude from the **Auto-Fill** process. Supports tidy selection helpers. | `""` | `exclude-cols="id, notes"` |
 | `na-action` | Action for empty values: `"omit"` (pass empty string), `"keep"` (pass `none`), `"string"` (pass `"NA"`). | `"omit"` | `na-action="string"` |
 
@@ -34,14 +34,32 @@ The logic works slot by slot (Argument 0, Argument 1, Argument 2, ...) for the c
 
 This allows you to customize specific parts of the layout (e.g., combining dates) while letting the rest of the data fill in automatically.
 
-### String Interpolation
+### String Interpolation & Aggregation
 
 When using `pos-<N>`, you can reference column names by wrapping them in curly braces `{}`.
 
+#### 1. Simple Reference & Combination
 *   **Simple Reference:** `pos-0="{Location}"` inserts the value of the 'Location' column.
 *   **Combination:** `pos-0="{Start} -- {End}"` combines two columns.
 *   **Formatting:** `pos-1="**{Title}**"` adds Markdown formatting (if supported) or static text around the value.
 *   **Static Text:** `pos-2="Projects"` ignores data columns and passes the static string "Projects".
+
+#### 2. Column Aggregation (The Pipe Syntax)
+You can aggregate multiple columns into a single string using **Tidy Selectors** and a **Separator**. This is useful for combining multiple detail columns (e.g., `detail_1`, `detail_2`, `detail_3`) into one block without worrying about empty values.
+
+**Syntax:** `{ <SELECTOR> | <SEPARATOR> }`
+
+*   **Selector:** A column name, a range (`colA:colB`), or a helper function (like `starts_with`).
+*   **Separator:** The string used to join the values.
+
+**Behavior:**
+*   It finds all columns matching the selector.
+*   It filters out empty (`NA`) values automatically.
+*   It joins the remaining values using the separator.
+
+**Example:** `"{starts_with('detail') | , }"` joins all detail columns with a comma.
+
+---
 
 ### Examples
 
@@ -78,9 +96,7 @@ Suppose your data has columns `Start`, `End`, `Job`, `Employer`, but the layout 
 
 You can inject labels or format specific fields directly in the shortcode.
 
-codeMarkdown
-
-```
+```markdown
 {{< cv-section 
     sheet="working" 
     func="resume-entry" 
@@ -104,11 +120,6 @@ Sometimes a layout function has a slot you want to leave empty (e.g., a subtitle
 >}}
 ```
 
-*   **Slot 0:** Auto-fills (e.g., Date).
-*   **Slot 1:** Explicitly 'Title'.
-*   **Slot 2:** Explicitly empty.
-*   **Slot 3:** Auto-fills with next available data (e.g., Description).
-
 **Option B: Jumping Indexes**
 
 ```markdown
@@ -119,19 +130,29 @@ Sometimes a layout function has a slot you want to leave empty (e.g., a subtitle
 >}}
 ```
 
-*   **Slots 0-4:** Auto-fill with the first 5 available columns.
-*   **Slot 5:** Explicitly uses 'Description'.
+#### 5. Aggregating Columns (Dynamic Lists)
 
-### Tidy Selection Helpers (`exclude-cols`)
+If you have a variable number of detail columns (`detail_1` to `detail_7`) and want to join them with a Typst line break (`\ \`), use the pipe syntax.
 
-To prevent specific columns (like internal IDs or notes) from appearing during the **Auto-Fill** phase, use `exclude-cols`. You can list names or use helper functions:
+```markdown
+{{< cv-section 
+    sheet="working" 
+    func="resume-entry"
+    pos-5="{starts_with('detail') | \\ \\ }"
+>}}
+```
+
+---
+
+### Tidy Selection Helpers
+
+Both `exclude-cols` and the **interpolation syntax `{...}`** support the following helper functions to select columns dynamically:
 
 *   `starts_with("prefix")`: Selects columns starting with the prefix (e.g., `starts_with("detail")`).
 *   `ends_with("suffix")`: Selects columns ending with the suffix.
 *   `contains("string")`: Selects columns containing the substring.
 *   `matches("pattern")`: Selects columns matching a Lua pattern.
 *   `col_a:col_b`: Selects a range of columns from `col_a` to `col_b` (inclusive).    
-
 
 ```markdown
 {{< cv-section 

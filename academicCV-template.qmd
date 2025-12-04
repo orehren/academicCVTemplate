@@ -112,7 +112,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
     exclude-cols="label_7"
     pos-1="details_2"
     pos-2="label_2" 
-    pos-3="interest_1, interest_2"
+    pos-3="{details_6}, {details_7}"
   >}}
 
 ## Working Experiences
@@ -122,8 +122,8 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
     func="resume-entry" 
     exclude-cols="date"
     pos-0="{start} -- {end}" 
-    pos-5="· {details_1} \\ \\ · {details_2} \\ \\ · {details_3} \\ \\ · {details_4} \\ \\ · {details_5} \\ \\ · {details_6} \\ \\ · {details_7}" 
-  >}}
+    pos-5="· {starts_with('detail') | \\ \\ · }" 
+>}}
 
 ## Publications
 
