@@ -11,7 +11,7 @@
 #' @export
 acvt_template <- function(path, firstname, lastname, renv, git, ...) {
 
-  # Ensure path is absolute to help RStudio context switching
+  # Ensure path is absolute to avoid ambiguity during RStudio context switch
   path <- normalizePath(path, mustWork = FALSE)
 
   # 1. Create Project Directory
@@ -36,15 +36,16 @@ acvt_template <- function(path, firstname, lastname, renv, git, ...) {
   file.copy(from = file.path(source_of_truth_dir, "_quarto.yml"),
             to = file.path(path, "_quarto.yml"))
 
-  # Copy directly to 'cv.qmd' to match .dcf OpenFiles
+  # Copy directly to 'cv.qmd'
+  target_qmd <- file.path(path, "cv.qmd")
   file.copy(from = file.path(source_of_truth_dir, "academicCV-template.qmd"),
-            to = file.path(path, "cv.qmd"))
+            to = target_qmd)
 
   # 5. Personalize YAML Header
-  .update_template_yaml(file.path(path, "cv.qmd"), firstname, lastname)
+  .update_template_yaml(target_qmd, firstname, lastname)
 
   # 6. Initialize Version Control & Environment
-  # Using system calls on the target directory to avoid setwd() side effects
+  # We use system calls on the target directory to remain side-effect free (no setwd)
 
   if (git && nzchar(Sys.which("git"))) {
     system(paste("git -C", shQuote(path), "init"), ignore.stdout = TRUE, ignore.stderr = TRUE)
@@ -54,8 +55,14 @@ acvt_template <- function(path, firstname, lastname, renv, git, ...) {
     renv::init(project = path, bare = TRUE, restart = FALSE)
   }
 
-  # Return absolute path to signal RStudio where the new project is
-  return(path)
+  # 7. Explicitly open the file in the IDE
+  # This is the imperative fallback if the declarative .dcf 'OpenFiles' fails.
+  if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+    # We use the absolute path to ensure RStudio finds it regardless of the current WD
+    rstudioapi::navigateToFile(target_qmd)
+  }
+
+  return(invisible(TRUE))
 }
 
 
