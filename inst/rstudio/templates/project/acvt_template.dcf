@@ -1,7 +1,7 @@
 Binding: acvt_template
 Title: Academic CV Project
 Icon: acvt_icon.png
-OpenFiles: cv.qmd
+OpenFiles: *.qmd
 
 Parameter: firstname
 Widget: TextInput
