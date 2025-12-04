@@ -39,8 +39,9 @@ acvt_template <- function(path, ...) {
   file.copy(from = file.path(source_of_truth_dir, "_quarto.yml"),
             to = file.path(path, "_quarto.yml"))
 
+  target_qmd <- file.path(path, "cv.qmd")
   file.copy(from = file.path(source_of_truth_dir, "academicCV-template.qmd"),
-            to = file.path(path, "cv.qmd"))
+            to = target_qmd)
 
   # 6. Personalize YAML Header
   .update_template_yaml(target_qmd, firstname, lastname)
