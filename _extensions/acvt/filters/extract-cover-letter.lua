@@ -1,99 +1,119 @@
---[[
-extract-cover-letter.lua – move the "Coverletter" section into document metadata
-as a raw typst variable, instead of writing to a file.
-]]
+-- =============================================================================
+-- 1. CONSTANTS & PERFORMANCE
+-- =============================================================================
 
-local section_identifiers = {
-  coverletter = true,
-}
-local collected_coverletter_blocks = {} -- Hier speichern wir die Blöcke zwischen
-local toplevel = 6
+local t_insert = table.insert
+local p_write  = pandoc.write
+local p_Pandoc = pandoc.Pandoc
+local p_Raw    = pandoc.RawBlock
 
----
--- Main state-machine to separate section content from body content.
--- Populates the local 'collected_coverletter_blocks' table.
----
-local function extract_section_content (blocks)
-  local body_blocks = {}
-  local looking_at_section = false
+-- Configuration
+local TARGET_SECTION_ID = "coverletter"
+local TYPST_VAR_NAME    = "cover_letter_content"
+local META_INJECTION_KEY = "definitions-01b-injected-cover-letter"
+local FORMAT_TYPST      = "typst"
 
-  local function process_header(block)
-    if block.level > toplevel then
-      body_blocks[#body_blocks + 1] = block
-      return looking_at_section
-    end
 
-    toplevel = block.level
+-- =============================================================================
+-- 2. PREDICATES (Decision Logic)
+-- =============================================================================
 
-    if section_identifiers[block.identifier] then
-      -- Start collecting -> Reset collection for safety or append? 
-      -- Assuming one cover letter section, we can just use the global table.
-      return block.identifier 
-    else
-      body_blocks[#body_blocks + 1] = block
-      return false -- New state: not collecting
-    end
-  end
-
-  local function process_section_block(block)
-    -- A 'HorizontalRule' (---) signals the end of the special section
-    if block.t == 'HorizontalRule' then
-      return false -- New state: not collecting
-    end
-
-    -- Add to our internal collection instead of a complex table structure
-    -- since we only care about 'coverletter' right now.
-    if looking_at_section == "coverletter" then
-      table.insert(collected_coverletter_blocks, block)
-    end
-    
-    return looking_at_section
-  end
-
-  for _, block in ipairs(blocks) do
-    if block.t == 'Header' then
-      looking_at_section = process_header(block)
-    elseif looking_at_section then
-      looking_at_section = process_section_block(block)
-    else
-      body_blocks[#body_blocks + 1] = block
-    end
-  end
-
-  return body_blocks
+-- Checks if a block is the specific header that starts the cover letter
+local function is_start_header(block)
+  return block.t == "Header" and block.identifier == TARGET_SECTION_ID
 end
 
----
--- PANDOC FILTER DEFINITIONS
----
+-- Checks if a block signals the end of the current section
+-- (Either a Horizontal Rule or a Header of the same/higher level)
+local function is_end_signal(block, current_section_level)
+  if block.t == "HorizontalRule" then return true end
 
--- 1. Blocks läuft zuerst: Trennt den Cover Letter vom Rest des Dokuments
-function Blocks(blocks)
-  return extract_section_content(blocks)
+  if block.t == "Header" and block.level <= current_section_level then
+    return true
+  end
+
+  return false
 end
 
--- 2. Pandoc läuft danach: Nimmt die separierten Blöcke und injiziert sie als Variable
+
+-- =============================================================================
+-- 3. EXTRACTION ENGINE
+-- =============================================================================
+
+local function separate_blocks(all_blocks)
+  local main_content = {}
+  local extracted_content = {}
+
+  local is_extracting = false
+  local section_level = 0
+
+  for _, block in ipairs(all_blocks) do
+
+    -- State Transition: Start Extraction
+    if is_start_header(block) then
+      is_extracting = true
+      section_level = block.level
+      -- We do not add the header itself to either list (it is consumed)
+      goto continue
+    end
+
+    -- State Transition: Stop Extraction
+    if is_extracting and is_end_signal(block, section_level) then
+      is_extracting = false
+      -- The block that ended the section belongs to the main content
+      t_insert(main_content, block)
+      goto continue
+    end
+
+    -- Action: Distribute Block
+    if is_extracting then
+      t_insert(extracted_content, block)
+    else
+      t_insert(main_content, block)
+    end
+
+    ::continue::
+  end
+
+  return main_content, extracted_content
+end
+
+
+-- =============================================================================
+-- 4. TYPST GENERATION
+-- =============================================================================
+
+local function generate_typst_variable(content_blocks)
+  if #content_blocks == 0 then
+    return string.format('#let %s = none', TYPST_VAR_NAME)
+  end
+
+  -- Convert Pandoc AST blocks to a Typst string
+  local doc_fragment = p_Pandoc(content_blocks)
+  local typst_body = p_write(doc_fragment, FORMAT_TYPST)
+
+  -- Wrap in a Typst content variable structure
+  return string.format('#let %s = [\n%s\n]', TYPST_VAR_NAME, typst_body)
+end
+
+
+-- =============================================================================
+-- 5. MAIN ENTRY POINT
+-- =============================================================================
+
 function Pandoc(doc)
-  local raw_typst_code = ""
+  -- 1. Separate the cover letter from the rest of the document
+  local body_blocks, cover_blocks = separate_blocks(doc.blocks)
 
-  if #collected_coverletter_blocks > 0 then
-    -- Konvertiere die gesammelten Blöcke in Typst-Syntax
-    local content_as_string = pandoc.write(pandoc.Pandoc(collected_coverletter_blocks), 'typst')
-    
-    -- Baue die Typst-Variable
-    raw_typst_code = '#let cover_letter_content = [\n' .. content_as_string .. '\n]'
-  else
-    -- Fallback: Leere Variable definieren, damit Typst nicht meckert
-    raw_typst_code = '#let cover_letter_content = none'
-  end
+  -- 2. Generate the Typst code for the variable
+  local typst_code = generate_typst_variable(cover_blocks)
 
-  -- Injiziere den Code als RawBlock in die Metadaten
-  doc.meta['definitions-01b-injected-cover-letter'] = pandoc.RawBlock('typst', raw_typst_code)
-  
+  -- 3. Inject into metadata
+  -- This makes the content available to the Typst template without printing it directly
+  doc.meta[META_INJECTION_KEY] = p_Raw(FORMAT_TYPST, typst_code)
+
+  -- 4. Update document body (removing the extracted section)
+  doc.blocks = body_blocks
+
   return doc
 end
-
-return {
-  { Blocks = Blocks },
-  { Pandoc = Pandoc }
-}

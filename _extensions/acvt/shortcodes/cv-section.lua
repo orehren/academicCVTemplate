@@ -470,4 +470,3 @@ local function generate_cv_section(args, kwargs, meta)
 end
 
 return { ["cv-section"] = generate_cv_section }
-
