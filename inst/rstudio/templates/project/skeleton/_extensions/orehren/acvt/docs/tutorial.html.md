@@ -67,7 +67,9 @@ profile-photo: "path/to/your/photo.jpg"
 # profile-photo: null
 ```
 
-**Note:** For this tutorial, we assume you want to use all features. However, if you don't have a profile photo or don't want it to be displayed, you can simply set this field to `null`. Just deleting the entry from the YAML header will not work in this case, as the default picture, which is just a placeholder image in form of a pictogram, will then be displayed.
+::: {.callout-note}
+For this tutorial, we assume you want to use all features. However, if you don't have a profile photo or don't want it to be displayed, you can simply set this field to `null`. Just deleting the entry from the YAML header will not work in this case, as the default picture, which is just a placeholder image in form of a pictogram, will then be displayed.
+:::
 
 ## 3. The Cover Letter
 

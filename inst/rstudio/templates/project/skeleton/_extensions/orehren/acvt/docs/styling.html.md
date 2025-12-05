@@ -92,7 +92,9 @@ For available functions, see the **[Official Typst Documentation](https://typst.
 
 For users who want more control, you can directly modify the Typst style files located in the `_extensions/orehren/acvt/typst/` directory.
 
-**Warning:** Modifying these files requires some knowledge of the Typst language. Always make a backup before making changes.
+::: {.callout-warning}
+Modifying these files requires some knowledge of the Typst language. Always make a backup before making changes.
+:::
 
 ### Key Files
 

@@ -20,18 +20,22 @@ The extension operates as a Quarto Project Extension using several interacting c
 
 ### Pre-render Script
 
-*Files:* `_fetch_cv_data.R`
+::: {.callout-note icon="false" appearance="simple"}
+*Files:* `_fetch_cv_data.R` 
 
 *Location:* `acvt/R/`
+:::
 
 The script `_fetch_cv_data.R` runs **before** any content in your `.qmd` file is processed.
 It handles authentication, fetches data from Google Sheets, and writes the structured data to `.cv_data.json` in the project root folder.
 
 ### Filters
 
+::: {.callout-note icon="false" appearance="simple"}
 *Files:* `inject-metadata.lua`, `cover-letter.lua`, `embed-attachments.lua`
 
 *Location:* `acvt/filters/`
+:::
 
 Lua filters intervene in the Pandoc conversion process to inject data and handle special content.
 
@@ -41,9 +45,11 @@ Lua filters intervene in the Pandoc conversion process to inject data and handle
 
 ### Shortcodes
 
+::: {.callout-note icon="false" appearance="simple"}
 *Files:* `cv-section.lua`, `publications.lua`
 
 *Location:* `acvt/shortcodes/`
+:::
 
 These Lua scripts provide the user-facing commands used in the `.qmd` file:
 
@@ -52,15 +58,19 @@ These Lua scripts provide the user-facing commands used in the `.qmd` file:
 
 ### Template & Partials
 
-*Files*: `template.typ`, `typst-template.typ`, `helper-functions.typ`, `stylings.typ`, `parts-functions.typ`, `page.typ`
+::: {.callout-note icon="false" appearance="simple"}
+*Files:* `template.typ`, `typst-template.typ`, `helper-functions.typ`, `stylings.typ`, `parts-functions.typ`, `page.typ`
 
-*Location*: `acvt/typst/`
+*Location:* `acvt/typst/`
+:::
 
 The main file, `template.typ`, orchestrates the rendering process.
 It determines the sequence in which the template partials are loaded and processed.
 
-**Note:** You should generally not modify `template.typ` directly.
+::: {.callout-caution}
+You should generally not modify `template.typ` directly.
 Instead, modify the specific partials it loads:
+:::
 
 | Partial File | Purpose |
 |:-----------------------------------|:-----------------------------------|
@@ -74,14 +84,16 @@ Instead, modify the specific partials it loads:
 
 ### R Components (Package Logic)
 
+::: {.callout-note icon="false" appearance="simple"}
 *Files:* Located in `R/` (Source) or `acvt/R/` (Extension)
+:::
 
 The R scripts are divided into two categories: **Runtime Scripts** (used during rendering) and **Package Utilities** (used for setup and maintenance).
 
 **1. Runtime Scripts (Data Fetching)**
 
 | Filename | Purpose |
-|:-------------------------|:---------------------------------------------|
+|:--------------------------|:--------------------------------------------|
 | `_fetch_cv_data.R` | The main pre-render script. Orchestrates authentication and data loading. |
 | `load_cv_sheets.R` | Functions to download sheets from Google Drive. |
 | `read_cv_sheet.R` | Functions to parse individual sheets. |
@@ -90,7 +102,7 @@ The R scripts are divided into two categories: **Runtime Scripts** (used during 
 **2. Package Utilities (Setup & Maintenance)**
 
 | Filename | Purpose |
-|:-------------------------|:---------------------------------------------|
+|:--------------------------|:--------------------------------------------|
 | `acvt_template.R` | Contains `acvt_template()`. The logic behind the RStudio "New Project" wizard. |
 | `update_template.R` | Contains `update_current_cv_project()`. Updates the extension files in an existing project. |
 |  | Contains `update_template_from_git()`. Downloads the latest template version from GitHub. |
@@ -101,7 +113,7 @@ The R scripts are divided into two categories: **Runtime Scripts** (used during 
 The extension includes several static assets in `_extensions/orehren/acvt/assets/`.
 
 | Directory | Content |
-|:-------------------|:---------------------------------------------------|
+|:----------------------|:------------------------------------------------|
 | `bib/` | Bibliography files (`bibliography.bib`, `.json`, `.ris`, `.xml`, or `.yml`). |
 | `images/` | Default profile picture (`picture.jpg` or `.png`) and example appendix files (`appendix1.png`, `appendix2.png`). |
 
@@ -124,9 +136,11 @@ The template uses a consistent two-column grid layout:
 When you use `{{< cv-section >}}`, the extension iterates through your data sheet row by row.
 For each row, it calls the specified Typst function (e.g., `#resume-entry`).
 
-**Important:** The `cv-section` shortcode is agnostic regarding layout.
+::: {.callout-important}
+The `cv-section` shortcode is agnostic regarding layout.
 It simply passes the column values to the function.
 The layout is determined entirely by the Typst function, which maps the incoming content columns to grid cells **sequentially from left to right**.
+:::
 
 ### Example: `resume-entry` Mapping
 
@@ -161,7 +175,7 @@ This extension comes with the following Typst functions to display different con
 | `visualize-skills-list` | Renders a graphical bar chart table. | Visualizing skill levels. | `{{< cv-section >}}` |
 
 You can also write and provide your own custom Typst functions.
-To do this, declare a new function in `typst/parts-functions.typ` and then call it via the `func` argument in the shortcode.
+To do this, declare a new function in `typst/04-definitions-parts-functions.typ` and then call it via the `func` argument in the shortcode.
 
 See [**Shortcodes & Content**](./shortcodes.qmd) for usage examples.
 

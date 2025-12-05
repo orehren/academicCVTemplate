@@ -33,7 +33,9 @@ The path to your profile photo, relative to the project root.
 
 **Type:** String
 
-**Note:** Set to `null` or `""` to disable the photo.
+::: {.callout-note}
+Set to `null` or `""` to disable the photo.
+:::
 
 ```yaml
 profile-photo: "assets/images/my_photo.jpg"
