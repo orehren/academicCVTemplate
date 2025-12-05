@@ -149,7 +149,7 @@ This allows you to manually define the position of each column directly in the s
 
 ## 4. Typst Function Reference
 
-These layout functions are defined in `typst/04-definitions-parts-functions.typ`.
+These layout functions are defined in `typst/parts-functions.typ`.
 By allowing you to specify the `func` in the shortcode, the template provides the flexibility to choose different layouts for different sections of your CV (e.g., a detailed list for jobs vs. a simple list for interests) without changing the underlying data structure.
 This extension comes with the following Typst functions to display different content types.
 
@@ -161,7 +161,7 @@ This extension comes with the following Typst functions to display different con
 | `visualize-skills-list` | Renders a graphical bar chart table. | Visualizing skill levels. | `{{< cv-section >}}` |
 
 You can also write and provide your own custom Typst functions.
-To do this, declare a new function in `typst/04-definitions-parts-functions.typ` and then call it via the `func` argument in the shortcode.
+To do this, declare a new function in `typst/parts-functions.typ` and then call it via the `func` argument in the shortcode.
 
 See [**Shortcodes & Content**](./shortcodes.qmd) for usage examples.
 
