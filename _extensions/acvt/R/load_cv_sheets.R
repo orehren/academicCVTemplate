@@ -31,7 +31,6 @@
 load_cv_sheets <- function(doc_identifier,
                            sheets_to_load,
                            ...) {
-
   .validate_load_cv_sheets_args(doc_identifier, sheets_to_load, ...)
 
   ss_input <- .resolve_doc_identifier(doc_identifier)
@@ -60,7 +59,7 @@ load_cv_sheets <- function(doc_identifier,
     # between the source sheet name and the target list key.
     if (length(valid_indices) < length(load_config$sheet_names_to_read)) {
       load_config$sheet_names_to_read <- load_config$sheet_names_to_read[valid_indices]
-      load_config$target_list_names   <- load_config$target_list_names[valid_indices]
+      load_config$target_list_names <- load_config$target_list_names[valid_indices]
     }
   }
 
@@ -83,7 +82,6 @@ load_cv_sheets <- function(doc_identifier,
 }
 
 
-
 #' Prepare Sheet Loading Configuration
 #'
 #' Internal helper to determine the exact sheet names to read and the desired
@@ -99,22 +97,23 @@ load_cv_sheets <- function(doc_identifier,
 #'
 #' @noRd
 .prepare_sheet_load_config <- function(sheets_to_load, ss_input = NULL) {
-
-  sheet_names_to_read <- NULL
-  target_list_names <- NULL
-
   is_special_wildcard <- is.character(sheets_to_load) && length(sheets_to_load) == 1 && sheets_to_load == "*"
 
   if (is_special_wildcard) {
     if (is.null(ss_input)) {
       cli::cli_abort("Internal error: {.arg ss_input} must be provided when {.arg sheets_to_load} is \"*\".", call. = FALSE)
     }
+
     cli::cli_inform("Fetching all sheet names from the document...")
-    sheet_names_to_read <- tryCatch({
-      googlesheets4::sheet_names(ss_input)
-    }, error = function(e) {
-      cli::cli_abort("Failed to retrieve sheet names from the document when 'sheets_to_load = \"*\"'.", parent = e, call. = FALSE)
-    })
+
+    sheet_names_to_read <- tryCatch(
+      {
+        googlesheets4::sheet_names(ss_input)
+      },
+      error = function(e) {
+        cli::cli_abort("Failed to retrieve sheet names from the document when 'sheets_to_load = \"*\"'.", parent = e, call. = FALSE)
+      }
+    )
 
     if (length(sheet_names_to_read) == 0) {
       cli::cli_warn("No sheets found in the document or failed to retrieve names.")
@@ -124,17 +123,22 @@ load_cv_sheets <- function(doc_identifier,
     target_list_names <- gsub("[^[:alnum:]_]+", "_", tolower(sheet_names_to_read))
     cli::cli_inform("Using all {length(sheet_names_to_read)} sheets found: {paste(shQuote(sheet_names_to_read), collapse = ', ')}. Target list names: {.val {target_list_names}}")
 
+    return(list(
+      sheet_names_to_read = sheet_names_to_read,
+      target_list_names = target_list_names
+    ))
+  }
+
+  # Standard Case: Explicit List
+  if (rlang::is_named(sheets_to_load)) {
+    sheet_names_to_read <- names(sheets_to_load)
+    target_list_names <- as.character(unlist(sheets_to_load))
   } else {
-    if (rlang::is_named(sheets_to_load)) {
-      sheet_names_to_read <- names(sheets_to_load)
-      target_list_names <- as.character(unlist(sheets_to_load))
-    } else {
-      sheet_names_to_read <- sheets_to_load
-      target_list_names <- gsub("[^[:alnum:]_]+", "_", tolower(sheet_names_to_read))
-      cli::cli_inform(
-        "Using cleaned sheet names as names for the returned list: {.val {target_list_names}}"
-      )
-    }
+    sheet_names_to_read <- sheets_to_load
+    target_list_names <- gsub("[^[:alnum:]_]+", "_", tolower(sheet_names_to_read))
+    cli::cli_inform(
+      "Using cleaned sheet names as names for the returned list: {.val {target_list_names}}"
+    )
   }
 
   return(list(
@@ -190,11 +194,16 @@ load_cv_sheets <- function(doc_identifier,
 #' @noRd
 .validate_load_cv_sheets_args <- function(doc_identifier, sheets_to_load, ...) {
   checkmate::assert_string(doc_identifier, min.chars = 1)
+
   if (is.character(sheets_to_load)) {
     checkmate::assert_character(sheets_to_load, min.chars = 1, min.len = 1)
-  } else if (rlang::is_named(sheets_to_load)) {
-    checkmate::assert_list(sheets_to_load, types = "character", names = "unique")
-  } else {
-    checkmate::assert_list(sheets_to_load, types = "character")
+    return(invisible(TRUE))
   }
+
+  if (rlang::is_named(sheets_to_load)) {
+    checkmate::assert_list(sheets_to_load, types = "character", names = "unique")
+    return(invisible(TRUE))
+  }
+
+  checkmate::assert_list(sheets_to_load, types = "character")
 }
