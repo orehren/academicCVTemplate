@@ -26,7 +26,6 @@ read_cv_sheet <- function(doc_identifier,
                           na_strings = c("", "NA", "N/A"),
                           col_types = NULL,
                           trim_ws = TRUE) {
-
   .validate_read_cv_sheet_args(
     doc_identifier, sheet_name, na_strings, col_types, trim_ws
   )
@@ -78,9 +77,8 @@ read_cv_sheet <- function(doc_identifier,
 
   if (is_potential_id) {
     return(doc_identifier)
-  } else {
-    return(NULL)
   }
+  return(NULL)
 }
 
 #' Resolve Identifier as Name
@@ -96,29 +94,37 @@ read_cv_sheet <- function(doc_identifier,
 .resolve_identifier_as_name <- function(doc_identifier) {
   cli::cli_inform("Interpreting identifier as a name, searching Google Drive for: {.val {doc_identifier}}")
 
-  found_files_dribble <- googledrive::drive_find(
-    q = sprintf(
-      "name = '%s' and mimeType = 'application/vnd.google-apps.spreadsheet'",
-      gsub("'", "\\\\'", doc_identifier)
-    ),
+  found_files <- .find_file_in_drive(doc_identifier)
+
+  .validate_search_result(found_files, doc_identifier)
+
+  cli::cli_inform("Found unique document with name {.val {doc_identifier}}, using its dribble representation.")
+  return(found_files)
+}
+
+.find_file_in_drive <- function(name) {
+  # Escape single quotes for the Drive query syntax
+  safe_name <- gsub("'", "\\\\'", name)
+
+  googledrive::drive_find(
+    q = sprintf("name = '%s' and mimeType = 'application/vnd.google-apps.spreadsheet'", safe_name),
     n_max = 2
   )
+}
 
-  if (nrow(found_files_dribble) == 0) {
-    cli::cli_abort("No Google Sheet document found with the exact name {.val {doc_identifier}}.", call. = FALSE)
+.validate_search_result <- function(found_files, original_name) {
+  if (nrow(found_files) == 0) {
+    cli::cli_abort("No Google Sheet document found with the exact name {.val {original_name}}.", call. = FALSE)
   }
 
-  if (nrow(found_files_dribble) > 1) {
+  if (nrow(found_files) > 1) {
     cli::cli_abort(
-      c("Multiple Google Sheet documents found with the name {.val {doc_identifier}}.",
+      c("Multiple Google Sheet documents found with the name {.val {original_name}}.",
         "i" = "Please use the unique document ID or URL instead."
       ),
       call. = FALSE
     )
   }
-
-  cli::cli_inform("Found unique document with name {.val {doc_identifier}}, using its dribble representation.")
-  return(found_files_dribble)
 }
 
 #' Resolve Document Identifier (Dispatcher)
@@ -132,10 +138,8 @@ read_cv_sheet <- function(doc_identifier,
 #'
 #' @noRd
 .resolve_doc_identifier <- function(doc_identifier) {
-  is_url <- grepl("://", doc_identifier, fixed = TRUE)
-  if (is_url) {
-    resolved_input <- .resolve_identifier_as_url(doc_identifier)
-    return(resolved_input)
+  if (grepl("://", doc_identifier, fixed = TRUE)) {
+    return(.resolve_identifier_as_url(doc_identifier))
   }
 
   resolved_id <- .resolve_identifier_as_id(doc_identifier)
@@ -143,8 +147,7 @@ read_cv_sheet <- function(doc_identifier,
     return(resolved_id)
   }
 
-  resolved_dribble <- .resolve_identifier_as_name(doc_identifier)
-  return(resolved_dribble)
+  return(.resolve_identifier_as_name(doc_identifier))
 }
 
 #' Read Sheet Data

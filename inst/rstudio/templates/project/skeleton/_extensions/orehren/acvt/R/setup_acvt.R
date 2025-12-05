@@ -9,24 +9,17 @@ setup_acvt <- function() {
   if (!interactive()) stop("This function must be run in an interactive R session.")
 
   # --- STEP 1: WELCOME ---
-  if (!.step_welcome()) {
-    return(invisible(NULL))
-  }
+  if (!.step_welcome()) return(invisible(NULL))
 
   # --- STEP 2: PACKAGES ---
   # Returns TRUE (next), "skip_auth" (skip next), or FALSE (abort)
   pkg_result <- .step_packages()
 
-  if (isFALSE(pkg_result)) {
-    return(invisible(NULL))
-  } # User aborted
+  if (isFALSE(pkg_result)) return(invisible(NULL))
 
   # --- STEP 3: AUTHENTICATION ---
-  # Only run auth if the user didn't choose to skip it in the previous step
   if (!identical(pkg_result, "skip_auth")) {
-    if (!.step_auth()) {
-      return(invisible(NULL))
-    }
+    if (!.step_auth()) return(invisible(NULL))
   } else {
     cli::cli_alert_info("Skipping Google Authentication as requested.")
   }
@@ -34,6 +27,16 @@ setup_acvt <- function() {
   # --- STEP 4: FINISH ---
   .step_finish()
 }
+
+
+# ==============================================================================
+# 0. CONSTANTS
+# ==============================================================================
+
+REQUIRED_PACKAGES <- c(
+  "googlesheets4", "googledrive", "readxl", "jsonlite",
+  "checkmate", "cli", "purrr", "rlang"
+)
 
 
 # ==============================================================================
@@ -68,23 +71,9 @@ setup_acvt <- function() {
     return(FALSE)
   }
 
-  # If user wants to skip packages, we return TRUE here but handle the skip logic
-  # in the main function or just let the package step handle the skip?
-  # Better: The main function calls .step_packages(). We can pass a flag or
-  # simply let the user choose "Skip" inside the package step if they want.
-  # However, based on the menu above:
   if (choice == "2") {
     cli::cli_alert_info("Skipping package check...")
-    return(TRUE) # Proceed, but the caller logic needs to know?
-    # Actually, simpler architecture: The wizard flows linearly.
-    # If user chose 2, we might want to set a global flag or just return TRUE
-    # and let the next function be called.
-    # BUT: The main function calls .step_packages() next.
-    # Let's adjust the return: TRUE means "Go to next step".
-    # We need a way to signal "Skip next step".
-    # For simplicity in this linear script: We just return TRUE.
-    # The user can skip inside the package step again or we change the flow.
-    # Let's keep it simple: This welcome just confirms they want to run the tool.
+    return(TRUE)
   }
 
   return(TRUE)
@@ -95,68 +84,27 @@ setup_acvt <- function() {
 # 2. PACKAGE INSTALLATION STEP
 # ==============================================================================
 
-.step_packages <- function() {
-  cli::cli_h2("Step 1: Package Check")
-
-  req_pkgs <- c("googlesheets4", "googledrive", "readxl", "jsonlite", "checkmate", "cli", "purrr", "rlang")
-
-  # --- 1. List Requirements ---
-  cli::cli_text("To function correctly, this extension requires the following R packages:")
-  cli::cli_ul(req_pkgs)
-  cli::cli_text("") # Empty line for visual separation
-
-  # --- 2. Explain Next Step ---
-  cli::cli_alert_info("We will now scan your R library to check which of these are already installed.")
+.handle_all_packages_installed <- function() {
+  cli::cli_alert_success("Great news! All required packages are already installed.")
+  cli::cli_text("We are now ready to proceed with the Google Authentication setup.")
   cli::cli_text("──────────────────────────────────────────────────────────────")
 
-  choice <- .ask_option(
+  next_choice <- .ask_option(
     question = "How do you want to proceed?",
     options = c(
-      "1" = "Start Scan",
-      "2" = "Skip Package Check",
+      "1" = "Proceed to Google Authentication",
+      "2" = "Skip Google Authentication",
       "q" = "Quit Wizard"
     )
   )
 
-  if (choice == "q") {
-    return(FALSE)
-  }
-  if (choice == "2") {
-    cli::cli_alert_warning("Skipping package installation.")
-    return(TRUE)
-  }
+  if (next_choice == "q") return(FALSE)
+  if (next_choice == "2") return("skip_auth")
 
-  # --- Scanning ---
-  cli::cli_progress_step("Scanning library...", spinner = TRUE)
-  Sys.sleep(0.5) # Short delay for UX (so the user sees something is happening)
-  missing <- req_pkgs[!purrr::map_lgl(req_pkgs, requireNamespace, quietly = TRUE)]
-  cli::cli_progress_done()
+  return(TRUE)
+}
 
-  # --- CASE A: ALL PACKAGES PRESENT (The new Dialog) ---
-  if (length(missing) == 0) {
-    cli::cli_alert_success("Great news! All required packages are already installed.")
-    cli::cli_text("We are now ready to proceed with the Google Authentication setup.")
-    cli::cli_text("──────────────────────────────────────────────────────────────")
-
-    next_choice <- .ask_option(
-      question = "How do you want to proceed?",
-      options = c(
-        "1" = "Proceed to Google Authentication",
-        "2" = "Skip Google Authentication",
-        "q" = "Quit Wizard"
-      )
-    )
-
-    if (next_choice == "q") {
-      return(FALSE)
-    }
-    if (next_choice == "2") {
-      return("skip_auth")
-    } # Signal to main function
-    return(TRUE) # Proceed normally
-  }
-
-  # --- Missing Packages Found ---
+.handle_missing_packages <- function(missing) {
   cli::cli_text("")
   cli::cli_alert_warning(paste("We Found", length(missing), "missing packages:"))
   cli::cli_ul(missing)
@@ -171,12 +119,8 @@ setup_acvt <- function() {
     )
   )
 
-  if (sub_choice == "q") {
-    return(FALSE)
-  }
-  if (sub_choice == "2") {
-    return(TRUE)
-  }
+  if (sub_choice == "q") return(FALSE)
+  if (sub_choice == "2") return(TRUE)
 
   cli::cli_h3("Installing...")
   utils::install.packages(missing)
@@ -185,15 +129,98 @@ setup_acvt <- function() {
   return(TRUE)
 }
 
+.step_packages <- function() {
+  cli::cli_h2("Step 1: Package Check")
+
+  cli::cli_text("To function correctly, this extension requires the following R packages:")
+  cli::cli_ul(REQUIRED_PACKAGES)
+  cli::cli_text("")
+
+  cli::cli_alert_info("We will now scan your R library to check which of these are already installed.")
+  cli::cli_text("──────────────────────────────────────────────────────────────")
+
+  choice <- .ask_option(
+    question = "How do you want to proceed?",
+    options = c(
+      "1" = "Start Scan",
+      "2" = "Skip Package Check",
+      "q" = "Quit Wizard"
+    )
+  )
+
+  if (choice == "q") return(FALSE)
+  if (choice == "2") {
+    cli::cli_alert_warning("Skipping package installation.")
+    return(TRUE)
+  }
+
+  cli::cli_progress_step("Scanning library...", spinner = TRUE)
+  Sys.sleep(0.5)
+  missing <- REQUIRED_PACKAGES[!purrr::map_lgl(REQUIRED_PACKAGES, requireNamespace, quietly = TRUE)]
+  cli::cli_progress_done()
+
+  if (length(missing) == 0) {
+    return(.handle_all_packages_installed())
+  }
+
+  return(.handle_missing_packages(missing))
+}
+
 
 # ==============================================================================
 # 3. AUTHENTICATION STEP
 # ==============================================================================
 
+.prompt_for_valid_email <- function() {
+  email <- ""
+
+  while (nchar(email) == 0) {
+    sub_choice <- .ask_option(
+      question = "Ready to enter email?",
+      options = c(
+        "1" = "Enter Email",
+        "2" = "Skip Authentication",
+        "q" = "Quit Wizard"
+      )
+    )
+
+    if (sub_choice == "q") return(NULL) # Signal abort
+    if (sub_choice == "2") {
+      cli::cli_alert_warning("Skipping authentication.")
+      return("SKIP") # Signal skip
+    }
+
+    cli::cli_alert_info("Please enter your email address explicitly to ensure the correct account is used.")
+    input <- readline(prompt = "Google Email: ")
+    email <- trimws(input)
+
+    if (nchar(email) == 0) {
+      cli::cli_alert_danger("Email cannot be empty. Please try again.")
+    }
+  }
+  return(email)
+}
+
+.execute_auth_strategy <- function(is_global, email) {
+  cli::cli_alert_info("Launching browser...")
+
+  tryCatch({
+    if (is_global) {
+      .perform_global_auth(email)
+    } else {
+      .perform_local_auth(email)
+    }
+    return(TRUE)
+  }, error = function(e) {
+    cli::cli_alert_danger(paste("Authentication failed:", e$message))
+    return(FALSE)
+  })
+}
+
 .step_auth <- function() {
   cli::cli_h2("Step 2: Google Authentication")
 
-  # --- DIALOG 1: INTRO & WHY ---
+  # --- DIALOG 1: INTRO ---
   cli::cli_text("To fetch data from Google Sheets, R needs to authenticate with the Google API.")
   cli::cli_text("This process involves:")
   cli::cli_ul()
@@ -210,14 +237,11 @@ setup_acvt <- function() {
     )
   )
 
-  if (choice_1 == "q") {
-    return(FALSE)
-  }
+  if (choice_1 == "q") return(FALSE)
   if (choice_1 == "2") {
     cli::cli_alert_warning("Skipping authentication.")
     return(TRUE)
   }
-
 
   # --- DIALOG 2: MODE SELECTION ---
   cli::cli_h3("Authentication Options")
@@ -249,18 +273,13 @@ setup_acvt <- function() {
     )
   )
 
-  if (choice_2 == "q") {
-    return(FALSE)
-  }
+  if (choice_2 == "q") return(FALSE)
   if (choice_2 == "3") {
     cli::cli_alert_warning("Skipping authentication.")
     return(TRUE)
   }
 
-  is_global <- (choice_2 == "1")
-
-
-  # --- DIALOG 3: EMAIL INPUT & BROWSER INFO ---
+  # --- DIALOG 3: EMAIL INPUT ---
   cli::cli_h3("Credentials & Browser Flow")
   cli::cli_text("We will now perform the authentication.")
   cli::cli_ul()
@@ -270,63 +289,20 @@ setup_acvt <- function() {
   cli::cli_li("4. You close the browser and return here.")
   cli::cli_end()
 
-  # Loop to ensure email is entered or user explicitly aborts
-  email <- ""
-  while (nchar(email) == 0) {
-    # We ask for intent first to allow aborting before typing
-    sub_choice <- .ask_option(
-      question = "Ready to enter email?",
-      options = c(
-        "1" = "Enter Email",
-        "2" = "Skip Authentication",
-        "q" = "Quit Wizard"
-      )
-    )
+  email <- .prompt_for_valid_email()
 
-    if (sub_choice == "q") {
-      return(FALSE)
-    }
-    if (sub_choice == "2") {
-      cli::cli_alert_warning("Skipping authentication.")
-      return(TRUE)
-    }
+  if (is.null(email)) return(FALSE) # User quit
+  if (email == "SKIP") return(TRUE) # User skipped
 
-    cli::cli_alert_info("Please enter your email address explicitly to ensure the correct account is used.")
-    input <- readline(prompt = "Google Email: ")
-    email <- trimws(input)
-
-    if (nchar(email) == 0) {
-      cli::cli_alert_danger("Email cannot be empty. Please try again.")
-    }
-  }
-
-  # Perform Auth
-  cli::cli_alert_info("Launching browser...")
-
-  success <- tryCatch(
-    {
-      if (is_global) {
-        .perform_global_auth(email)
-      } else {
-        .perform_local_auth(email)
-      }
-      TRUE
-    },
-    error = function(e) {
-      cli::cli_alert_danger(paste("Authentication failed:", e$message))
-      FALSE
-    }
-  )
-
-  if (!success) {
+  # --- EXECUTION ---
+  if (!.execute_auth_strategy(choice_2 == "1", email)) {
     return(FALSE)
   }
-
 
   # --- DIALOG 4: SUCCESS & SECURITY INFO ---
   cli::cli_h3("Authentication Successful")
 
-  if (is_global) {
+  if (choice_2 == "1") {
     cli::cli_alert_success("Credentials stored in: {.strong User System Cache}")
     cli::cli_text("You can now use this CV template without re-authenticating.")
   } else {
@@ -348,7 +324,7 @@ setup_acvt <- function() {
   )
 
   if (choice_4 == "2") {
-    .delete_credentials(choice_2) # 1=Global, 2=Local
+    .delete_credentials(choice_2)
     cli::cli_alert_warning("Credentials deleted. Setup aborted.")
     return(FALSE)
   }
@@ -380,10 +356,8 @@ setup_acvt <- function() {
 .ask_option <- function(question, options) {
   cli::cli_text(paste0("\n{.strong ", question, "}"))
 
-  # Print options
   for (key in names(options)) {
     label <- options[[key]]
-    # Color 'q' red to indicate abort
     if (key == "q") {
       cli::cli_text(paste0("  {.red [", key, "]} ", label))
     } else {
@@ -391,7 +365,6 @@ setup_acvt <- function() {
     }
   }
 
-  # Loop until valid input
   valid_keys <- names(options)
   selection <- ""
 
@@ -443,6 +416,7 @@ setup_acvt <- function() {
 .secure_local_folder <- function(folder_name) {
   git_path <- ".gitignore"
   if (!file.exists(git_path)) file.create(git_path)
+
   content <- readLines(git_path, warn = FALSE)
   if (!any(grepl(paste0("^", folder_name), content))) {
     prefix <- if (length(content) > 0 && nzchar(tail(content, 1))) "\n" else ""
@@ -454,10 +428,12 @@ setup_acvt <- function() {
 .add_to_rprofile <- function(line) {
   profile_path <- ".Rprofile"
   if (!file.exists(profile_path)) file.create(profile_path)
+
   content <- readLines(profile_path, warn = FALSE)
   if (any(grepl(trimws(line), trimws(content), fixed = TRUE))) {
     return()
   }
+
   prefix <- if (length(content) > 0 && nzchar(tail(content, 1))) "\n" else ""
   cat(paste0(prefix, line, "\n"), file = profile_path, append = TRUE)
 }
