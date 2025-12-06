@@ -1,10 +1,8 @@
 ---
-title: "Installation"
+title: "Installation Guide"
 ---
 
-# Installation Guide
-
-There are two ways to install and use the `acvt` project: via the R package (recommended) or via manual Quarto installation.
+There are two ways to install and use the `acvt` project: via the R package (recommended) or via manual Quarto extension installation.
 
 ## Method 1: Installation via R Package (Recommended)
 

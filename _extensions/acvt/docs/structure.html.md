@@ -1,8 +1,6 @@
 ---
-title: "Structure & Layout"
+title: "Structure & Layout of the Extension"
 ---
-
-# Extension Structure
 
 This page explains the architecture of the `academicCVTemplate` extension.
 

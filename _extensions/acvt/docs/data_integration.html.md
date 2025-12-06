@@ -2,8 +2,6 @@
 title: "Data Integration"
 ---
 
-# Data Integration
-
 This template separates content from layout by fetching data from Google Sheets.
 
 ## 1. Setup Data Integration
