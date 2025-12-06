@@ -1,0 +1,380 @@
+[
+  {
+    "objectID": "installation.html",
+    "href": "installation.html",
+    "title": "Installation Guide",
+    "section": "",
+    "text": "There are two ways to install and use the acvt project: via the R package (recommended) or via manual Quarto extension installation."
+  },
+  {
+    "objectID": "installation.html#method-1-installation-via-r-package-recommended",
+    "href": "installation.html#method-1-installation-via-r-package-recommended",
+    "title": "Installation Guide",
+    "section": "Method 1: Installation via R Package (Recommended)",
+    "text": "Method 1: Installation via R Package (Recommended)\nThis is the easiest and most powerful way to use the template. This method installs all R package dependencies automatically and makes the project available as a template in the RStudio “New Project” wizard.\n\n1. Install the R Package from GitHub\nOpen your R console (or RStudio) and run the following commands:\n# Install devtools if you don't have it already\nif (!requireNamespace(\"devtools\", quietly = TRUE)) {\n  install.packages(\"devtools\")\n}\n\n# Install the acvt package from GitHub\ndevtools::install_github(\"orehren/academicCVTemplate\")\n\n\n2. Restart RStudio\nYou must restart your RStudio session for the project template to appear in the wizard.\n\n\n3. Create a New Project\nAfter restarting, go to File &gt; New Project… &gt; New Directory. You will now see “Academic CV Project” in the list of project types. Select it, fill in your details, and a new, ready-to-use CV project will be created. All R package dependencies will be installed and available to the project."
+  },
+  {
+    "objectID": "installation.html#method-2-alternative-manual-installation",
+    "href": "installation.html#method-2-alternative-manual-installation",
+    "title": "Installation Guide",
+    "section": "Method 2: Alternative Manual Installation",
+    "text": "Method 2: Alternative Manual Installation\nIf you prefer not to use the R package or the RStudio template, you can install the Quarto extension manually."
+  },
+  {
+    "objectID": "installation.html#install-the-extension",
+    "href": "installation.html#install-the-extension",
+    "title": "Installation Guide",
+    "section": "1. Install the Extension",
+    "text": "1. Install the Extension\nYou can start a new project with the template or add it to an existing Quarto project.\n\nOption A: Create a New Project (Recommended)\nTo start fresh, run this command in your terminal:\nquarto use template orehren/acvt\nFollow the prompts to name your directory (e.g., my-cv).\n\n\nOption B: Add to an Existing Project\nIf you already have a Quarto project, run this command in your project root:\nquarto add orehren/acvt\nThis downloads the extension files into the _extensions/ directory. You then need to copy the files _quarto.yml from the orehren/acvt folder to the project base folder."
+  },
+  {
+    "objectID": "installation.html#install-r-packages",
+    "href": "installation.html#install-r-packages",
+    "title": "Installation Guide",
+    "section": "2. Install R Packages",
+    "text": "2. Install R Packages\nThis extension uses R to fetch and process data from Google Sheets. Regardless of how you installed the extension, you must install the required R packages.\nOpen your R console (or RStudio) and run:\ninstall.packages(c(\n  \"googledrive\",\n  \"googlesheets4\",\n  \"yaml\",\n  \"rmarkdown\",\n  \"cli\",\n  \"purrr\",\n  \"checkmate\",\n  \"rlang\"\n))"
+  },
+  {
+    "objectID": "installation.html#next-steps",
+    "href": "installation.html#next-steps",
+    "title": "Installation Guide",
+    "section": "3. Next Steps",
+    "text": "3. Next Steps\nOnce installed, you need to connect your Google Sheet.\n\nGo to Data Integration to set up authentication and your spreadsheet.\nGo to Tutorial for a walkthrough of the template features."
+  },
+  {
+    "objectID": "yaml_reference.html",
+    "href": "yaml_reference.html",
+    "title": "Complete YAML Reference",
+    "section": "",
+    "text": "This page provides a comprehensive reference for all the configuration options available in the YAML frontmatter of your .qmd file."
+  },
+  {
+    "objectID": "yaml_reference.html#document-metadata",
+    "href": "yaml_reference.html#document-metadata",
+    "title": "Complete YAML Reference",
+    "section": "Document Metadata",
+    "text": "Document Metadata\nThese fields define the core identity of your document.\n\ntitle\nThe document title, often used in the PDF metadata.\nType: String\ntitle: \"Application for Tenure Track Position\"\n\n\nposition\nYour current job title or the position you are applying for. This appears prominently on the Title Page.\nType: String\nposition: \"Senior Data Scientist\"\n\n\nprofile-photo\nThe path to your profile photo, relative to the project root.\nType: String\n\n\n\n\n\n\nNote\n\n\n\nSet to null or \"\" to disable the photo.\n\n\nprofile-photo: \"assets/images/my_photo.jpg\"\n\n\naboutme\nA short bio or summary paragraph displayed on the Title Page.\nType: String (multiline)\naboutme: |\n  Passionate researcher with 5+ years of experience in...\n  Dedicated to open science and reproducibility.\n\n\nfamous-quote\nAn optional quote displayed in the document.\nType: Object (text, attribution)\nFields:\n\ntext: The quote text. Type: String\nattribution: The author of the quote. Type: String\n\nfamous-quote:\n  text: \"The most reliable way to predict the future is to create it.\"\n  attribution: \"Abraham Lincoln\""
+  },
+  {
+    "objectID": "yaml_reference.html#author-details",
+    "href": "yaml_reference.html#author-details",
+    "title": "Complete YAML Reference",
+    "section": "Author Details",
+    "text": "Author Details\nThe author object contains your personal information and contact details.\n\nauthor\nType: Object (firstname, lastename, contact, socialmedia)\nFields:\n\nfirstname: Your first name. Type: String\nlastname: Your last name. Type: String\ncontact: A list of contact details. Type: List of Objects (icon, text, url)\nsocialmedia: A list of social profiles. Type: List of Objects (icon, text, url)\n\n\nContact & Social Media Items\nEach item in the list is an object with:\n\nicon: A Font Awesome icon class (e.g., fa envelope, fa brands github). Type: String\ntext: The text to display. Type: String\nurl: (Optional) The link destination. Type: String\n\nExample:\nauthor:\n  firstname: \"Jane\"\n  lastname: \"Doe\"\n  contact:\n    - icon: fa envelope\n      text: \"jane@example.com\"\n      url: \"mailto:jane@example.com\"\n    - icon: fa mobile-screen\n      text: \"+1 234 567 890\"\n  socialmedia:\n    - icon: fa brands github\n      text: \"github.com/janedoe\"\n      url: \"https://github.com/janedoe\"\n    - icon: fa globe\n      text: \"janedoe.com\"\n      url: \"https://janedoe.com\""
+  },
+  {
+    "objectID": "yaml_reference.html#cover-letter",
+    "href": "yaml_reference.html#cover-letter",
+    "title": "Complete YAML Reference",
+    "section": "Cover Letter",
+    "text": "Cover Letter\nConfiguration for the cover letter section.\n\nrecipient\nInformation about the addressee.\nType: Object (name, salutation, valediction, addressee address, city, zip)\nFields:\n\nsalutation: Form of greeting to use. Type: String\nvalediction: Form of complimentary close to use. Type: String\nname: Name of the Person to address in salutation. Type: String\naddressee: First line of the address (Name/Company). Type: String\naddress: Street address. Type: String\ncity: City. Type: String\nzip: Postal code. Type: String\n\nExample:\nrecipient:\n  salutation: \"Dear,\"\n  valediction: \"Sincerely,\"\n  name: \"Dr. Turing\"\n  addressee: \"Dr. Alan Turing\"\n  address: \"Bletchley Park\"\n  city: \"Milton Keynes\"\n  zip: \"MK3 6EB\"\n\n\ndate & subject\nType: String\ndate: \"October 24, 2025\"\nsubject: \"Application for Research Position\""
+  },
+  {
+    "objectID": "yaml_reference.html#data-integration-google-document",
+    "href": "yaml_reference.html#data-integration-google-document",
+    "title": "Complete YAML Reference",
+    "section": "Data Integration (google-document)",
+    "text": "Data Integration (google-document)\nConfigures the connection to your data sources. While the key is named google-document for historical reasons, it now supports a hybrid approach, allowing you to mix Google Sheets, local Excel/CSV/JSON files, and entire directories.\n\ngoogle-document\nType: Object\nFields:\n\nauth-email: The email address used for Google authentication (only required if using Google Sheets). Type: String\ndocument-identifier: The source(s) of your data. Can be a single string or a list of strings. Type: String | List of Strings\nsheets-to-load: A list of specific data sections to import from the defined sources. Type: List of Objects\n\n\n\ndocument-identifier\nThis field tells the system where to look for data. You can provide a single source or a list of multiple sources. The system will merge them together.\nSupported Source Types:\n\nGoogle Sheet: Provide the unique ID (recommended) or the exact Name of the file on your Google Drive or the url to that file.\nLocal File: Provide a relative path to a .xlsx, .csv, or .json file.\nLocal Directory: Provide a relative path to a folder (e.g., _data/). The system will scan it for supported files.\n\nHow Matching Works: * Google Sheets / Excel: The system looks for a Tab (Sheet) matching the name defined in sheets-to-load. * CSV / JSON: The system looks for a Filename matching the name defined in sheets-to-load (ignoring the extension).\n\nExamples\n1. Online Only (Classic) Fetches all data from a single Google Sheet.\ngoogle-document:\n  auth-email: \"me@gmail.com\"\n  document-identifier: \"1BxiMVs0XRA5nSLqo...\" # or \"My CV Data\"\n  sheets-to-load:\n    - name: \"Working Experiences\"\n      shortname: \"working\"\n2. Local File Only Uses a local Excel file instead of the cloud. No email required.\ngoogle-document:\n  document-identifier: \"data/my_cv.xlsx\"\n  sheets-to-load:\n    - name: \"Education\" # Looks for a tab named \"Education\" in the xlsx\n      shortname: \"edu\"\n3. Mixed Sources (Hybrid) Combines public data from Google Sheets with private data from a local Excel file.\ngoogle-document:\n  auth-email: \"me@gmail.com\"\n  document-identifier:\n    - \"My Public CV Data\"   # Google Sheet\n    - \"private/details.xlsx\" # Local Excel\n  sheets-to-load:\n    - name: \"Working Experiences\" # From Google\n      shortname: \"working\"\n    - name: \"References\"          # From local Excel\n      shortname: \"refs\"\n4. Directory Scan Scans a folder. Useful if you prefer one CSV per section (e.g., _data/skills.csv, _data/languages.csv).\ngoogle-document:\n  document-identifier: \"_data/\"\n  sheets-to-load:\n    - name: \"skills\"    # Matches '_data/skills.csv'\n      shortname: \"skills\"\n    - name: \"languages\" # Matches '_data/languages.csv'\n      shortname: \"lang\"\n\n\n\nsheets-to-load\nDefines what data to extract from the sources configured above.\nObject Format (Recommended):\n\nname: The identifier used to find the data.\n\nFor Excel/Google: The exact Tab Name.\nFor CSV/JSON: The Filename (without extension).\n\nshortname: The unique ID you will use in the {{&lt; cv-section &gt;}} shortcode to render this data.\n\nString Format: You can simply list names. The shortname will be automatically generated (lowercased, spaces replaced by underscores).\nsheets-to-load:\n  # Object Format\n  - name: \"Working Experiences\"\n    shortname: \"working\"\n  # String Format\n  - \"Education\" # shortname becomes 'education'"
+  },
+  {
+    "objectID": "yaml_reference.html#publication-list-publication-list",
+    "href": "yaml_reference.html#publication-list-publication-list",
+    "title": "Complete YAML Reference",
+    "section": "Publication List (publication-list)",
+    "text": "Publication List (publication-list)\nConfigures the automated bibliography generation.\n\n\n\n\n\n\nImportant\n\n\n\nThe publication list generation does not use the standard citation framework from Quarto and Typst. This framework is disabled in this extension. Therefore, the usual YAML fields (bibliography, csl, etc.) have no effect, and citations in the traditional way are not possible. To restore this functionality, add surpress-bibliography: true to the document’s YAML header.\n\n\n\npublication-list\nType: Object (bib_file, bib_style, author_name, typst_func_name, default_label, group_labels, group_order)\nBasic Configuration:\n\nbib_file: Path to bibliography file(s). Use a list for multiple files. Type: String (or List of Strings)\nbib_style: Path to the CSL style file. Type: String\nauthor_name: The name to highlight (e.g., “Doe, J.”). Type: String\nhighlight_author: Styling. Type: String (bold, italic, color, or format string)\nfunc_name: The Typst function to render the list (Default: \"publication-list\"). Useful for advanced customization. Type: String\n\nGrouping & Sorting:\n\ndefault_label: The default label for items that don’t match a group (Default: \"Other\"). Type: String\ngroup_labels: A dictionary mapping Pandoc types to Custom Labelss. Type: Map (Key: String, Value: String)\n\nPandoc Types: article (Journal), book, conference (Proceedings), thesis, report, misc.\n\ngroup_order: A list defining the order of groups. Type: List of Strings\n\nIndexing: Use Label=Index strings to fix positions.\nNote: Use the Custom Label names here.\n\n\nExample:\npublication-list:\n  bib_file: [\"pubs.bib\", \"talks.json\"]\n  bib_style: \"assets/bib/apa-cv.csl\"\n  \n  # Grouping\n  default_label: \"Miscellaneous\"\n  group_labels:\n    article: \"Journal Articles\"\n    conference: \"Conference Proceedings\"\n  \n  # Ordering: Put Journals 1st, Proceedings 3rd. \n  # \"Miscellaneous\" (default_label) will fill the 2nd slot.\n  group_order: \n    - \"Journal Articles=1\"\n    - \"Conference Proceedings=3\"\n    - \"Other\"\n\n  # Author Highlighting\n  author_name: \"Doe, J.\"\n  highlight_author: \"bold\""
+  },
+  {
+    "objectID": "yaml_reference.html#style-output",
+    "href": "yaml_reference.html#style-output",
+    "title": "Complete YAML Reference",
+    "section": "Style & Output",
+    "text": "Style & Output\n\nstyle\nCustomize the visual identity.\nType: Object (color-accent, font-header, font-text)\nFields:\n\ncolor-accent: Hex color code (without #). Type: String\nfont-header: List of font families for headings. Type: List of Strings\nfont-text: List of font families for body text. Type: List of Strings\n\nExample:\nstyle:\n  color-accent: \"5e81ac\"\n  font-header: [\"Lato\", \"Helvetica\", \"sans-serif\"]\n  font-text: [\"Roboto\", \"Arial\", \"sans-serif\"]\n\n\nrender-output\nControls which documents are generated.\nOptions: \"cv-only\", \"letter-only\", \"combined\".\n\ncv-only: Outputs the curriculum vitae only.\nletter-only: Outputs the cover letter only.\ncombined (Default): Outputs both, the cover letter and the curriculum vitae.\n\nrender-output: \"combined\"\n\n\nattachments\nAppends documents to the end of the PDF.\nType: List of Objects (name, file)\nFields: (per item)\n\nname: Display name. Type: String\nfile: Path to the image file. Type: String\n\nattachments:\n  - name: \"Transcript\"\n    file: \"assets/docs/transcript.pdf\""
+  },
+  {
+    "objectID": "acknowledgements.html",
+    "href": "acknowledgements.html",
+    "title": "Acknowledgements",
+    "section": "",
+    "text": "This project was made possible by the excellent work of the open-source community. We were inspired by and, in some cases, directly borrowed code and ideas from the following projects. We are deeply grateful for their contributions."
+  },
+  {
+    "objectID": "acknowledgements.html#awesome-cv",
+    "href": "acknowledgements.html#awesome-cv",
+    "title": "Acknowledgements",
+    "section": "1. Awesome-CV",
+    "text": "1. Awesome-CV\n\nProject Link: https://github.com/posquit0/Awesome-CV\nDevelopers: The Awesome-CV team and its many contributors.\n\nThe visual design and overall structure of this CV template are heavily inspired by the classic and widely-used Awesome-CV LaTeX template. Its clean, modern aesthetic is the foundation upon which this project is built."
+  },
+  {
+    "objectID": "acknowledgements.html#quarto-awesomecv-typst",
+    "href": "acknowledgements.html#quarto-awesomecv-typst",
+    "title": "Acknowledgements",
+    "section": "2. quarto-awesomecv-typst",
+    "text": "2. quarto-awesomecv-typst\n\nProject Link: https://github.com/kazuyanagimoto/quarto-awesomecv-typst\nDeveloper: Kazuharu Yanagimoto (@kazuyanagimoto)\n\nThis project served as a crucial starting point and proof-of-concept for creating an Awesome-CV-style template in the Quarto and Typst ecosystem. Several of the initial Typst styling rules and functions were adapted from this work."
+  },
+  {
+    "objectID": "acknowledgements.html#abstract-section-pandoc-filter",
+    "href": "acknowledgements.html#abstract-section-pandoc-filter",
+    "title": "Acknowledgements",
+    "section": "3. abstract-section (Pandoc Filter)",
+    "text": "3. abstract-section (Pandoc Filter)\n\nProject Link: https://github.com/pandoc-ext/abstract-section\nDevelopers: Albert Krewinkel (@tarleb), John MacFarlane (@jgm), Mickaël Canouil (@mcanouil)\n\nThe cover-letter.lua filter in this project is a modified version of the abstract-section.lua filter. Their elegant and robust code for extracting a specific section from a document was adapted to handle the cover letter content."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "acvt - academicCVTemplate",
+    "section": "",
+    "text": "Welcome to the documentation for the academicCVTemplate. This is a comprehensive Quarto Project Extension designed to help you create professional academic CVs and cover letters using the Typst typesetting system."
+  },
+  {
+    "objectID": "index.html#project-extension",
+    "href": "index.html#project-extension",
+    "title": "acvt - academicCVTemplate",
+    "section": "Project Extension",
+    "text": "Project Extension\nUnlike simple document templates, this is a full-featured project extension. It integrates:\n\nProject Type: Activated via project: type: acvt to handle the build pipeline.\nCustom Format: acvt-typst for high-quality PDF generation.\nFilters & Shortcodes: Powerful tools to fetch data, process content, and automate layout.\nTypst Templates: Modular, customizable styling."
+  },
+  {
+    "objectID": "index.html#why-use-this-extension",
+    "href": "index.html#why-use-this-extension",
+    "title": "acvt - academicCVTemplate",
+    "section": "Why Use This Extension?",
+    "text": "Why Use This Extension?\n\nData-Driven: Keep your CV content in Google Sheets and let the extension handle the formatting.\nAutomated Layout: Use shortcodes like {{&lt; cv-section &gt;}} to map your data to professional 2-column layouts.\nFlexible Styling: Customize fonts, colors, and content using YAML and Typst inline code.\nPublication Management: Generate categorized publication lists automatically from BibTeX, BibLatex, CSL-JSON, RIS, YAML and XML."
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "acvt - academicCVTemplate",
+    "section": "Getting Started",
+    "text": "Getting Started\n\nInstallation: Set up the project and dependencies.\nStructure: Understand how the extension works.\nTutorial: Create your first CV step-by-step."
+  },
+  {
+    "objectID": "tutorial.html",
+    "href": "tutorial.html",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "",
+    "text": "This tutorial will guide you through the process of creating a complete CV and cover letter using the academicCV-template.qmd file."
+  },
+  {
+    "objectID": "tutorial.html#the-template-file",
+    "href": "tutorial.html#the-template-file",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "1. The Template File",
+    "text": "1. The Template File\nThe template comes with a file named academicCV-template.qmd. This file serves as the control center for your CV. It contains:\n\nYAML Header: Metadata, configuration, and personal details.\nShortcodes: Placeholders that tell Quarto where to insert your CV sections and publications.\n\nMake a copy of this file and rename it to something like my-cv.qmd."
+  },
+  {
+    "objectID": "tutorial.html#configure-personal-details-yaml",
+    "href": "tutorial.html#configure-personal-details-yaml",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "2. Configure Personal Details (YAML)",
+    "text": "2. Configure Personal Details (YAML)\nOpen my-cv.qmd. The top section enclosed in --- is the YAML header.\n\n2.1. Basic Information\nUpdate your name, position, and the document title.\ntitle: \"Application for Assistant Professor\"\nauthor:\n  firstname: \"Jane\"\n  lastname: \"Doe\"\nposition: \"PhD Candidate in Computational Biology\"\n\n\n2.2. Contact & Social Media\nAdd your contact & social media details. Each entry is a list, that consists of three information details.\n\nicon: An icon to display for this contact or social media detail. You can use any Font Awesome icon by specifying its class (e.g., fa envelope, fa brands github).\ntext: The Text to be displayed for this contact or social media detail. You can choose any arbitrary text you like.\nurl: The link address for this contact or social media detail. This is the address, that will be opened, when clicking on the contact detail in the final document.\n\nEach of the detail informations are optional. For example:\nauthor:\n  # ...\n  contact:\n    - icon: fa envelope\n      text: \"jane.doe@example.com\"\n      url: \"mailto:jane.doe@example.com\"\n    - text: \"New York, USA\"\n  socialmedia:\n    - icon: fa brands github\n      text: \"github.com/janedoe\"\n      url: \"https://github.com/janedoe\"\nThis will render two contact details (e-mail address and the living location) and one social media detail (github profile) in the final document.\n\n\n2.3. Profile Photo\nTo change the profile photo, replace the file at _extensions/orehren/acvt/assets/images/picture.jpg or update the path in the YAML:\nprofile-photo: \"path/to/your/photo.jpg\"\n# To disable the photo:\n# profile-photo: null\n\n\n\n\n\n\nNote\n\n\n\nFor this tutorial, we assume you want to use all features. However, if you don’t have a profile photo or don’t want it to be displayed, you can simply set this field to null. Just deleting the entry from the YAML header will not work in this case, as the default picture, which is just a placeholder image in form of a pictogram, will then be displayed."
+  },
+  {
+    "objectID": "tutorial.html#the-cover-letter",
+    "href": "tutorial.html#the-cover-letter",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "3. The Cover Letter",
+    "text": "3. The Cover Letter\nThis project gives you the possibility to include a cover letter, matching the design of the cv. To include a cover letter, first you need to set render-output in the YAML header of the document to either \"combined\", which is the default value, or \"letter-only\". While the first will output application documents, that include a cover letter as well as a cv, the latter one will output only a cover letter as final document.\nrender-output: \"combined\" | \"letter-only\"\nTo omit the renedring of a cover letter, choose \"cv-only\", which will result in application documents, that only consist of the cv.\nrender-output: \"cv-only\"\nIf you want to include a cover letter, configure the recipient details and write the content in the body of the document.\n\n3.1. Recipient Details\nrecipient:\n  name: \"Dr. Turing\"\n  salutation: \"Dear\"\n  valediction: \"Sincerely\n  addressee: Dr. Alan Turing\"\n  address: \"Department of Computer Science\"\n  city: \"Bletchley Park\"\n  zip: \"MK3 6EB\"\ndate: \"October 24, 2025\"\nsubject: \"Application for Research Position\"\n\n\n3.2. Letter Content\nWrite your cover letter text under the ## Coverletter heading in the main body of the document using standard Markdown.\n## Coverletter\n\nI am writing to express my interest in...\nBe aware, that you don’t have to include the salutation or the valediction / complimentary close, as this will be automatically generated, based on the values in the YAML header. For the salutation, you can use salutation: \"Name of Person to address\". The complimentary close will be generated from author.firstname and author.lastname."
+  },
+  {
+    "objectID": "tutorial.html#connecting-your-data",
+    "href": "tutorial.html#connecting-your-data",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "4. Connecting Your Data",
+    "text": "4. Connecting Your Data\nThe power of this template comes from its integration with Google Sheets. Instead of typing your work history manually into the document, you manage it in a Google spreadsheet online.\n\nCreate your Sheet: See the Data Integration guide for the expected format.\nConfigure YAML:\n\ngoogle-document:\n  auth-email: \"your.email@gmail.com\"\n  document-identifier: \"Name_of_Your_Google_Sheet\"\n  sheets-to-load:\n    - name: \"Working Experiences\" # Tab name in Google Sheets\n      shortname: \"working\"        # ID to use in shortcodes\n    - name: \"Education\"\n      shortname: \"education\"\nThis allows you to automatically parse informations from sheets in a spreadsheet in your Google Drive and insert it into the document at any section."
+  },
+  {
+    "objectID": "tutorial.html#adding-cv-sections-shortcodes",
+    "href": "tutorial.html#adding-cv-sections-shortcodes",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "5. Adding CV Sections (Shortcodes)",
+    "text": "5. Adding CV Sections (Shortcodes)\nTo display a section from your data (e.g., your work experience), use the {{&lt; cv-section &gt;}} shortcode. You place this directly in the document body.\n## Working Experience\n\n{{&lt; cv-section sheet=\"working\" func=\"resume-entry\" &gt;}}\n\nsheet: Matches the shortname you defined in the YAML.\nfunc: The layout function to use (e.g., resume-entry for standard CV entries, research-interests for simple lists).\n\nSee the Shortcodes Reference: cv-section for advanced options like filtering columns or combining bullet points."
+  },
+  {
+    "objectID": "tutorial.html#adding-publications",
+    "href": "tutorial.html#adding-publications",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "6. Adding Publications",
+    "text": "6. Adding Publications\nTo add your publication list, configure the bibliography file in the YAML and use the {{&lt; publication-list &gt;}} shortcode.\npublication-list:\n  bib-file: \"my_pubs.bib\"\n  bib-style: \"apa.csl\"\n\nbib-file: Path to your bibliography file(s), relative to your project root folder. Defaults to example bibliography files from different formats included in this extension.\nbib-style: Path to your CSL Style file, relative to your project root folder. Defaults to an altered APA 7. Edition CSL style included in this extension.\n\nYou have the possibility to choose different bibliography file formats. This extension is able to handle the following bibliography formats:\n\n\n\nFormat\nFile Suffix\nAdditional Informations\n\n\n\n\nBibLaTeX\n.bib\nBibLaTeX - CTAN\n\n\nBibTeX\n.bibtex\nBibTeX - CTAN\n\n\nCSL YAML\n.yaml\nCiteproc CSL YAML Documentation\n\n\nCSL Json\n.json\nCiteproc CSL Json Documentation\n\n\nResearch Information System (RIS)\n.ris\nRIS Documentation in RefDB Handbook\n\n\nEndNote XML\n.xml\nOfficial EndNote Documentation\n\n\n\nTo output the publication list, just insert the shortcode at the desired location in the document.\n## Publications\n\n{{&lt; publication-list &gt;}}\nSee the Shortcodes Reference: publication-list for advanced options like labeling of outlet groups or reordering."
+  },
+  {
+    "objectID": "tutorial.html#adding-an-appendix-attachments",
+    "href": "tutorial.html#adding-an-appendix-attachments",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "7. Adding an Appendix (Attachments)",
+    "text": "7. Adding an Appendix (Attachments)\nYou can append documents (e.g., transcripts, certificates) to the end of your CV using the attachments YAML key.\nattachments:\n  - name: \"Master's Transcript\"\n    file: \"assets/docs/transcript.png\"\n  - name: \"Certificate\"\n    file: \"assets/docs/cert.jpg\"\n\nSupported File Types & Typst Version\nThe types of files you can include depend on the version of Typst installed on your system. You can check your version by running quarto typst --version in your terminal.\n\nTypst &lt; 0.13.0: Supports Images only (.png, .jpg, .svg).\nTypst &gt;= 0.13.1: Adds support for embedding PDF files (.pdf)."
+  },
+  {
+    "objectID": "tutorial.html#render",
+    "href": "tutorial.html#render",
+    "title": "Tutorial: Creating Your First CV",
+    "section": "8. Render",
+    "text": "8. Render\nTo generate your PDF, run:\nquarto render my-cv.qmd"
+  },
+  {
+    "objectID": "structure.html",
+    "href": "structure.html",
+    "title": "Structure & Layout of the Extension",
+    "section": "",
+    "text": "This page explains the architecture of the academicCVTemplate extension."
+  },
+  {
+    "objectID": "structure.html#data-caching-mechanism",
+    "href": "structure.html#data-caching-mechanism",
+    "title": "Structure & Layout of the Extension",
+    "section": "1. Data Caching Mechanism",
+    "text": "1. Data Caching Mechanism\nTo avoid exceeding Google API limits and to speed up rendering, the extension uses a caching system.\n\nCache Files: Fetched data is stored in a hidden cache file. The file is called .cv_data.json is located in your project base directory and will be used by the shortcodes to inject the content of your sheets into the document.\nValidity: The cache is valid for 24 hours.\nForcing Update: If you update your Google Sheet and want to see changes immediately, you must delete the .cv_data.json file from your project root folder. The next render will force a fresh fetch."
+  },
+  {
+    "objectID": "structure.html#extension-components",
+    "href": "structure.html#extension-components",
+    "title": "Structure & Layout of the Extension",
+    "section": "2. Extension Components",
+    "text": "2. Extension Components\nThe extension operates as a Quarto Project Extension using several interacting components:\n\nPre-render Script\n\n\n\n\n\n\nFiles: _fetch_cv_data.R\nLocation: acvt/R/\n\n\n\nThe script _fetch_cv_data.R runs before any content in your .qmd file is processed. It handles authentication, fetches data from Google Sheets, and writes the structured data to .cv_data.json in the project root folder.\n\n\nFilters\n\n\n\n\n\n\nFiles: inject-metadata.lua, cover-letter.lua, embed-attachments.lua\nLocation: acvt/filters/\n\n\n\nLua filters intervene in the Pandoc conversion process to inject data and handle special content.\n\ninject-metadata.lua: Reads the entire YAML data and converts it into Typst variables. The Variables are then passed to the typst template.\ncover-letter.lua: Extracts the content under ## Coverletter and makes it available to the template.\nembed-attachments.lua: Handles the inclusion of appendix documents.\n\n\n\nShortcodes\n\n\n\n\n\n\nFiles: cv-section.lua, publications.lua\nLocation: acvt/shortcodes/\n\n\n\nThese Lua scripts provide the user-facing commands used in the .qmd file:\n\ncv-section.lua: Implements {{&lt; cv-section &gt;}}. This is the default shortcode used to display most sections of the CV. It reads the content of your sheets from .cv_data.json\npublications.lua: Implements {{&lt; publication-list &gt;}}. A shortcode for rendering publication lists.\n\n\n\nTemplate & Partials\n\n\n\n\n\n\nFiles: template.typ, typst-template.typ, helper-functions.typ, stylings.typ, parts-functions.typ, page.typ\nLocation: acvt/typst/\n\n\n\nThe main file, template.typ, orchestrates the rendering process. It determines the sequence in which the template partials are loaded and processed.\n\n\n\n\n\n\nCaution\n\n\n\nYou should generally not modify template.typ directly. Instead, modify the specific partials it loads:\n\n\n\n\n\n\n\n\n\nPartial File\nPurpose\n\n\n\n\ntypst-template.typ\nDefines the main document structure (Logic for Cover Letter vs. CV).\n\n\nhelper-functions.typ\nHelper functions for data processing and icons.\n\n\nstylings.typ\nDefines the visual identity (colors, fonts, text styles).\n\n\nparts-functions.typ\nContains the layout functions (resume-entry, etc.).\n\n\npage.typ\nConfigures page dimensions and margins.\n\n\n\nOutput: By default, the generated document is saved to the _output/ directory.\n\n\nR Components (Package Logic)\n\n\n\n\n\n\nFiles: Located in R/ (Source) or acvt/R/ (Extension)\n\n\n\nThe R scripts are divided into two categories: Runtime Scripts (used during rendering) and Package Utilities (used for setup and maintenance).\n1. Runtime Scripts (Data Fetching)\n\n\n\n\n\n\n\nFilename\nPurpose\n\n\n\n\n_fetch_cv_data.R\nThe main pre-render script. Orchestrates authentication and data loading.\n\n\nload_cv_sheets.R\nFunctions to download sheets from Google Drive.\n\n\nread_cv_sheet.R\nFunctions to parse individual sheets.\n\n\nsetup_acvt.R\nContains setup_acvt(). The interactive wizard for installing dependencies and configuring Google Auth.\n\n\n\n2. Package Utilities (Setup & Maintenance)\n\n\n\n\n\n\n\nFilename\nPurpose\n\n\n\n\nacvt_template.R\nContains acvt_template(). The logic behind the RStudio “New Project” wizard.\n\n\nupdate_template.R\nContains update_current_cv_project(). Updates the extension files in an existing project.\n\n\n\nContains update_template_from_git(). Downloads the latest template version from GitHub.\n\n\nzzz_dev.R\nContains dev_sync_template(). A developer tool to sync local source files to the installed library.\n\n\n\n\n\nAssets\nThe extension includes several static assets in _extensions/orehren/acvt/assets/.\n\n\n\n\n\n\n\nDirectory\nContent\n\n\n\n\nbib/\nBibliography files (bibliography.bib, .json, .ris, .xml, or .yml).\n\n\nimages/\nDefault profile picture (picture.jpg or .png) and example appendix files (appendix1.png, appendix2.png)."
+  },
+  {
+    "objectID": "structure.html#layout-logic-the-grid",
+    "href": "structure.html#layout-logic-the-grid",
+    "title": "Structure & Layout of the Extension",
+    "section": "3. Layout Logic (The Grid)",
+    "text": "3. Layout Logic (The Grid)\nThe template uses a consistent two-column grid layout:\n\nLeft Column (Sidebar): Narrow, right-aligned.\nRight Column (Content): Wide, left-aligned.\n\n\n\n\nSidebar Column\nContent Column\n\n\n\n\nCell 1\nCell 2\n\n\nCell 3\nCell 4\n\n\nCell 5\nCell 6\n\n\nCell …\n…\n\n\n\n\nData Processing Sequence\nWhen you use {{&lt; cv-section &gt;}}, the extension iterates through your data sheet row by row. For each row, it calls the specified Typst function (e.g., #resume-entry).\n\n\n\n\n\n\nImportant\n\n\n\nThe cv-section shortcode is agnostic regarding layout. It simply passes the column values to the function. The layout is determined entirely by the Typst function, which maps the incoming content columns to grid cells sequentially from left to right.\n\n\n\n\nExample: resume-entry Mapping\nThe resume-entry function fills the grid cells sequentially using the columns it receives, in the following order:\n\nColumn 1: Maps to Sidebar Column: Cell 1 (e.g., Date range).\nColumn 2: Maps to Content Column: Cell 2 (e.g., Job Title, bolded).\nColumn 3: Maps to Sidebar Column: Cell 3 (e.g., Sub-label or empty).\nColumn 4: Maps to Content Column: Cell 4 (e.g., Description text).\nColumn 5: Maps to Sidebar Column: Cell 5 (e.g., Bullet points/Details).\n\nWithout any manual ordering via a shortcode argument, the Typst function maps the content of the columns sequentially, one after the other. The first column content goes to the left column (Cell 1), the next to the right column (Cell 2), the third back to the left column (Cell 3—below the first entry), and so on.\nTherefore, to fully automate document creation, the content in your Google Sheets should ideally be placed in the exact sequence you want it displayed in the grid.\nHowever, relying solely on the spreadsheet order requires a clear vision of how you want to populate every section. To alter the sequence of the columns dynamically, you can use the column-order argument in the shortcode. This allows you to manually define the position of each column directly in the shortcode call, ensuring that your “Date” column is passed as Column 1, your “Title” as Column 2, and so on, regardless of their order in the source sheet."
+  },
+  {
+    "objectID": "structure.html#typst-function-reference",
+    "href": "structure.html#typst-function-reference",
+    "title": "Structure & Layout of the Extension",
+    "section": "4. Typst Function Reference",
+    "text": "4. Typst Function Reference\nThese layout functions are defined in typst/parts-functions.typ. By allowing you to specify the func in the shortcode, the template provides the flexibility to choose different layouts for different sections of your CV (e.g., a detailed list for jobs vs. a simple list for interests) without changing the underlying data structure. This extension comes with the following Typst functions to display different content types.\n\n\n\n\n\n\n\n\n\nFunction\nLayout Behavior\nUse Case\nShortcode\n\n\n\n\nresume-entry\nMaps arguments to the 2-column grid (Left, Right, Left, Right…).\nStandard CV entries (Experience, Education).\n{{&lt; cv-section &gt;}}\n\n\nresearch-interests\nSkips the first few grid positions to place content directly in the right column.\nSimple lists or bullet points.\n{{&lt; cv-section &gt;}}\n\n\npublication-list\nRenders a formatted bibliography list.\nPublication sections.\n{{&lt; publication-list &gt;}}\n\n\nvisualize-skills-list\nRenders a graphical bar chart table.\nVisualizing skill levels.\n{{&lt; cv-section &gt;}}\n\n\n\nYou can also write and provide your own custom Typst functions. To do this, declare a new function in typst/04-definitions-parts-functions.typ and then call it via the func argument in the shortcode.\nSee Shortcodes & Content for usage examples."
+  },
+  {
+    "objectID": "structure.html#package-architecture-maintenance",
+    "href": "structure.html#package-architecture-maintenance",
+    "title": "Structure & Layout of the Extension",
+    "section": "5. Package Architecture & Maintenance",
+    "text": "5. Package Architecture & Maintenance\nThe acvt R package acts as a container and manager for the Quarto extension. It ensures that users can easily create, configure, and update their CV projects.\n\nThe “Source of Truth”\nThe master version of the template files (QMD, YAML, CSS, Lua) is stored inside the R package structure at: inst/rstudio/templates/project/skeleton/\n\n\nUpdate Workflows\nThe package provides three distinct mechanisms to handle template updates, depending on the target:\n\nProject Update (update_current_cv_project):\n\nSource: The installed R package library.\nTarget: The _extensions/ folder of your current project.\nUse Case: You updated the R package and want to apply fixes to an existing CV.\n\nTemplate Hotfix (update_template_from_git):\n\nSource: The GitHub repository (ZIP download).\nTarget: The installed R package library.\nUse Case: You want to fetch the latest template version for new projects without reinstalling the full package.\n\nDeveloper Sync (dev_sync_template):\n\nSource: Your local source code folder (inst/).\nTarget: The installed R package library.\nUse Case: For package developers to test changes in the “New Project” wizard immediately."
+  },
+  {
+    "objectID": "shortcodes.html",
+    "href": "shortcodes.html",
+    "title": "Shortcodes Reference",
+    "section": "",
+    "text": "This chapter provides a detailed reference for the shortcodes included in the extension. These tools allow you to dynamically fetch, filter, and format your data from Google Sheets or local files without writing complex code."
+  },
+  {
+    "objectID": "shortcodes.html#sec-cv-section",
+    "href": "shortcodes.html#sec-cv-section",
+    "title": "Shortcodes Reference",
+    "section": "1. {{< cv-section >}}",
+    "text": "1. {{&lt; cv-section &gt;}}\nThe cv-section shortcode is the primary tool for building your CV. It acts as a bridge between your data and the layout: it fetches a specific dataset (sheet) and processes it row by row, mapping data columns to the arguments of a selected Typst layout function.\n\nArguments\n\n\n\n\n\n\n\n\n\nArgument\nDescription\nDefault\nExample\n\n\n\n\nsheet\nRequired. The shortname of the data sheet to load (defined in your YAML configuration).\n-\nsheet=\"working\"\n\n\nfunc\nRequired. The Typst function to use for rendering. This determines the grid layout.\n-\nfunc=\"resume-entry\"\n\n\npos-&lt;N&gt;\nThe Mapping Engine. Defines the content for the Nth argument (grid position) of the Typst function. Supports string interpolation and column aggregation (e.g., \"{starts_with('det') \\| , }\").\n-\npos-0=\"{Date}\"\n\n\nexclude-cols\nColumns to exclude from the Auto-Fill process. Supports tidy selection helpers.\n\"\"\nexclude-cols=\"id, notes\"\n\n\nna-action\nAction for empty values: \"omit\" (pass empty string), \"keep\" (pass none), \"string\" (pass \"NA\").\n\"omit\"\nna-action=\"string\"\n\n\n\n\n\n\nThe Mapping Logic (Hybrid Mode)\nThe power of cv-section lies in its Hybrid Mapping Logic. It combines precise control (via pos-X) with convenient automation (Auto-Fill).\nThe logic works slot by slot (Argument 0, Argument 1, Argument 2, …) for the chosen Typst function:\n\nCheck for Explicit Mapping: Is pos-&lt;current_slot&gt; defined in the shortcode?\n\nYES: Use the provided string. You can use String Interpolation to combine columns or add static text (e.g., \"{Title} at {Company}\"). The columns used here are marked as “consumed”.\nNO: Switch to Auto-Fill. Pick the next available column from your data that hasn’t been consumed or excluded yet.\n\n\nThis allows you to customize specific parts of the layout (e.g., combining dates) while letting the rest of the data fill in automatically.\n\n\nString Interpolation & Aggregation\nWhen using pos-&lt;N&gt;, you can reference column names by wrapping them in curly braces {}.\n\n1. Simple Reference & Combination\n\nSimple Reference: pos-0=\"{Location}\" inserts the value of the ‘Location’ column.\nCombination: pos-0=\"{Start} -- {End}\" combines two columns.\nFormatting: pos-1=\"**{Title}**\" adds Markdown formatting (if supported) or static text around the value.\nStatic Text: pos-2=\"Projects\" ignores data columns and passes the static string “Projects”.\n\n\n\n2. Column Aggregation (The Pipe Syntax)\nYou can aggregate multiple columns into a single string using Tidy Selectors and a Separator. This is useful for combining multiple detail columns (e.g., detail_1, detail_2, detail_3) into one block without worrying about empty values.\nSyntax: { &lt;SELECTOR&gt; | &lt;SEPARATOR&gt; }\n\nSelector: A column name, a range (colA:colB), or a helper function (like starts_with).\nSeparator: The string used to join the values.\n\nBehavior: * It finds all columns matching the selector. * It filters out empty (NA) values automatically. * It joins the remaining values using the separator.\nExample: \"{starts_with('detail') | , }\" joins all detail columns with a comma.\n\n\n\n\nExamples\n\n1. The “Auto-Pilot” (Zero Configuration)\nIf your spreadsheet columns are already in the correct order for the Typst function (e.g., Date, Title, Company), you don’t need any mapping arguments.\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\" \n&gt;}}\n\nResult: Arg 0 gets Col 1, Arg 1 gets Col 2, etc.\n\n\n\n2. Reordering & Interpolation\nSuppose your data has columns Start, End, Job, Employer, but the layout expects the Date (combined) first, then the Job.\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\" \n    pos-0=\"{Start} -- {End}\" \n    pos-1=\"{Job}\"\n&gt;}}\n\nSlot 0: Combines ‘Start’ and ‘End’.\nSlot 1: Uses ‘Job’.\nSlot 2+: Auto-fills with remaining columns (e.g., ‘Employer’) automatically.\n\n\n\n3. Adding Static Text & Formatting\nYou can inject labels or format specific fields directly in the shortcode.\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\" \n    pos-1=\"**{Role}**\" \n    pos-2=\"Team: {TeamName} at {Company}\" \n&gt;}}\n\n\n4. Handling Gaps (Skipping Slots)\nSometimes a layout function has a slot you want to leave empty (e.g., a subtitle slot you don’t use). You can explicitly set it to an empty string to skip it, or simply map the next slot to a later index.\nOption A: Explicit Empty String\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\"\n    pos-1=\"{Title}\"\n    pos-2=\"\" \n&gt;}}\nOption B: Jumping Indexes\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\"\n    pos-5=\"{Description}\"\n&gt;}}\n\n\n5. Aggregating Columns (Dynamic Lists)\nIf you have a variable number of detail columns (detail_1 to detail_7) and want to join them with a Typst line break (\\ \\), use the pipe syntax.\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\"\n    pos-5=\"{starts_with('detail') | \\\\ \\\\ }\"\n&gt;}}\n\n\n\n\nTidy Selection Helpers\nBoth exclude-cols and the interpolation syntax {...} support the following helper functions to select columns dynamically:\n\nstarts_with(\"prefix\"): Selects columns starting with the prefix (e.g., starts_with(\"detail\")).\nends_with(\"suffix\"): Selects columns ending with the suffix.\ncontains(\"string\"): Selects columns containing the substring.\nmatches(\"pattern\"): Selects columns matching a Lua pattern.\ncol_a:col_b: Selects a range of columns from col_a to col_b (inclusive).\n\n{{&lt; cv-section \n    sheet=\"working\" \n    func=\"resume-entry\"\n    exclude-cols=\"id, notes, starts_with('internal_')\"\n&gt;}}"
+  },
+  {
+    "objectID": "shortcodes.html#sec-publication-list",
+    "href": "shortcodes.html#sec-publication-list",
+    "title": "Shortcodes Reference",
+    "section": "2. {{< publication-list >}}",
+    "text": "2. {{&lt; publication-list &gt;}}\nThis shortcode automatically generates a formatted bibliography from one or more bibliography files.\n\nArguments\nYou can configure the bibliography globally in the YAML header (under publication-list:) or locally by passing arguments to the shortcode. Local arguments override YAML settings.\n\n\n\n\n\n\n\nArgument\nDescription\n\n\n\n\nbib-file\nPath to the bibliography file(s). You can list multiple files separated by commas (e.g., \"papers.bib, talks.json\"). Formats can be mixed. Defaults to example bibliography files for all formats.\n\n\nbib-style\nPath to the CSL style file. Defaults to an altered version of the CSL for APA 7. edition.\n\n\ndefault-label\nDefault Label for uncategorized items (Default: \"Other\").\n\n\ngroup-labels\nComma-separated key=value string mapping Pandoc types to custom headers (e.g., \"article=Papers, conference=Talks\"). Note: Keys must match standard Pandoc types (e.g., article, book, conference).\n\n\ngroup-order\nComma-separated list string defining the sort order. Works exactly like column-order (supports indexing).\n\n\nauthor-name\nName to highlight (e.g., “Doe, J.”).\n\n\nhighlight-author\nStyle for highlighting. Accepts keywords (bold, italic, color) or a custom Typst string pattern (e.g., \"#strong[%s]\").\n\n\n\n\n\nConfiguration & Interaction\nThe power of this shortcode lies in combining global and local configuration. Local arguments override YAML settings.\n\nExample 1: Multiple Lists (Mixed Sources)\nDefine the style and author globally in YAML, but specify the files locally.\nYAML:\npublication-list:\n  bib-style: \"assets/bib/apa-cv.csl\"\n  author-name: \"Doe, J.\"\nDocument:\n## Peer-Reviewed Papers\n{{&lt; publication-list bib-file=\"journals.bib, conferences.yaml\" &gt;}}\n\n## Presentations\n{{&lt; publication-list bib-file=\"talks.json\" &gt;}}\n\n\nExample 2: Grouping and Ordering\nYou can customize the group labels (using Pandoc types) and their order (using names or indices).\n{{&lt; publication-list \n    group-labels=\"article=Journal Papers, conference=Conference Proceedings\" \n    group-order=\"Journal Papers=1, Conference Proceedings=2, Other\" \n&gt;}}\nNote that group-order uses the custom labels you defined.\n\n\n\nAuthor Highlighting\nYou can highlight specific author names (e.g., make them bold) in the bibliography.\n\nAutomatic Inference: If author-name is not set, the extension attempts to infer it from the author.lastname and author.firstname fields in your YAML header.\n\nNote: This works best for citation styles that use the standard Lastname, F. format.\n\nManual Configuration: Set author-name to the exact string produced by the citation style (e.g., “Doe, J.” for APA).\n\nStyling (highlight-author): You can customize how the name is highlighted using keywords or a custom Typst string.\n\nbold (Default) -&gt; Doe, J.\nitalic -&gt; Doe, J.\ncolor -&gt; Uses the document’s accent color.\nCustom Typst String: You can pass a raw Typst format string where %s represents the author name.\n\nExample: highlight-author=\"#text(fill: red, weight: \\\"bold\\\")[%s]\""
+  },
+  {
+    "objectID": "shortcodes.html#visualizing-skills",
+    "href": "shortcodes.html#visualizing-skills",
+    "title": "Shortcodes Reference",
+    "section": "3. Visualizing Skills",
+    "text": "3. Visualizing Skills\nTo create a graphical representation of your skills (bar charts), you can use the visualize-skills-list function as part of the cv-section shortcode.\n\nPrerequisites\nYour data sheet must contain a column named value with numeric values between 0.0 and 1.0.\n\n\nUsage\nUse cv-section with func=\"visualize-skills-list\". This will process your skills data and render the visualization.\n## Skills\n{{&lt; cv-section sheet=\"skills\" func=\"visualize-skills-list\" &gt;}}"
+  },
+  {
+    "objectID": "styling.html",
+    "href": "styling.html",
+    "title": "Advanced Styling Guide",
+    "section": "",
+    "text": "This template provides several ways to customize the visual appearance of your CV and cover letter, from simple YAML options to modifying the underlying Typst stylesheets."
+  },
+  {
+    "objectID": "styling.html#basic-styling-with-yaml",
+    "href": "styling.html#basic-styling-with-yaml",
+    "title": "Advanced Styling Guide",
+    "section": "1. Basic Styling with YAML",
+    "text": "1. Basic Styling with YAML\nThe easiest way to change the look of your document is by using the style object in the YAML header. For a complete list of options, see the YAML Reference.\n\ncolor-accent\nThis sets the primary color used for heading accents, links, and other highlighted elements.\nType: String (Hex color code)\nExample:\nstyle:\n  color-accent: \"#2a9d8f\" # A dark teal color\n\n\nfont-header and font-text\nThese options allow you to change the fonts used in the document. Provide a list of font names. Typst will try each font in order until it finds one installed on your system.\nType: List of Strings\nExample:\nstyle:\n  font-header: [\"Calibri\", \"Arial\", \"sans-serif\"]\n  font-text: [\"Garamond\", \"Times New Roman\", \"serif\"]\n\n\nFonts & Rendering\nThis template is designed to look best with the Roboto, Source Sans and Lato font families.\nRecommendation:\nFor the intended visual result, please install these fonts on your system:\n\nDownload Robto\nDownload Source Sans Pro\nDownload Lato\n\nUnderstanding Font Warnings:\nWhen rendering, you might see warnings in the console like:\nwarning: unknown font family: lato\nThis is normal behavior if you haven’t installed the specific fonts. It means:\n\nTypst looked for “Lato” but couldn’t find it on your system.\nTypst is now automatically falling back to the built-in fonts (Libertinus Serif).\nYour PDF will still be generated correctly, but it will use a serif font style instead of the intended sans-serif style."
+  },
+  {
+    "objectID": "styling.html#advanced-styling-typst-inline-code",
+    "href": "styling.html#advanced-styling-typst-inline-code",
+    "title": "Advanced Styling Guide",
+    "section": "2. Advanced Styling (Typst Inline Code)",
+    "text": "2. Advanced Styling (Typst Inline Code)\nA powerful feature is the ability to use Typst inline code directly within your Google Sheet data.\n\nHow it Works\nThe template processes data in markup mode. You can use the # symbol to call Typst functions or standard Typst syntax (like \\ for line breaks).\nExample: Highlight a project name and force a line break.\nIn Google Sheets:\n\n\n\n\n\n\n\ntitle\nlocation\n\n\n\n\nResearch Associate in #text(fill: rgb(\"5e81ac\"), weight: \"bold\")[My Project]\nUniversity  of Science\n\n\n\nRendered Result: * “My Project” appears in the accent color and bold. * “University” and “of Science” appear on separate lines.\nContext: The content is handled as if it is in Typst markup mode. * #text(...)[] works. * text(...)[] (without hash) does not work.\nFor available functions, see the Official Typst Documentation."
+  },
+  {
+    "objectID": "styling.html#advanced-styling-modifying-typst",
+    "href": "styling.html#advanced-styling-modifying-typst",
+    "title": "Advanced Styling Guide",
+    "section": "3. Advanced Styling (Modifying Typst)",
+    "text": "3. Advanced Styling (Modifying Typst)\nFor users who want more control, you can directly modify the Typst style files located in the _extensions/orehren/acvt/typst/ directory.\n\n\n\n\n\n\nWarning\n\n\n\nModifying these files requires some knowledge of the Typst language. Always make a backup before making changes.\n\n\n\nKey Files\n\nstylings.typ: This is the main stylesheet. It defines all the core styles, such as colors and font sizes, as #let variables. This is the best place to start for most advanced changes. For example, you can change the default font sizes:\n// in stylings.typ\n#let font-size-large = 18pt\n#let font-size-middle = 12pt\n#let font-size-small = 10pt\ntypst-show.typ: This file controls the appearance of specific document elements, like headings, using #show rules. For example, you could change the style of a level-2 heading:\n// in typst-show.typ\n#show heading.where(level: 2): it =&gt; {\n    set text(fill: blue, weight: \"bold\") // Change to bold and blue\n    it.body\n}\nparts-functions.typ: This file contains the functions that render larger components, like the title-page. You can modify the layout of these components here. For example, you could change the alignment or spacing of elements on the title page.\n\n\n\nHow to Apply Changes\n\nOpen the relevant .typ file in a text editor.\nMake your desired changes.\nSave the file.\nRe-render your .qmd document with quarto render.\n\nYour changes will be immediately reflected in the new PDF output.\n\n\nTypst Template Structure\nFor users who want to modify the core layout, the Typst files are located in the typst/ subdirectory of the extensions root folder.\n\n\nFile Overview\n\n\n\n\n\n\n\nFile\nPurpose\n\n\n\n\ntemplate.typ\nThe main entry point. Orchestrates the loading of partials.\n\n\ntypst-template.typ\nContains the main document structure and logic.\n\n\nhelper-functions.typ\nHelper functions for data processing and icons.\n\n\ninjected-meta-data\nAuto-generated. Contains the metadata injected from your YAML.\n\n\ninjected-cover-letter\nAuto-generated. Contains the content of the cover letter.\n\n\nstylings.typ\nDefines colors, fonts, and text styles.\n\n\nparts-functions.typ\nDefines the layout components (resume-entry, visualize-skills-list, title page, footer).\n\n\npage.typ\nPage setup (margins, size).\n\n\ntypst-show.typ\nGlobal show rules.\n\n\n\nTo customize these files, you can copy them to your project root and update the template-partials in your _extension.yml (or _quarto.yml) to point to your local versions."
+  },
+  {
+    "objectID": "update_template.html",
+    "href": "update_template.html",
+    "title": "Template & Update Management",
+    "section": "",
+    "text": "Since Quarto extensions are file-based (files are copied into your project folder upon creation), existing projects do not automatically benefit from updates to the R package.\nThe acvt package provides three specialized functions to keep your templates and projects up to date."
+  },
+  {
+    "objectID": "update_template.html#overview-which-tool-for-which-purpose",
+    "href": "update_template.html#overview-which-tool-for-which-purpose",
+    "title": "Template & Update Management",
+    "section": "Overview: Which tool for which purpose?",
+    "text": "Overview: Which tool for which purpose?\n\n\n\n\n\n\n\n\n\n\nFunction\nAudience\nSource\nDestination\nPurpose\n\n\n\n\nupdate_current_cv_project()\nUser\nInstalled R Package\nCurrent Project (_extensions/)\nUpdates an existing CV after a package update.\n\n\nupdate_template_from_git()\nUser\nGitHub (Main Branch)\nInstalled R Package\nUpdates the template for new projects without reinstalling the package (“Hotfix”).\n\n\ndev_sync_template()\nDeveloper\nLocal Source (inst/)\nInstalled R Package\nTests changes to the template immediately in the “New Project” wizard."
+  },
+  {
+    "objectID": "update_template.html#updating-existing-projects",
+    "href": "update_template.html#updating-existing-projects",
+    "title": "Template & Update Management",
+    "section": "1. Updating Existing Projects",
+    "text": "1. Updating Existing Projects\n\nupdate_current_cv_project()\nThis function is designed for end-users who are already working on a CV. If a new version of the acvt package is released (e.g., containing bug fixes for the Lua filter or CSS updates), your existing project will initially remain on the old version.\nThis function copies the extension files from your currently installed R library into your active project directory.\nUsage: Run this command in the R console while your CV project is open in RStudio:\nacvt::update_current_cv_project()\nWhat happens: 1. Checks if you are in a valid CV project (_quarto.yml exists). 2. Deletes the folder _extensions/orehren/acvt. 3. Copies the version from the installed R package to this location.\n\n\n\n\n\n\nWarningWarning: Overwrite\n\n\n\nAny manual changes you have made directly to files inside the _extensions/ folder will be lost. However, changes to your cv.qmd or _quarto.yml remain untouched."
+  },
+  {
+    "objectID": "update_template.html#updating-the-template-installation-hotfix",
+    "href": "update_template.html#updating-the-template-installation-hotfix",
+    "title": "Template & Update Management",
+    "section": "2. Updating the Template Installation (Hotfix)",
+    "text": "2. Updating the Template Installation (Hotfix)\n\nupdate_template_from_git()\nThis function updates the template (“Skeleton”) stored inside the R package, which is used by the RStudio “New Project” wizard. It downloads the latest files directly from GitHub.\nThis is useful for quickly obtaining the latest version of the template without going through the process of a full package re-installation (devtools::install_github(...)).\nUsage:\n# Standard: Downloads from the main branch\nacvt::update_template_from_git()\n\n# Optional: Choose a different branch or repository\nacvt::update_template_from_git(branch = \"develop\")\nWhat happens: 1. Downloads the repository as a ZIP file from GitHub. 2. Extracts the folder inst/rstudio/templates/project/skeleton. 3. Overwrites the corresponding folder in your R library.\nEffect: All future projects created via the wizard will now use this version. Existing projects are not affected.\n\n\n\n\n\n\nNotePermissions\n\n\n\nThis function requires write access to your R library folder. On Windows and macOS (User Library), this is usually not an issue. In managed Linux environments (System Library), this might fail if you do not have sufficient permissions."
+  },
+  {
+    "objectID": "update_template.html#development-testing",
+    "href": "update_template.html#development-testing",
+    "title": "Template & Update Management",
+    "section": "3. Development & Testing",
+    "text": "3. Development & Testing\n\ndev_sync_template()\nThis function is a tool purely for package developers. It accelerates the “Edit-Test-Loop” when working on the template files (cv.qmd, template.dcf, etc.).\nInstead of having to rebuild and reinstall the package (Install & Restart) after every change to inst/, this function synchronizes the files immediately.\nUsage: Must be run from the root directory of the acvt source package:\nacvt::dev_sync_template()\nWhat happens: 1. Takes the files from your local development folder inst/rstudio/templates/project/skeleton. 2. Copies them directly into the package’s installation folder in the R library.\nWorkflow: 1. Make changes to inst/.../academicCV-template.qmd. 2. Run acvt::dev_sync_template(). 3. Open File -&gt; New Project in RStudio -&gt; The changes are visible immediately."
+  },
+  {
+    "objectID": "data_integration.html",
+    "href": "data_integration.html",
+    "title": "Data Integration",
+    "section": "",
+    "text": "This template separates content from layout by fetching data from Google Sheets."
+  },
+  {
+    "objectID": "data_integration.html#setup-data-integration",
+    "href": "data_integration.html#setup-data-integration",
+    "title": "Data Integration",
+    "section": "1. Setup Data Integration",
+    "text": "1. Setup Data Integration\nBefore you can render your CV, you must authenticate with Google Drive. The extension’s pre-render script runs non-interactively, so it relies on a cached authentication token.\n\nStep 1: Authenticate Interactively\nOpen your R console (in your project directory) and run:\nlibrary(googledrive)\ndrive_auth()\n\nThis will open a browser window.\nLog in with the Google account that has access to your CV spreadsheet.\nGrant the requested permissions.\n\n\n\nStep 2: Ensure Token Availability\nThe authentication token is typically stored in a user-level cache (e.g., ~/.cache/gargle). The Quarto render process needs to access this token to fetch your data.\n\nRun in Project Context: The most reliable method is to run the drive_auth() command in the R Console of your project (e.g., inside RStudio with your project open). This ensures that the token is cached in a location accessible to the project’s environment.\nMatch the Email: Ensure that the email address you use to log in matches exactly with the auth-email you specify in the google-document YAML configuration. The pre-render script uses this email to look up the correct token.\nPersistence: Once authenticated interactively once, the token persists. You do not need to run drive_auth() every time you render, only when the token expires or becomes invalid."
+  },
+  {
+    "objectID": "data_integration.html#configuration",
+    "href": "data_integration.html#configuration",
+    "title": "Data Integration",
+    "section": "2. Configuration",
+    "text": "2. Configuration\nIn your .qmd file, configure the connection in the google-document YAML block.\ngoogle-document:\n  auth-email: \"your.email@gmail.com\" # The email you authenticated with\n  document-identifier: \"Name_of_Your_Sheet\"\n  sheets-to-load:\n    - name: \"Working Experiences\"\n      shortname: \"working\"\nFor a detailed explanation of all available configuration options, please refer to the google-document section in the YAML Reference."
+  },
+  {
+    "objectID": "data_integration.html#spreadsheet-structure",
+    "href": "data_integration.html#spreadsheet-structure",
+    "title": "Data Integration",
+    "section": "3. Spreadsheet Structure",
+    "text": "3. Spreadsheet Structure\nYour Google Sheet should have separate tabs for each section. The first row must contain Column Headers.\n\nExample: Skills (Visualized)\nFor the visual skills bar (using visualize-skills-list), your data must include a value column (0.0 - 1.0):\n\n\n\narea\nskill\nvalue\nlevel\n\n\n\n\nLanguages\nEnglish\n1.0\nNative\n\n\nTech\nR\n0.9\nExpert\n\n\n\n\n\nExample: Working Experience\n\n\n\ntitle\nlocation\ndescription\nstart\nend\n\n\n\n\nResearcher\nUni X\nProject Y\n2020\n2024"
+  },
+  {
+    "objectID": "data_integration.html#connecting-data-to-layout",
+    "href": "data_integration.html#connecting-data-to-layout",
+    "title": "Data Integration",
+    "section": "4. Connecting Data to Layout",
+    "text": "4. Connecting Data to Layout\nOnce your data is structured in Google Sheets, you need to tell the template where and how to display it. You do this using the cv-section shortcode.\nThis shortcode acts as a bridge: it fetches the data from the sheet you specify (e.g., working) and passes each row to a Typst layout function (e.g., resume-entry).\n{{&lt; cv-section sheet=\"working\" func=\"resume-entry\" &gt;}}\nBy default, the columns in your sheet are passed to the layout function in the order they appear. If you need to customize this mapping (e.g., if your sheet columns are in a different order than the layout expects), you can use the column-order argument.\nFor a complete guide on how to control this mapping, combine columns, and filter data, please consult the cv-section section in the Shortcodes Reference."
+  }
+]
