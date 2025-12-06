@@ -1,8 +1,6 @@
 ---
-title: "Shortcodes & Content"
+title: "Shortcodes Reference"
 ---
-
-# Shortcodes Reference
 
 This chapter provides a detailed reference for the shortcodes included in the extension. These tools allow you to dynamically fetch, filter, and format your data from Google Sheets or local files without writing complex code.
 

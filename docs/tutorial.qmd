@@ -1,8 +1,6 @@
 ---
-title: "Tutorial: Your First CV"
+title: "Tutorial: Creating Your First CV"
 ---
-
-# Tutorial: Creating Your First CV
 
 This tutorial will guide you through the process of creating a complete CV and cover letter using the `academicCV-template.qmd` file.
 
