@@ -251,6 +251,10 @@ sheets-to-load:
 
 Configures the automated bibliography generation.
 
+::: {.callout-important}
+The publication list generation does not use the standard citation framework from Quarto and Typst. This framework is disabled in this extension. Therefore, the usual YAML fields (`bibliography`, `csl`, etc.) have no effect, and citations in the traditional way are not possible. To restore this functionality, add `surpress-bibliography: true` to the document's YAML header.
+:::
+
 ### `publication-list`
 **Type:** Object (`bib_file`, `bib_style`, `author_name`, `typst_func_name`, `default_label`, `group_labels`, `group_order`)
 
