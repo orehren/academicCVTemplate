@@ -2,8 +2,6 @@
 title: "Acknowledgements"
 ---
 
-# Acknowledgements
-
 This project was made possible by the excellent work of the open-source community. We were inspired by and, in some cases, directly borrowed code and ideas from the following projects. We are deeply grateful for their contributions.
 
 ## 1. Awesome-CV

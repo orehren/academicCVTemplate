@@ -1,8 +1,6 @@
 ---
-title: "YAML Reference"
+title: "Complete YAML Reference"
 ---
-
-# Complete YAML Reference
 
 This page provides a comprehensive reference for all the configuration options available in the YAML frontmatter of your `.qmd` file.
 
